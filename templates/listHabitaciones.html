@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Habitaciones</title>
+</head>
+<body>
+    <h2>Habitaciones</h2>
+
+    <table>
+        <tr>
+            <th>Número</th>
+            <th>Plazas</th>
+        </tr>
+        {% for hab in habitaciones %}
+        <tr>
+            <td>{{ hab.numero }}</td>
+            <td>{{ hab.plazas }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
