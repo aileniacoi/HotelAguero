@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid my-3">
+    <h3>Clientes</h3>
+<div class="table-responsive">
+
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Dni</th>
+            <th>Teléfono</th>
+            <th style="width:1%"></th>
+            <th style="width:1%"></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for cliente in clientes %}
+        <tr>
+            <td>{{ cliente.nombreYApellido }}</td>
+            <td>{{ cliente.dni }}</td>
+            <td>{{ cliente.telefono }}</td>
+            <td style="width:1%">Editar</td>
+            <td style="width:1%">Borrar</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+</div>
+{% endblock %}

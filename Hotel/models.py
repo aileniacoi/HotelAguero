@@ -8,6 +8,7 @@ class Habitacion(models.Model):
     numero = models.IntegerField()
     esPlantaBaja = models.BooleanField(verbose_name='Planta baja')
     plazas = models.IntegerField()
+#    habilitada = models.BooleanField()
 
     def __str__(self):
         return f'N° {self.numero}'
@@ -78,7 +79,7 @@ class DescuentoDetalleListaPrecio(models.Model):
     precioPorDia = models.DecimalField(decimal_places=2, max_digits=10)
     idDetalleListaPrecio = models.ForeignKey(DetalleListaPrecio, on_delete=models.CASCADE)
     cantidadDias = models.IntegerField()
-    
+
     def __str__(self):
         return f'{self.cantidadDias} días - ${self.precioTotalRedondeado}'
 

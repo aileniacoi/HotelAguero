@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container-fluid my-3">
+  <h3>Reservas</h3>
+  <div id="accordion">
+
+      {% for reserva in reservas %}
+    <div class="card">
+      <div class="card-header">
+        <a class="btn" data-bs-toggle="collapse" href="#collapse{{ forloop.counter }}">
+            {{ reserva.idCliente }} - {{ reserva.fechaIngreso }}
+        </a>
+          <button style="float: right;">Editar</button>
+      </div>
+      <div id="collapse{{ forloop.counter }}" class="collapse" data-bs-parent="#accordion">
+        <div class="card-body">
+            {{ reserva.cantidadPersonas }}
+        </div>
+      </div>
+    </div>
+
+      {% endfor %}
+  </div>
+
+{% endblock %}
