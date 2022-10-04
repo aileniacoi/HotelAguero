@@ -3,11 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{ title }} | Hotel Agüero</title>
-
-    <link rel="icon" href="{% static 'Hotel/logo-imagen.png' %}">
-
-    <script src="https://kit.fontawesome.com/0b058192e0.js" crossorigin="anonymous"></script>
+    <title>Title</title>
 
     <!-- CSS only -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -21,8 +17,8 @@
 <div class="container-fluid">
     <nav class="navbar navbar-expand-sm" style="background-color:#F3B13C">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">
-      <img src="{% static 'Hotel/logo1.png' %}" alt="logo" style="width:50px;" class="rounded-pill">
+    <a class="navbar-brand btn btn-light" href="/index">
+      <img src="{% static 'Hotel/logo1.png' %}" alt="logo" style="width:40px;" class="">
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
       <span class="navbar-toggler-icon"></span>
@@ -41,7 +37,7 @@
           <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Precios</a>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="/listasPrecio">Lista</a></li>
+            <li><a class="dropdown-item" href="#">Lista</a></li>
             <li><a class="dropdown-item" href="#">Calendario</a></li>
           </ul>
       </li>

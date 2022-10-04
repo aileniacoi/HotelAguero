@@ -20,6 +20,10 @@ def inicio(request):
     context = {'cantidad': cantidad}
     return render(request, 'base.html', context)
 
+def index(request):
+    context = {}
+    return render(request, 'index.html', context)
+
 
 def habitaciones(request):
     habitaciones = Habitacion.objects.all()
