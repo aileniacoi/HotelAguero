@@ -2,7 +2,16 @@
 {% block content %}
 
 <div class="container-fluid my-3">
-  <h3>Reservas</h3>
+   <div class="row">
+       <div class="col-md-10">
+            <h3 class="m-3" style ="float:left;">Reservas</h3>
+
+       </div>
+       <div class="col-md-2">
+
+            <a class="btn btn-success m-3" href="add" style="float: right;">Agregar</a>
+       </div>
+   </div>
   <div id="accordion">
 
       {% for reserva in reservas %}
@@ -11,11 +20,29 @@
         <a class="btn" data-bs-toggle="collapse" href="#collapse{{ forloop.counter }}">
             {{ reserva.idCliente }} - {{ reserva.fechaIngreso }}
         </a>
-          <button style="float: right;">Editar</button>
+          <div style="float: right;">
+            <a class="btn btn-outline-primary btn-sm" href="edit/{{ cliente.pk }}">Editar</a>
+            <a class="btn btn-outline-danger btn-sm" href="delete/{{ cliente.pk }}">Borrar</a>
+          </div>
       </div>
       <div id="collapse{{ forloop.counter }}" class="collapse" data-bs-parent="#accordion">
         <div class="card-body">
-            {{ reserva.cantidadPersonas }}
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped mx-5" style="width: 300px">
+                    <tr>
+                        <td style="width: 80px;"><i class="fa-sharp fa-solid fa-person"></i></td>
+                        <td>{{ reserva.cantidadPersonas }} pax</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 80px;"><i class="fa-solid fa-bed"></i></td>
+                        <td>{{ reserva.idHabitacion }}</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 80px;"><i class="fa-solid fa-money-bill-1"></i></td>
+                        <td>{{ reserva.precioTotal }}</td>
+                    </tr>
+                </table>
+            </div>
         </div>
       </div>
     </div>

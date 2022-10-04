@@ -1,20 +1,32 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container-fluid my-3">
-        <h3>Habitaciones</h3>
+        <div class="row">
+       <div class="col-md-10">
+            <h3 class="m-3" style ="float:left;">Habitaciones</h3>
 
+       </div>
+       <div class="col-md-2">
+
+            <a class="btn btn-success m-3" href="add" style="float: right;">Agregar</a>
+       </div>
+   </div>
     <div class="table-responsive">
         <table class="table table-bordered">
         <tr>
             <th>Número</th>
             <th>Plazas</th>
             <th>Habilitada</th>
+            <th style="width: 1%"></th>
+            <th style="width: 1%"></th>
         </tr>
         {% for hab in habitaciones %}
         <tr>
             <td>{{ hab.numero }}</td>
             <td>{{ hab.plazas }}</td>
             <td></td>
+            <td style="width: 1%"><a class="btn btn-outline-primary btn-sm" href="edit/{{ cliente.pk }}">Editar</a></td>
+            <td style="width: 1%"><a class="btn btn-outline-danger btn-sm" href="delete/{{ cliente.pk }}">Borrar</a></td>
         </tr>
         {% endfor %}
     </table>
