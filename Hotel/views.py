@@ -46,10 +46,15 @@ def clientes(request):
 class ClienteNuevoView(FormView):
     template_name = 'clienteForm.html'
     form_class = ClienteForm
+    success_url = '/movexitoso'
 
     def form_valid(self, form):
         form.save()
         return super().form_valid(form)
+
+class FormSuccessView(View):
+        def get(self, request, *args, **kwargs):
+            return HttpResponse("Cliente grabado exitosamente")
 
 
 class ClienteModView(UpdateView):
