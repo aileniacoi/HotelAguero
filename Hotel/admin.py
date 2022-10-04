@@ -1,5 +1,5 @@
 from django.contrib import admin
-from Hotel.models import Habitacion, Cliente, Reserva, ListaPrecio, DetalleListaPrecio, DescuentoDetalleListaPrecio
+from Hotel.models import Habitacion, Cliente, Reserva, ListaPrecio, DetalleListaPrecio
 from Hotel.models import MovimientoCaja
 
 # Register your models here.
@@ -38,5 +38,4 @@ admin.site.register(Reserva, AdminReserva)
 admin.site.register(Cliente, AdminCliente)
 admin.site.register(ListaPrecio, AdminListaPrecio)
 admin.site.register(DetalleListaPrecio, AdminDetalleListaPrecio)
-admin.site.register(DescuentoDetalleListaPrecio)
 admin.site.register(MovimientoCaja, AdminMovimientoCaja)

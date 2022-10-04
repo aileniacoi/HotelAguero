@@ -8,7 +8,8 @@ class Habitacion(models.Model):
     numero = models.IntegerField()
     esPlantaBaja = models.BooleanField(verbose_name='Planta baja')
     plazas = models.IntegerField()
-#    habilitada = models.BooleanField()
+    habilitada = models.BooleanField()
+    reservas = models.ManyToManyField("Cliente", through="Reserva")
 
     def __str__(self):
         return f'N° {self.numero}'
@@ -18,9 +19,10 @@ class Cliente(models.Model):
     """Clientes que reservaron en el hotel"""
     nombreYApellido = models.CharField(max_length=200, verbose_name='Nombre y apellido')
     dni = models.CharField(max_length=10, blank=True)
-    email = models.EmailField()
+    email = models.EmailField(blank=True)
     telefono = models.CharField(max_length=15)
     direccion = models.CharField(max_length=200, blank=True)
+    reservas = models.ManyToManyField("Habitacion", through="Reserva")
 
     def __str__(self):
         return self.nombreYApellido
@@ -34,10 +36,11 @@ class Reserva(models.Model):
     idHabitacion = models.ForeignKey(Habitacion, on_delete=models.CASCADE)
     idCliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, verbose_name='Cliente')
     senia = models.DecimalField(decimal_places=2, max_digits=10, null=True, verbose_name='Seña')
-    precioTotal = models.DecimalField(decimal_places=2, max_digits=10)
+    precioTotal = models.DecimalField(decimal_places=2, max_digits=10, null=True)
     precioPorDia = models.DecimalField(decimal_places=2, max_digits=10)
     incluyeDesayuno = models.BooleanField()
     observaciones = models.TextField(max_length=500, blank=True)
+
 
     def __str__(self):
         return f'{self.idCliente} - {self.fechaIngreso}'
@@ -45,6 +48,15 @@ class Reserva(models.Model):
 
 class ListaPrecio(models.Model):
     """Listas de precios"""
+    TEMPORADABAJA = 'TB'
+    TEMPORADAMEDIA = 'TM'
+    TEMPORADAALTA = 'TA'
+    TIPOLISTA = [
+        (TEMPORADAALTA, 'Temporada Alta'),
+        (TEMPORADAMEDIA, 'Temporada Media'),
+        (TEMPORADABAJA, 'Temporada Baja'),
+    ]
+    idTipoLista = models.CharField(choices=TIPOLISTA, max_length=3)
     vigenciaDesde = models.DateField()
     vigenciaHasta = models.DateField()
     
@@ -61,27 +73,27 @@ class DetalleListaPrecio(models.Model):
     def __str__(self):
         return f'{self.cantidadPersonas} pers. - $ {self.precioPorDia}'
     
-    
-class DescuentoDetalleListaPrecio(models.Model):
-    """Descuento sobre los detalles en listas de precio"""
-    CINCOPORCIENTO = 'CP'
-    DIEZPORCIENTO = 'DP'
-    QUINCEPORCIENTO = 'QP'
-    VEINTEPORCIENTO = 'VP'
-    DESCUENTO = [
-        (CINCOPORCIENTO, '5%'),
-        (DIEZPORCIENTO, '10%'),
-        (QUINCEPORCIENTO, '15%'),
-        (VEINTEPORCIENTO, '20%'),
-    ]
-    idDescuento = models.CharField(choices=DESCUENTO, verbose_name='Porcentaje de descuento', max_length=3)
-    precioTotalRedondeado = models.DecimalField(decimal_places=2, max_digits=10)
-    precioPorDia = models.DecimalField(decimal_places=2, max_digits=10)
-    idDetalleListaPrecio = models.ForeignKey(DetalleListaPrecio, on_delete=models.CASCADE)
-    cantidadDias = models.IntegerField()
-
-    def __str__(self):
-        return f'{self.cantidadDias} días - ${self.precioTotalRedondeado}'
+#
+# class DescuentoDetalleListaPrecio(models.Model):
+#     """Descuento sobre los detalles en listas de precio"""
+#     CINCOPORCIENTO = 'CP'
+#     DIEZPORCIENTO = 'DP'
+#     QUINCEPORCIENTO = 'QP'
+#     VEINTEPORCIENTO = 'VP'
+#     DESCUENTO = [
+#         (CINCOPORCIENTO, '5%'),
+#         (DIEZPORCIENTO, '10%'),
+#         (QUINCEPORCIENTO, '15%'),
+#         (VEINTEPORCIENTO, '20%'),
+#     ]
+#     idDescuento = models.CharField(choices=DESCUENTO, verbose_name='Porcentaje de descuento', max_length=3)
+#     precioTotalRedondeado = models.DecimalField(decimal_places=2, max_digits=10)
+#     precioPorDia = models.DecimalField(decimal_places=2, max_digits=10)
+#     idDetalleListaPrecio = models.ForeignKey(DetalleListaPrecio, on_delete=models.CASCADE)
+#     cantidadDias = models.IntegerField()
+#
+#     def __str__(self):
+#         return f'{self.cantidadDias} días - ${self.precioTotalRedondeado}'
 
 
 class MovimientoCaja(models.Model):
