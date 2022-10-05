@@ -15,6 +15,20 @@ from django.views import View
 # Create your views here.
 
 
+class SuccessMessageMixin:
+    success_message = ''
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        success_message = self.get_success_message(form.cleaned_data)
+        if success_message:
+            messages.success(self.request, success_message)
+        return response
+
+    def get_success_message(self, cleaned_data):
+        return self.success_message % cleaned_data
+
+
 def inicio(request):
     cantidad = Habitacion.objects.count()
     context = {'cantidad': cantidad}
@@ -34,7 +48,7 @@ def habitaciones(request):
 def detHabitacion(request, id):
     habitacion = Habitacion.objects.filter(id=id).first()
     context = {'habitacion': habitacion}
-    return render(request, 'listHabitaciones.html', context)
+    return render(request, 'habitacionform.html', context)
 
 
 def clientes(request):
@@ -57,17 +71,23 @@ class FormSuccessView(View):
             return HttpResponse("Cliente grabado exitosamente")
 
 
-class ClienteModView(UpdateView):
+class ClienteModView(SuccessMessageMixin, UpdateView):
     model = Cliente
     form_class = ClienteForm
     template_name = 'clienteForm.html'
-    success_url = '/movexitoso'
+    success_message = "Cliente actualizado correctamente"
 
 
 class ClienteBajaView(DeleteView):
     model = Cliente
     template_name = 'clienteBaja.html'
-    success_url = '/movexitoso'
+
+
+
+class ClienteDetalleView(DetailView):
+    model = Cliente
+    template_name = 'clienteForm.html'
+    success_message = "Gracias...!"
 
 
 def reservas(request):
