@@ -60,7 +60,7 @@ def clientes(request):
 class ClienteNuevoView(FormView):
     template_name = 'clienteForm.html'
     form_class = ClienteForm
-    success_url = '/movexitoso'
+    success_url = '/clientes'
 
     def form_valid(self, form):
         form.save()
@@ -94,6 +94,11 @@ def reservas(request):
     reservas = Reserva.objects.all()
     context = {'reservas': reservas, 'title': 'Reservas'}
     return render(request, 'listReservas.html', context)
+
+
+class ReservasDetalleView(DetailView):
+    model = Reserva
+    template_name = 'reservasForm.html'
 
 
 def listasPrecio(request):

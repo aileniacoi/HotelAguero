@@ -13,3 +13,8 @@ class ClienteForm(forms.ModelForm):
             'telefono': forms.TextInput(attrs={'class': 'form-control'}),
             'direccion': forms.TextInput(attrs={'class': 'form-control'}),
         }
+
+class ReservaForm(forms.ModelForm):
+    class Meta:
+        model = Reserva
+        fields = "__all__"
