@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from Hotel.views import ReservasDetalleView
 
 urlpatterns = [
     path('', views.inicio, name='vInicio'),
@@ -14,6 +15,7 @@ urlpatterns = [
     path('clientes/viewdetail/<int:pk>', views.cliente_edit, name='detailCliente'),
     path('clientes/delete/<int:pk>', views.ClienteModView.as_view(), name='detailCliente'),
     path('reservas/', views.reservas),
+    path('reservas/reservasdetail/<int:pk>/', ReservasDetalleView.as_view(), name='detalleReserva'),
     path('listasPrecio/', views.listasPrecio),
 
 ]

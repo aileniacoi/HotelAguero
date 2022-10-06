@@ -57,7 +57,7 @@ def clientes(request):
     return render(request, 'listClientes.html', context)
 
 
-class ClienteNuevoView(SuccessMessageMixin, FormView):
+class ClienteNuevoView(FormView):
     template_name = 'clienteForm.html'
     form_class = ClienteForm
     success_message = "Cliente agregado correctamente"
@@ -65,6 +65,10 @@ class ClienteNuevoView(SuccessMessageMixin, FormView):
     def form_valid(self, form):
         form.save()
         return super().form_valid(form)
+
+class FormSuccessView(View):
+        def get(self, request, *args, **kwargs):
+            return HttpResponse("Cliente grabado exitosamente")
 
 
 class ClienteModView(SuccessMessageMixin, UpdateView):
@@ -80,7 +84,7 @@ class ClienteBajaView(DeleteView):
 
 
 
-class ClienteDetalleView(SuccessMessageMixin, DetailView):
+class ClienteDetalleView(DetailView):
     model = Cliente
     template_name = 'clienteForm.html'
     success_message = "Gracias...!"
@@ -109,6 +113,11 @@ def reservas(request):
     reservas = Reserva.objects.all()
     context = {'reservas': reservas, 'title': 'Reservas'}
     return render(request, 'listReservas.html', context)
+
+
+class ReservasDetalleView(DetailView):
+    model = Reserva
+    template_name = 'reservasForm.html'
 
 
 def listasPrecio(request):
