@@ -2,8 +2,54 @@
 {% block content %}
 
    <div class="container-fluid">
-    <h3>Reserva detalles</h3>
-
+       <h3>Reserva detalles</h3>
+       <div class="row">
+        <div class="col-md-8">
+            <table class="table table-bordered">
+                <tr>
+                    <td class="text-end col-1"><b>Fecha ingreso</b></td>
+                    <td class="col-11">{{ object.fechaIngreso }}</td>
+                </tr>
+                <tr>
+                    <td class="text-end col-1"><b>Fecha egreso</b></td>
+                    <td class="col-11">{{ object.fechaEgreso }}</td>
+                </tr>
+                <tr>
+                    <td class="text-end col-1"><b>Cantidad de personas</b></td>
+                    <td class="col-11">{{ object.cantidadPersonas }}</td>
+                </tr>
+                <tr>
+                    <td class="text-end col-1"><b>Id habitacion</b></td>
+                    <td class="col-11">{{ object.idHabitacion }}</td>
+                </tr>
+                <tr>
+                    <td class="text-end col-1"><b>Id cliente</b></td>
+                    <td class="col-11">{{ object.idCliente }}</td>
+                </tr>
+                <tr>
+                    <td class="text-end col-1"><b>senia</b></td>
+                    <td class="col-11">{{ object.senia }}</td>
+                </tr>
+                <tr>
+                    <td class="text-end col-1"><b>Precio total</b></td>
+                    <td class="col-11">{{ object.precioTotal }}</td>
+                </tr>
+                <tr>
+                    <td class="text-end col-1"><b>Precio por dia</b></td>
+                    <td class="col-11">{{ object.precioPorDia }}</td>
+                </tr>
+                <tr>
+                    <td class="text-end col-1"><b>Incluye desayuno</b></td>
+                    <td class="col-11">{{ object.incluyeDesayuno }}</td>
+                </tr>
+                <tr>
+                    <td class="text-end col-1"><b>Observaciones</b></td>
+                    <td class="col-11">{{ object.observaciones }}</td>
+                </tr>
+            </table>
+        </div>
+       </div>
    </div>
+
 
 {% endblock %}

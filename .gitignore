@@ -127,3 +127,4 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+/Hotel/migrations/0002_cliente_reservas_habitacion_habilitada_and_more.py
