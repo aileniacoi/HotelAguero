@@ -57,9 +57,10 @@ def clientes(request):
     return render(request, 'listClientes.html', context)
 
 
-class ClienteNuevoView(FormView):
+class ClienteNuevoView(SuccessMessageMixin, FormView):
     template_name = 'clienteForm.html'
     form_class = ClienteForm
+    success_message = "Cliente agregado correctamente"
 
     def form_valid(self, form):
         form.save()
@@ -79,10 +80,29 @@ class ClienteBajaView(DeleteView):
 
 
 
-class ClienteDetalleView(DetailView):
+class ClienteDetalleView(SuccessMessageMixin, DetailView):
     model = Cliente
     template_name = 'clienteForm.html'
     success_message = "Gracias...!"
+
+
+def cliente_edit(request, pk=None):
+    if pk is not None:
+        cliente = get_object_or_404(Cliente, pk=pk)
+    else:
+        cliente = None
+    if request.method == "POST":
+        form = ClienteForm(request.POST, instance=cliente)
+        if form.is_valid():
+            updated_cliente = form.save()
+            if cliente is None:
+                 messages.success(request, "El cliente \"{}\" fue creado.".format(updated_cliente))
+            else:
+                 messages.success(request, "El cliente \"{}\" fue modificado.".format(updated_cliente))
+            return redirect("/clientes/viewdetail/" + str(updated_cliente.pk), cliente_edit)
+    else:
+        form = ClienteForm(instance=cliente)
+    return render(request, "clienteForm.html", {"method": request.method, "form": form})
 
 
 def reservas(request):

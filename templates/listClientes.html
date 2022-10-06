@@ -33,7 +33,7 @@
             <td>{{ cliente.dni }}</td>
             <td>{{ cliente.telefono }}</td>
             <td style="width:1%"><a class="btn btn-outline-primary btn-sm" href="edit/{{ cliente.pk }}">Editar</a></td>
-            <td style="width:1%"><a class="btn btn-outline-danger btn-sm" href="delete/ {{ cliente.pk }}">Borrar</a></td>
+            <td style="width:1%"><a class="btn btn-outline-danger btn-sm" href="delete/{{ cliente.pk }}">Borrar</a></td>
         </tr>
         {% endfor %}
         </tbody>

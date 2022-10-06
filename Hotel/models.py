@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 # Create your models here.
 
@@ -9,7 +10,6 @@ class Habitacion(models.Model):
     esPlantaBaja = models.BooleanField(verbose_name='Planta baja')
     plazas = models.IntegerField()
     habilitada = models.BooleanField()
-    reservas = models.ManyToManyField("Cliente", through="Reserva")
 
     def __str__(self):
         return f'N° {self.numero}'
@@ -22,10 +22,13 @@ class Cliente(models.Model):
     email = models.EmailField(blank=True)
     telefono = models.CharField(max_length=15)
     direccion = models.CharField(max_length=200, blank=True)
-    reservas = models.ManyToManyField("Habitacion", through="Reserva")
 
     def __str__(self):
         return self.nombreYApellido
+
+
+    def get_absolute_url(self):
+        return reverse('detailCliente', kwargs={'pk': self.pk})
 
 
 class Reserva(models.Model):
@@ -33,7 +36,7 @@ class Reserva(models.Model):
     fechaIngreso = models.DateField(verbose_name='Fecha de Ingreso')
     fechaEgreso = models.DateField(verbose_name='Fecha de Egreso')
     cantidadPersonas = models.IntegerField(verbose_name='Cantidad de personas')
-    idHabitacion = models.ForeignKey(Habitacion, on_delete=models.CASCADE)
+    idHabitacion = models.ForeignKey(Habitacion, on_delete=models.CASCADE, null=True)
     idCliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, verbose_name='Cliente')
     senia = models.DecimalField(decimal_places=2, max_digits=10, null=True, verbose_name='Seña')
     precioTotal = models.DecimalField(decimal_places=2, max_digits=10, null=True)
