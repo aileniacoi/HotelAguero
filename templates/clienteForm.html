@@ -1,6 +1,18 @@
 {% extends 'base.html' %}
 {% block content %}
 
+    {% if messages %}
+        {% for message in messages %}
+    <div class="row">
+           <div class="alert {{ message.tags }} alert-dismissible col-md-6">
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                {{ message }}
+            </div>
+    </div>
+
+        {% endfor %}
+    {% endif %}
+
    <div class="container-fluid">
     <h3>Cliente</h3>
     <form method="post">
