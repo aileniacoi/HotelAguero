@@ -22,11 +22,11 @@
         </tr>
         {% for hab in habitaciones %}
         <tr>
-            <td>{{ hab.numero }}</td>
-            <td>{{ hab.plazas }}</td>
-            <td></td>
-            <td style="width: 1%"><a class="btn btn-outline-primary btn-sm" href="edit/{{ cliente.pk }}">Editar</a></td>
-            <td style="width: 1%"><a class="btn btn-outline-danger btn-sm" href="delete/{{ cliente.pk }}">Borrar</a></td>
+            <td class="pointer" onclick="ViewItem({{ hab.pk }})">{{ hab.numero }}</td>
+            <td class="pointer" onclick="ViewItem({{ hab.pk }})">{{ hab.plazas }}</td>
+            <td class="pointer" onclick="ViewItem({{ hab.pk }})">{{ hab.habilitada }}</td>
+            <td style="width: 1%"><a class="btn btn-outline-primary btn-sm" href="edit/{{ hab.pk }}">Editar</a></td>
+            <td style="width: 1%"><a class="btn btn-outline-danger btn-sm" href="delete/{{ hab.pk }}">Borrar</a></td>
         </tr>
         {% endfor %}
     </table>

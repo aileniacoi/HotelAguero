@@ -1,9 +1,33 @@
 {% extends 'base.html' %}
 {% block content %}
+<div class="container-fluid m-3">
 
-   <div class="container-fluid">
-    <h3>Reserva detalles</h3>
+    {% if messages %}
+        {% for message in messages %}
+    <div class="row">
+           <div class="alert {{ message.tags }} alert-dismissible col-md-6">
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                {{ message }}
+            </div>
+    </div>
 
-   </div>
+        {% endfor %}
+    {% endif %}
+
+    <h3>Reserva</h3>
+    <div class="container-fluid ">
+        <form method="post">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form.as_p }}
+                </div>
+
+            </div>
+
+            <p><input type="submit"></p>
+        </form>
+    </div>
+</div>
 
 {% endblock %}

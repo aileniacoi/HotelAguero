@@ -21,8 +21,8 @@
             {{ reserva.idCliente }} - {{ reserva.fechaIngreso }}
         </a>
           <div style="float: right;">
-            <a class="btn btn-outline-primary btn-sm" href="edit/{{ cliente.pk }}">Editar</a>
-            <a class="btn btn-outline-danger btn-sm" href="delete/{{ cliente.pk }}">Borrar</a>
+            <a class="btn btn-outline-primary btn-sm" href="edit/{{ reserva.pk }}">Editar</a>
+            <a class="btn btn-outline-danger btn-sm" href="delete/{{ reserva.pk }}">Borrar</a>
           </div>
       </div>
       <div id="collapse{{ forloop.counter }}" class="collapse" data-bs-parent="#accordion">
@@ -42,7 +42,7 @@
                         <td>{{ reserva.precioTotal }}</td>
                     </tr>
                 </table>
-                <a type="button" class="btn btn-secondary ms-5" href="reservasdetail/{{ reserva.pk }}">Ver mas</a>
+                <a type="button" class="btn btn-secondary ms-5" href="viewdetail/{{ reserva.pk }}">Ver mas</a>
             </div>
         </div>
       </div>

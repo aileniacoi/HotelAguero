@@ -7,8 +7,8 @@ from django.urls import reverse
 class Habitacion(models.Model):
     """Habitaciones en alquiler"""
     numero = models.IntegerField()
-    esPlantaBaja = models.BooleanField(verbose_name='Planta baja')
     plazas = models.IntegerField()
+    esPlantaBaja = models.BooleanField(verbose_name='Planta baja')
     habilitada = models.BooleanField()
 
     def __str__(self):

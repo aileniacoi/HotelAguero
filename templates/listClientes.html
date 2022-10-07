@@ -29,9 +29,9 @@
         <tbody>
         {% for cliente in clientes %}
         <tr>
-            <td>{{ cliente.nombreYApellido }}</td>
-            <td>{{ cliente.dni }}</td>
-            <td>{{ cliente.telefono }}</td>
+            <td class="pointer" onclick="ViewItem({{ cliente.pk }})">{{ cliente.nombreYApellido }}</td>
+            <td class="pointer" onclick="ViewItem({{ cliente.pk }})">{{ cliente.dni }}</td>
+            <td class="pointer" onclick="ViewItem({{ cliente.pk }})">{{ cliente.telefono }}</td>
             <td style="width:1%"><a class="btn btn-outline-primary btn-sm" href="edit/{{ cliente.pk }}">Editar</a></td>
             <td style="width:1%"><a class="btn btn-outline-danger btn-sm" href="delete/{{ cliente.pk }}">Borrar</a></td>
         </tr>

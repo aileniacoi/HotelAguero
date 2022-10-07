@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid my-3">
+        <div class="row">
+       <div class="col-md-10">
+            <h3 class="m-3" style ="float:left;">Caja</h3>
+
+       </div>
+       <div class="col-md-2">
+
+            <a class="btn btn-success m-3" href="add" style="float: right;">Agregar</a>
+       </div>
+   </div>
+    <div class="table-responsive">
+        <table class="table table-bordered">
+        <tr>
+            <th style="width: 1%"></th>
+            <th>Fecha</th>
+            <th>Concepto</th>
+            <th>Monto</th>
+            <th style="width: 1%"></th>
+            <th style="width: 1%"></th>
+        </tr>
+        {% for mov in cajaMov %}
+        <tr>
+            <td style="text-align: center; width: 1%;" class="pointer" onclick="ViewItem({{ hab.pk }})">
+                {% if mov.idTipoMovimiento == "IN" %}
+                    <i style="color: green;" class="fa-solid fa-circle-arrow-up"></i>
+                {% else %}
+                    <i style="color: red;" class="fa-solid fa-circle-arrow-down"></i>
+                {% endif %}
+            </td>
+            <td class="pointer" onclick="ViewItem({{ mov.pk }})">{{ mov.fecha }}</td>
+            <td class="pointer" onclick="ViewItem({{ mov.pk }})">{{ mov.get_idConcepto_display}}</td>
+            <td class="pointer" onclick="ViewItem({{ mov.pk }})">$ {{ mov.monto }}</td>
+            <td style="width: 1%"><a class="btn btn-outline-primary btn-sm" href="edit/{{ mov.pk }}">Editar</a></td>
+            <td style="width: 1%"><a class="btn btn-outline-danger btn-sm" href="delete/{{ mov.pk }}">Borrar</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+    </div>
+
+</div>
+{% endblock %}
