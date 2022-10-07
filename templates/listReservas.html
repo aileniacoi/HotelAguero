@@ -30,16 +30,16 @@
             <div class="table-responsive">
                 <table class="table table-bordered table-striped mx-5" style="width: 300px">
                     <tr>
-                        <td style="width: 80px;"><i class="fa-sharp fa-solid fa-person"></i></td>
+                        <td style="width: 80px;"><i class="fa-sharp fa-solid fa-person" title="Cantidad de personas"></i></td>
                         <td>{{ reserva.cantidadPersonas }} pax</td>
                     </tr>
                     <tr>
-                        <td style="width: 80px;"><i class="fa-solid fa-bed"></i></td>
+                        <td style="width: 80px;"><i class="fa-solid fa-bed" title="N° de habitación"></i></td>
                         <td>{{ reserva.idHabitacion }}</td>
                     </tr>
                     <tr>
-                        <td style="width: 80px;"><i class="fa-solid fa-money-bill-1"></i></td>
-                        <td>{{ reserva.precioTotal }}</td>
+                        <td style="width: 80px;"><i class="fa-solid fa-money-bill-1" title="Precio total"></i></td>
+                        <td>$ {{ reserva.precioTotal }}</td>
                     </tr>
                 </table>
                 <a type="button" class="btn btn-secondary ms-5" href="viewdetail/{{ reserva.pk }}">Ver mas</a>

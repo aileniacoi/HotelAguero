@@ -32,9 +32,9 @@
         <tr>
             <td>{{ lista.vigenciaDesde }}</td>
             <td>{{ lista.vigenciaHasta }}</td>
-            <td></td>
+            <td>{{ lista.get_idTipoLista_display}}</td>
             <td style="width:1%"><a class="btn btn-outline-primary btn-sm" href="edit/{{ lista.pk }}">Editar</a></td>
-            <td style="width:1%"><a class="btn btn-outline-danger btn-sm" href="delete/ {{ lista.pk }}">Borrar</a></td>
+            <td style="width:1%"><a class="btn btn-outline-danger btn-sm" href="delete/{{ lista.pk }}">Borrar</a></td>
         </tr>
         {% endfor %}
         </tbody>

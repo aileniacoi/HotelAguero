@@ -58,3 +58,14 @@ class CajaForm(forms.ModelForm):
             'numeroComprobante': forms.TextInput(attrs={'class': 'form-control'}),
             'idReserva': forms.Select(attrs={'class': 'form-control'})
         }
+
+
+class ListaPrecioForm(forms.ModelForm):
+    class Meta:
+        model = ListaPrecio
+        fields = "__all__"
+        widgets = {
+            'idTipoLista': forms.Select(attrs={'class': 'form-control'}),
+            'vigenciaDesde': forms.DateInput(attrs={'class': 'form-control'}),
+            'vigenciaHasta': forms.DateInput(attrs={'class': 'form-control'})
+        }

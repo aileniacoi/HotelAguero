@@ -59,9 +59,9 @@ class ListaPrecio(models.Model):
         (TEMPORADAMEDIA, 'Temporada Media'),
         (TEMPORADABAJA, 'Temporada Baja'),
     ]
-    idTipoLista = models.CharField(choices=TIPOLISTA, max_length=3)
-    vigenciaDesde = models.DateField()
-    vigenciaHasta = models.DateField()
+    vigenciaDesde = models.DateField(verbose_name='Vigencia desde')
+    vigenciaHasta = models.DateField(verbose_name='Vigencia hasta',)
+    idTipoLista = models.CharField(choices=TIPOLISTA, verbose_name='Tipo de lista', max_length=3)
     
     def __str__(self):
         return f'{self.vigenciaDesde} - {self.vigenciaHasta}'
@@ -130,12 +130,12 @@ class MovimientoCaja(models.Model):
         (TRANSFERENCIA, 'Transferencia')
     ]
     idTipoMovimiento = models.CharField(choices=TIPOMOVIMIENTO, verbose_name='Tipo de movimiento', max_length=3)
-    idConcepto = models.CharField(choices=CONCEPTO, max_length=3)
-    idFormaPago = models.CharField(choices=FORMAPAGO, max_length=3)
+    idConcepto = models.CharField(choices=CONCEPTO, verbose_name='Concepto', max_length=3)
+    idFormaPago = models.CharField(choices=FORMAPAGO, verbose_name='Forma de pago', max_length=3)
     fecha = models.DateField()
     monto = models.IntegerField()
-    numeroComprobante = models.CharField(max_length=50, blank=True)
-    idReserva = models.ForeignKey(Reserva, on_delete=models.CASCADE, blank=True, null=True)
+    numeroComprobante = models.CharField(max_length=50, verbose_name='Número de comprobante', blank=True)
+    idReserva = models.ForeignKey(Reserva, on_delete=models.CASCADE, verbose_name='Reserva', blank=True, null=True)
 
     def __str__(self):
         return str(self.monto)
