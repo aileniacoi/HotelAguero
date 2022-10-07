@@ -20,11 +20,219 @@
 
     <script src="https://kit.fontawesome.com/0b058192e0.js" crossorigin="anonymous"></script>
 </head>
+<style>
+.button {
+  background-color: white;
+  border: none;
+  color: white;
+
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+
+  border-radius: 5px;
+  transition-duration: 0.4s;
+  cursor: pointer;
+
+}
+
+.button1 {
+  background-color: #F3B13C;
+  color: black;
+  padding: 2px 2px;
+  margin: 4px 2px;
+}
+
+.button1:hover {
+  background-color: white;
+  color: black;
+}
+
+.button2 {
+  background-color: #F3B13C;
+  color: black;
+  padding: 9px 2px;
+  margin: 4px 2px;
+
+}
+
+.button2:hover {
+  background-color: white;
+  color: black;
+}
+
+.button3 {
+  background-color: #F3B13C;
+  color: black;
+  padding: 9px 9px;
+  margin: 0px;
+
+}
+
+.button3:hover {
+  background-color: white;
+  color: black;
+}
+
+/*
+========================
+      BUTTON ONE
+========================
+*/
+.btn {
+	text-align: center;
+	cursor: pointer;
+}
+.btn-one {
+	color: #FFFF;
+	transition: all 0.3s;
+	position: relative;
+}
+.btn-one span {
+	transition: all 0.3s;
+}
+.btn-one::before {
+	content: '';
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 1;
+	opacity: 0;
+	transition: all 0.3s;
+	border-top-width: 1px;
+	border-bottom-width: 1px;
+	border-top-style: solid;
+	border-bottom-style: solid;
+	border-top-color: rgba(255,255,255,0.5);
+	border-bottom-color: rgba(255,255,255,0.5);
+	transform: scale(0.1, 1);
+}
+.btn-one:hover span {
+	letter-spacing: 2px;
+}
+.btn-one:hover::before {
+	opacity: 1;
+	transform: scale(1, 1);
+}
+.btn-one::after {
+	content: '';
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 1;
+	transition: all 0.3s;
+	background-color: rgba(255,255,255,0.1);
+}
+.btn-one:hover::after {
+	opacity: 0;
+	transform: scale(0.1, 1);
+}
+
+/*
+========================
+      BUTTON TWO
+========================
+*/
+.btn-two {
+	color: #FFF;
+	transition: all 0.5s;
+	position: relative;
+}
+.btn-two span {
+	z-index: 2;
+	display: block;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+}
+.btn-two::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 1;
+	transition: all 0.5s;
+	border: 1px solid rgba(255,255,255,0.2);
+	background-color: rgba(255,255,255,0.1);
+}
+.btn-two::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 1;
+	transition: all 0.5s;
+	border: 1px solid rgba(255,255,255,0.2);
+	background-color: rgba(255,255,255,0.1);
+}
+.btn-two:hover::before {
+  transform: rotate(-45deg);
+  background-color: rgba(255,255,255,0);
+}
+.btn-two:hover::after {
+  transform: rotate(45deg);
+  background-color: rgba(255,255,255,0);
+}
+
+
+
+/*
+========================
+      BUTTON THREE
+========================
+*/
+.btn-three {
+	color: #FFF;
+	transition: all 0.5s;
+	position: relative;
+}
+.btn-three::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 1;
+	background-color: rgba(255,255,255,0.1);
+	transition: all 0.3s;
+}
+.btn-three:hover::before {
+	opacity: 0 ;
+	transform: scale(0.5,0.5);
+}
+.btn-three::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 1;
+	opacity: 0;
+	transition: all 0.3s;
+	border: 1px solid rgba(255,255,255,0.5);
+	transform: scale(1.2,1.2);
+}
+.btn-three:hover::after {
+	opacity: 1;
+	transform: scale(1,1);
+}
+</style>
 <body>
 <div class="container-fluid">
     <nav class="navbar navbar-expand-sm" style="background-color:#F3B13C">
   <div class="container-fluid">
-    <a class="navbar-brand" href="/index">
+    <a class="navbar-brand button button3" href="/index">
       <img src="{% static 'Hotel/logo1.png' %}" alt="logo" style="width:40px;" class="rounded-pill">
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
@@ -34,7 +242,7 @@
               <ul class="navbar-nav">
 
       <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="/reservas" role="button" data-bs-toggle="dropdown">Reservas</a>
+          <a class="nav-link dropdown-toggle " href="/reservas" role="button" data-bs-toggle="dropdown">Reservas</a>
           <ul class="dropdown-menu">
             <li><a class="dropdown-item" href="/reservas">Lista</a></li>
             <li><a class="dropdown-item" href="#">Calendario</a></li>
@@ -42,20 +250,20 @@
       </li>
 
           <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Precios</a>
+          <a class="nav-link dropdown-toggle " href="#" role="button" data-bs-toggle="dropdown">Precios</a>
           <ul class="dropdown-menu">
             <li><a class="dropdown-item" href="/listasprecio">Lista</a></li>
             <li><a class="dropdown-item" href="#">Calendario</a></li>
           </ul>
       </li>
 
-      <li class="nav-item">
+      <li class="nav-item btn-three">
         <a class="nav-link" href="/clientes">Clientes</a>
       </li>
-      <li class="nav-item">
+      <li class="nav-item btn btn-one">
         <a class="nav-link" href="/habitaciones">Habitaciones</a>
       </li>
-      <li class="nav-item">
+      <li class="nav-item btn btn-three">
         <a class="nav-link" href="/movimientoscaja">Caja</a>
       </li>
     </ul>
