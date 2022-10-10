@@ -69,8 +69,8 @@ class ListaPrecio(models.Model):
 
 class DetalleListaPrecio(models.Model):
     """Detalle en listas de precio"""
-    cantidadPersonas = models.IntegerField()
-    precioPorDia = models.DecimalField(decimal_places=2, max_digits=10)
+    cantidadPersonas = models.IntegerField(verbose_name='Cantidad de personas')
+    precioPorDia = models.DecimalField(verbose_name='Precio por día', decimal_places=2, max_digits=10)
     idListaPrecio = models.ForeignKey(ListaPrecio, on_delete=models.CASCADE)
     
     def __str__(self):

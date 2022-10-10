@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.forms import inlineformset_factory
-from .forms import ClienteForm, HabitacionForm, ReservaForm, CajaForm, ListaPrecioForm
+from .forms import ClienteForm, HabitacionForm, ReservaForm, CajaForm, ListaPrecioForm, DetalleListaPrecioForm, ListaPrecioDetalleInlineFormset
 
 from django.views.generic.edit import FormView, UpdateView, DeleteView, CreateView
 from django.views.generic import DetailView
@@ -42,7 +42,7 @@ def index(request):
 
 def habitaciones(request):
     habitaciones = Habitacion.objects.all()
-    context = {'habitaciones': habitaciones, 'title': 'Habitaciones'}
+    context = {'habitaciones': habitaciones}
     return render(request, 'listHabitaciones.html', context)
 
 
@@ -50,6 +50,13 @@ def detHabitacion(request, id):
     habitacion = Habitacion.objects.filter(id=id).first()
     context = {'habitacion': habitacion}
     return render(request, 'habitacionform.html', context)
+
+
+class HabitacionBajaView(SuccessMessageMixin, DeleteView):
+    model = Habitacion
+    template_name = 'habitacionbaja.html'
+    success_url = '/habitaciones'
+    success_message = 'La habitación fue eliminada.'
 
 
 def habitacion_edit(request, pk=None):
@@ -69,47 +76,38 @@ def habitacion_edit(request, pk=None):
     else:
         form = HabitacionForm(instance=habitacion)
     return render(request, "habitacionform.html", {"method": request.method,
-                                                   "form": form,
-                                                   "title": "Habitacion"})
-
+                                                   "form": form,})
 
 
 def clientes(request):
     clientes = Cliente.objects.all()
-    context = {'clientes': clientes, 'title': 'Clientes'}
+    context = {'clientes': clientes, }
     return render(request, 'listClientes.html', context)
 
 
-class ClienteNuevoView(FormView):
-    template_name = 'clienteForm.html'
-    form_class = ClienteForm
-    success_message = "Cliente agregado correctamente"
+# class ClienteNuevoView(FormView):
+#     template_name = 'clienteForm.html'
+#     form_class = ClienteForm
+#     success_message = "Cliente agregado correctamente"
+#
+#     def form_valid(self, form):
+#         form.save()
+#         return super().form_valid(form)
+#
+# class FormSuccessView(View):
+#         def get(self, request, *args, **kwargs):
+#             return HttpResponse("Cliente grabado exitosamente")
 
-    def form_valid(self, form):
-        form.save()
-        return super().form_valid(form)
 
-class FormSuccessView(View):
-        def get(self, request, *args, **kwargs):
-            return HttpResponse("Cliente grabado exitosamente")
-
-
-class ClienteModView(SuccessMessageMixin, UpdateView):
+class ClienteBajaView(SuccessMessageMixin, DeleteView):
     model = Cliente
-    form_class = ClienteForm
-    template_name = 'clienteForm.html'
-    success_message = "Cliente actualizado correctamente"
-
-
-class ClienteBajaView(DeleteView):
-    model = Cliente
-    template_name = 'clienteBaja.html'
-
+    template_name = 'clientebaja.html'
+    success_url = '/clientes'
+    success_message = 'El cliente fue eliminado.'
 
 class ClienteDetalleView(DetailView):
     model = Cliente
     template_name = 'clienteForm.html'
-
 
 
 def cliente_edit(request, pk=None):
@@ -128,12 +126,12 @@ def cliente_edit(request, pk=None):
             return redirect("/clientes/viewdetail/" + str(updated_cliente.pk), cliente_edit)
     else:
         form = ClienteForm(instance=cliente)
-    return render(request, "clienteForm.html", {"method": request.method, "form": form, "title": "Cliente"})
+    return render(request, "clienteForm.html", {"method": request.method, "form": form, })
 
 
 def reservas(request):
     reservas = Reserva.objects.all()
-    context = {'reservas': reservas, 'title': 'Reservas'}
+    context = {'reservas': reservas, }
     return render(request, 'listReservas.html', context)
 
 
@@ -159,50 +157,101 @@ def reserva_edit(request, pk=None):
             return redirect("/reservas/viewdetail/" + str(updated_reserva.pk), reserva_edit)
     else:
         form = ReservaForm(instance=reserva)
-    return render(request, "reservasForm.html", {"method": request.method, "form": form, "title": "Reserva"})
+    return render(request, "reservasForm.html", {"method": request.method, "form": form, })
 
 
 def listasPrecio(request):
     listas = ListaPrecio.objects.all()
-    context = {'listas': listas, 'title': 'Listas de Precio'}
+    context = {'listas': listas, }
     return render(request, 'listPrecios.html', context)
 
 
 def listaPrecio_edit(request, pk=None):
     if pk is not None:
         lista = get_object_or_404(ListaPrecio, pk=pk)
+        detalle = DetalleListaPrecio.objects.filter(idListaPrecio=lista)
     else:
         lista = None
+        detalle = ListaPrecioDetalleInlineFormset(queryset=ListaPrecio.objects.none())
+
     if request.method == "POST":
-        form = ListaPrecioForm(request.POST, instance=lista)
-        if form.is_valid():
-            updated_lista = form.save()
+        t_form = ListaPrecioForm(request.POST, instance=lista)
+        if t_form.is_valid():
+            updated_lista = t_form.save()
+
+            i_formset = ListaPrecioDetalleInlineFormset(request.POST, instance=lista)
+
+            if i_formset.is_valid():
+                i_formset.save()
+
             if lista is None:
                  messages.success(request, "La lista de precio fue creada.".format(updated_lista))
             else:
                  messages.success(request, "La lista de precio fue modificada.".format(updated_lista))
             return redirect("/listasprecio/viewdetail/" + str(updated_lista.pk), listaPrecio_edit)
     else:
-        form = ListaPrecioForm(instance=lista)
-    return render(request, "preciosform.html", {"method": request.method, "form": form, "title": "Lista de precio"})
+        t_form = ListaPrecioForm(instance=lista)
+        i_formset = ListaPrecioDetalleInlineFormset(instance=lista)
+        i_formset.extra = 1 if i_formset.queryset.count() < 1 else 0
+
+    return render(request, "preciosform.html", {"method": request.method, "t_form": t_form, 'i_formset': i_formset})
 
 
-def manage_lista(request, pk):
-    lista = ListaPrecio.objects.get(pk=pk)
-    DetalleListaInlineFormSet = inlineformset_factory(ListaPrecio, DetalleListaPrecio, fields=['cantidadPersonas'])
-    if request.method == "POST":
-        formset = DetalleListaInlineFormSet(request.POST, request.FILES, instance=lista)
-        if formset.is_valid():
-            formset.save()
-            return HttpResponseRedirect(lista.get_absolute_url())
-    else:
-        formset = DetalleListaInlineFormSet(instance=lista)
-    return render(request, 'preciosform.html', {'formset': formset})
+
+def ListaPrecioCreateView(request):
+    template_name = 'preciosform.html'
+    if request.method == 'GET':
+        t_form = ListaPrecioForm(request.GET or None)
+        i_formset = ListaPrecioDetalleInlineFormset(queryset=ListaPrecio.objects.none())
+    elif request.method == 'POST':
+        t_form = ListaPrecioForm(request.POST)
+        if t_form.is_valid():
+            t = t_form.save(commit=False)
+            t.save()
+
+            i_formset = ListaPrecioDetalleInlineFormset(request.POST, instance=t)
+            if i_formset.is_valid():
+                i_formset.save()
+                messages.success(request, 'La lista de precio fue creada.'.format(t))
+
+                return redirect('/listasprecio/viewdetail/', pk=t.pk)
+
+    return render(request, template_name, {
+        't_form': t_form,
+        'i_formset': i_formset,
+    })
+
+
+# def updateListaPrecio(request, pk):
+#     template_name = 'preciosform.html'
+#     t = get_object_or_404(ListaPrecio, pk=pk)
+#     i = DetalleListaPrecio.objects.filter(idListaPrecio=t)
+#     if request.method == 'GET':
+#         t_form = ListaPrecioForm(instance=t)
+#         i_formset = ListaPrecioDetalleInlineFormset(instance=t)
+#         i_formset.extra = 1 if i_formset.queryset.count() < 1 else 0
+#     elif request.method == 'POST':
+#         t_form = ListaPrecioForm(request.POST, instance=t)
+#         if t_form.is_valid():
+#             t_form.save()
+#             i_formset = ListaPrecioDetalleInlineFormset(request.POST, instance=t)
+#             if i_formset.is_valid():
+#                 i_formset.save()
+#                 messages.success(request, "La lista de precio fue modificada.".format(t_form))
+#                 return redirect('modlistasPrecio', pk=t.pk)
+#
+#     return render(request, template_name, {
+#         't_form': t_form,
+#         'i_formset': i_formset,
+#         'i': i,
+#         't': t,
+#
+#     })
 
 
 def movimientosCaja(request):
     cajaMov = MovimientoCaja.objects.all()
-    context = {'cajaMov': cajaMov, 'title': 'Caja'}
+    context = {'cajaMov': cajaMov, }
     return render(request, 'listCaja.html', context)
 
 
@@ -222,5 +271,5 @@ def caja_edit(request, pk=None):
             return redirect("/movimientoscaja/viewdetail/" + str(updated_mov.pk), caja_edit)
     else:
         form = CajaForm(instance=mov)
-    return render(request, "cajaform.html", {"method": request.method, "form": form, "title": "Caja"})
+    return render(request, "cajaform.html", {"method": request.method, "form": form, })
 

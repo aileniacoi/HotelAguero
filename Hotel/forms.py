@@ -1,5 +1,5 @@
 from django import forms
-from .models import Cliente, Reserva, Habitacion, MovimientoCaja, ListaPrecio
+from .models import Cliente, Reserva, Habitacion, MovimientoCaja, ListaPrecio, DetalleListaPrecio
 
 
 class ClienteForm(forms.ModelForm):
@@ -69,3 +69,21 @@ class ListaPrecioForm(forms.ModelForm):
             'vigenciaDesde': forms.DateInput(attrs={'class': 'form-control'}),
             'vigenciaHasta': forms.DateInput(attrs={'class': 'form-control'})
         }
+
+
+class DetalleListaPrecioForm(forms.ModelForm):
+    class Meta:
+        model = DetalleListaPrecio
+        fields = ('cantidadPersonas', 'precioPorDia')
+        widgets = {
+            'cantidadPersonas': forms.NumberInput(attrs={'class': 'form-control'}),
+            'precioPorDia': forms.NumberInput(attrs={'class': 'form-control'})
+        }
+
+
+ListaPrecioDetalleInlineFormset = forms.inlineformset_factory(
+    ListaPrecio,
+    DetalleListaPrecio,
+    form=DetalleListaPrecioForm,
+    extra=4
+)
