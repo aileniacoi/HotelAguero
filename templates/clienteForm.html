@@ -3,48 +3,34 @@
 
 {% block content %}
 
-<div class="container-fluid m-3">
+<div class="col-md-8 offset-md-4 mt-5">
 
     {% if messages %}
-    {% for message in messages %}
+        {% for message in messages %}
     <div class="row">
-        <div class="alert {{ message.tags }} alert-dismissible col-md-6">
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            {{ message }}
-        </div>
+           <div class="alert {{ message.tags }} alert-dismissible col-md-6">
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                {{ message }}
+            </div>
     </div>
 
-    {% endfor %}
+        {% endfor %}
     {% endif %}
-<div class="row">
-    <div class="col-md-12">
-            <div class="card card-header">
+
+
+    <div class="container-fluid ">
         <h3>Cliente</h3>
-        <div class="m-3">
-            <a href="/clientes" style="text-decoration: none; color: black;"><i class="fa fa-arrow-left"></i> Volver a
-                clientes</a>
-        </div>
-    </div>
-    </div>
-</div>
-
-
-<br />
-    <div class="container-fluid">
         <form method="post">
             {% csrf_token %}
-            <div class="card card-body">
-                 <div class="row">
+            <div class="row">
                 <div class="col-md-6">
                     {{ form.as_p }}
                 </div>
 
             </div>
-            </div>
-
 
             <button type="submit" class="btn btn-success">Enviar</button>
-            <!--            <p><input type="submit"></p>-->
+<!--            <p><input type="submit"></p>-->
         </form>
     </div>
 </div>
