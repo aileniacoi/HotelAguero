@@ -21,14 +21,14 @@ urlpatterns = [
     path('reservas/viewdetail/<int:pk>/', ReservasDetalleView.as_view(), name='detalleReserva'),
     path('reservas/delete/<int:pk>/', ReservasDetalleView.as_view(), name='deleteReserva'),
     path('listasprecio/', views.listasPrecio, name='listasPrecio'),
-    path('listasprecio/add/', views.ListaPrecioCreateView, name='newPrecio'),
+    path('listasprecio/add/', views.listaPrecio_edit, name='newPrecio'),
     path('listasprecio/edit/<int:pk>/', views.listaPrecio_edit, name='modlistasPrecio'),
     path('listasprecio/viewdetail/<int:pk>/', views.listaPrecio_edit, name='deleteListasPrecio'),
     path('listasprecio/delete/<int:pk>/', views.listasPrecio, name='listasPrecio'),
     path('movimientoscaja/', views.movimientosCaja, name='movimientosCaja'),
     path('movimientoscaja/add/', views.caja_edit, name="newCaja"),
     path('movimientoscaja/edit/<int:pk>/', views.caja_edit, name="modCaja"),
-    path('movimientoscaja/viewdetail/<int:pk>/', views.caja_edit, name="modCaja"),
+    path('movimientoscaja/viewdetail/<int:pk>/', views.caja_edit, name="detalleCaja"),
     path('movimientoscaja/delete/<int:pk>/', views.listasPrecio),
 
 ]

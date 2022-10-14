@@ -46,10 +46,10 @@ def habitaciones(request):
     return render(request, 'listHabitaciones.html', context)
 
 
-def detHabitacion(request, id):
-    habitacion = Habitacion.objects.filter(id=id).first()
-    context = {'habitacion': habitacion}
-    return render(request, 'habitacionform.html', context)
+# def detHabitacion(request, id):
+#     habitacion = Habitacion.objects.filter(id=id).first()
+#     context = {'habitacion': habitacion}
+#     return render(request, 'habitacionform.html', context)
 
 
 class HabitacionBajaView(SuccessMessageMixin, DeleteView):
@@ -69,9 +69,9 @@ def habitacion_edit(request, pk=None):
         if form.is_valid():
             updated_hab = form.save()
             if habitacion is None:
-                 messages.success(request, "La habitación {} fue creada.".format(updated_hab))
+                messages.success(request, "La habitación {} fue creada.".format(updated_hab))
             else:
-                 messages.success(request, "La habitación {} fue modificada.".format(updated_hab))
+                messages.success(request, "La habitación {} fue modificada.".format(updated_hab))
             return redirect("/habitaciones/viewdetail/" + str(updated_hab.pk), habitacion_edit)
     else:
         form = HabitacionForm(instance=habitacion)
@@ -151,9 +151,9 @@ def reserva_edit(request, pk=None):
         if form.is_valid():
             updated_reserva = form.save()
             if reserva is None:
-                 messages.success(request, "La reserva \"{}\" fue creada.".format(updated_reserva))
+                messages.success(request, "La reserva \"{}\" fue creada.".format(updated_reserva))
             else:
-                 messages.success(request, "La reserva \"{}\" fue modificada.".format(updated_reserva))
+                messages.success(request, "La reserva \"{}\" fue modificada.".format(updated_reserva))
             return redirect("/reservas/viewdetail/" + str(updated_reserva.pk), reserva_edit)
     else:
         form = ReservaForm(instance=reserva)
@@ -169,57 +169,57 @@ def listasPrecio(request):
 def listaPrecio_edit(request, pk=None):
     if pk is not None:
         lista = get_object_or_404(ListaPrecio, pk=pk)
-        detalle = DetalleListaPrecio.objects.filter(idListaPrecio=lista)
+        #detalle = DetalleListaPrecio.objects.filter(idListaPrecio=lista)
     else:
         lista = None
-        detalle = ListaPrecioDetalleInlineFormset(queryset=ListaPrecio.objects.none())
+        #detalle = ListaPrecioDetalleInlineFormset(queryset=ListaPrecio.objects.none())
 
     if request.method == "POST":
         t_form = ListaPrecioForm(request.POST, instance=lista)
         if t_form.is_valid():
-            updated_lista = t_form.save()
+            updated_lista = t_form.save(commit=False)
+            updated_lista.save()
 
-            i_formset = ListaPrecioDetalleInlineFormset(request.POST, instance=lista)
+            i_formset = ListaPrecioDetalleInlineFormset(request.POST, instance=updated_lista)
 
             if i_formset.is_valid():
                 i_formset.save()
 
             if lista is None:
-                 messages.success(request, "La lista de precio fue creada.".format(updated_lista))
+                messages.success(request, "La lista de precio fue creada.".format(updated_lista))
             else:
-                 messages.success(request, "La lista de precio fue modificada.".format(updated_lista))
+                messages.success(request, "La lista de precio fue modificada.".format(updated_lista))
             return redirect("/listasprecio/viewdetail/" + str(updated_lista.pk), listaPrecio_edit)
     else:
         t_form = ListaPrecioForm(instance=lista)
         i_formset = ListaPrecioDetalleInlineFormset(instance=lista)
-        i_formset.extra = 1 if i_formset.queryset.count() < 1 else 0
+        i_formset.extra = 4 if i_formset.queryset.count() < 1 else 0
 
     return render(request, "preciosform.html", {"method": request.method, "t_form": t_form, 'i_formset': i_formset})
 
 
 
-def ListaPrecioCreateView(request):
-    template_name = 'preciosform.html'
-    if request.method == 'GET':
-        t_form = ListaPrecioForm(request.GET or None)
-        i_formset = ListaPrecioDetalleInlineFormset(queryset=ListaPrecio.objects.none())
-    elif request.method == 'POST':
-        t_form = ListaPrecioForm(request.POST)
-        if t_form.is_valid():
-            t = t_form.save(commit=False)
-            t.save()
-
-            i_formset = ListaPrecioDetalleInlineFormset(request.POST, instance=t)
-            if i_formset.is_valid():
-                i_formset.save()
-                messages.success(request, 'La lista de precio fue creada.'.format(t))
-
-                return redirect('/listasprecio/viewdetail/', pk=t.pk)
-
-    return render(request, template_name, {
-        't_form': t_form,
-        'i_formset': i_formset,
-    })
+# def ListaPrecioCreateView(request):
+#     template_name = 'preciosform.html'
+#     if request.method == 'GET':
+#         t_form = ListaPrecioForm(request.GET or None)
+#         i_formset = ListaPrecioDetalleInlineFormset(queryset=ListaPrecio.objects.none())
+#     elif request.method == 'POST':
+#         t_form = ListaPrecioForm(request.POST)
+#         if t_form.is_valid():
+#             t = t_form.save(commit=False)
+#             t.save()
+#
+#             i_formset = ListaPrecioDetalleInlineFormset(request.POST, instance=t)
+#             if i_formset.is_valid():
+#                 i_formset.save()
+#
+#                 return redirect('/listasprecio/viewdetail/', pk=t.pk)
+#
+#     return render(request, template_name, {
+#         't_form': t_form,
+#         'i_formset': i_formset,
+#     })
 
 
 # def updateListaPrecio(request, pk):
@@ -265,9 +265,9 @@ def caja_edit(request, pk=None):
         if form.is_valid():
             updated_mov = form.save()
             if mov is None:
-                 messages.success(request, "El ingreso/egreso fue creado.".format(updated_mov))
+                messages.success(request, "El ingreso/egreso fue creado.".format(updated_mov))
             else:
-                 messages.success(request, "El ingreso/egreso fue modificado.".format(updated_mov))
+                messages.success(request, "El ingreso/egreso fue modificado.".format(updated_mov))
             return redirect("/movimientoscaja/viewdetail/" + str(updated_mov.pk), caja_edit)
     else:
         form = CajaForm(instance=mov)
