@@ -1,6 +1,19 @@
 {% extends 'base.html' %}
 {% block content %}
 
+<main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Precios</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/index">Home</a></li>
+          <li class="breadcrumb-item">Precios</li>
+          <li class="breadcrumb-item active">Lista</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
 <div class="container-fluid my-3">
 
    <div class="row">
@@ -26,11 +39,15 @@
         {% endfor %}
     {% endif %}
 
-<div class="row">
+    <div class="row">
     <div class="col-md-12">
         <div class="table-responsive">
 
-    <table class="table table-bordered table-striped">
+            <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Tabla de clientes</h5>
+
+    <table class="table table-hover">
         <thead>
         <tr>
             <th>Fecha inicio</th>
@@ -52,10 +69,14 @@
         {% endfor %}
         </tbody>
     </table>
+            </div>
+            </div>
 
 </div>
     </div>
 </div>
 </div>
+
+</main>
 
 {% endblock %}

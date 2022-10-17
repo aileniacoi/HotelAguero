@@ -1,6 +1,20 @@
 {% extends 'base.html' %}
 {% block content %}
- <div class="col-md-8 offset-md-4 mt-5">
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Habitaciones</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/index">Home</a></li>
+          <li class="breadcrumb-item"><a href="/habitaciones">Habitaciones</a></li>
+          <li class="breadcrumb-item active">Agregar</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+ <div class="">
 
     {% if messages %}
         {% for message in messages %}
@@ -14,20 +28,26 @@
         {% endfor %}
     {% endif %}
 
-    <h3>Habitacion</h3>
-    <div class="container-fluid ">
+
+
+        <div class="col-md-3 offset-md-0 m-0">
+        <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Agregar habitacion</h5>
         <form method="post">
             {% csrf_token %}
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-12">
                     {{ form.as_p }}
                 </div>
 
             </div>
-
+            <div class="text-center">
             <p><input type="submit" class="btn btn-success"></p>
+            </div>
         </form>
+            </div>
     </div>
 </div>
-
+</main>
 {% endblock %}
