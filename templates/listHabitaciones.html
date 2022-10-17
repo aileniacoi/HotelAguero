@@ -39,7 +39,14 @@
         <tr>
             <td class="pointer" onclick="ViewItem({{ hab.pk }})">{{ hab.numero }}</td>
             <td class="pointer" onclick="ViewItem({{ hab.pk }})">{{ hab.plazas }}</td>
-            <td class="pointer" onclick="ViewItem({{ hab.pk }})">{{ hab.habilitada }}</td>
+            <td style="text-align: center; width: 2%;" class="pointer" onclick="ViewItem({{ hab.pk }})">
+                {% if hab.habilitada %}
+                    <i style="color: green;" class="fa-solid fa-check"></i>
+                {% else %}
+                    <i style="color: red;" class="fa-solid fa-x"></i>
+                {% endif %}
+            </td>
+
             <td style="width: 1%"><a class="btn btn-outline-primary btn-sm" href="edit/{{ hab.pk }}">Editar</a></td>
             <td style="width: 1%"><a class="btn btn-outline-danger btn-sm" href="delete/{{ hab.pk }}">Borrar</a></td>
         </tr>

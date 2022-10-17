@@ -169,10 +169,10 @@ def listasPrecio(request):
 def listaPrecio_edit(request, pk=None):
     if pk is not None:
         lista = get_object_or_404(ListaPrecio, pk=pk)
-        #detalle = DetalleListaPrecio.objects.filter(idListaPrecio=lista)
+        detalle = DetalleListaPrecio.objects.filter(idListaPrecio=lista)
     else:
         lista = None
-        #detalle = ListaPrecioDetalleInlineFormset(queryset=ListaPrecio.objects.none())
+        detalle = ListaPrecioDetalleInlineFormset(queryset=ListaPrecio.objects.none())
 
     if request.method == "POST":
         t_form = ListaPrecioForm(request.POST, instance=lista)
@@ -185,11 +185,11 @@ def listaPrecio_edit(request, pk=None):
             if i_formset.is_valid():
                 i_formset.save()
 
-            if lista is None:
-                messages.success(request, "La lista de precio fue creada.".format(updated_lista))
-            else:
-                messages.success(request, "La lista de precio fue modificada.".format(updated_lista))
-            return redirect("/listasprecio/viewdetail/" + str(updated_lista.pk), listaPrecio_edit)
+                if lista is None:
+                    messages.success(request, "La lista de precio fue creada.".format(updated_lista))
+                else:
+                    messages.success(request, "La lista de precio fue modificada.".format(updated_lista))
+                return redirect("/listasprecio/edit/" + str(updated_lista.pk), listaPrecio_edit)
     else:
         t_form = ListaPrecioForm(instance=lista)
         i_formset = ListaPrecioDetalleInlineFormset(instance=lista)
