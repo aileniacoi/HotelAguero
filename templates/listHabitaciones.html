@@ -2,11 +2,23 @@
 {% block title %}Habitaciones{% endblock %}
 
 {% block content %}
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Habitaciones</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/index">Home</a></li>
+          <li class="breadcrumb-item">Habitaciones</li>
+          <li class="breadcrumb-item active">Lista</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
 <div class="container-fluid my-3">
         <div class="row">
        <div class="col-md-10">
-            <h3 class="m-3" style ="float:left;">Habitaciones</h3>
-
        </div>
        <div class="col-md-2">
 
@@ -26,8 +38,15 @@
         {% endfor %}
     {% endif %}
 
-    <div class="table-responsive">
-        <table class="table table-bordered table-striped">
+    <div class="row">
+    <div class="col-md-12">
+        <div class="table-responsive">
+
+            <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Tabla de habitaciones</h5>
+
+        <table class="table table-hover">
         <tr>
             <th>Número</th>
             <th>Plazas</th>
@@ -53,6 +72,10 @@
         {% endfor %}
     </table>
     </div>
-
+            </div>
+            </div>
+        </div>
+    </div>
 </div>
+</main>
 {% endblock %}

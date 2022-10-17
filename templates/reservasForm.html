@@ -3,6 +3,18 @@
 
 {% block content %}
 
+<main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Reservas</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/index">Home</a></li>
+          <li class="breadcrumb-item"><a href="/reservas">Reservas</a></li>
+          <li class="breadcrumb-item active">Agregar</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
 
 <div class="container-fluid m-3">
 
@@ -18,12 +30,15 @@
         {% endfor %}
     {% endif %}
 
-    <h3>Reserva</h3>
-    <div class="container-fluid ">
+        <div class="col-md-5 offset-md-0 m-0">
+        <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Reserva</h5>
+
         <form method="post">
             {% csrf_token %}
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-12">
                     {{ form.as_p }}
                 </div>
 
@@ -31,8 +46,12 @@
 
             <button type="submit" class="btn btn-success">Enviar</button>
         </form>
+            </div>
+        </div>
     </div>
 </div>
+
+</main>
 
 <!--   <div class="container-fluid">-->
 <!--       <h3>Reserva</h3>-->
