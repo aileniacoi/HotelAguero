@@ -32,8 +32,8 @@ class ReservaForm(forms.ModelForm):
         model = Reserva
         fields = "__all__"
         widgets = {
-            'fechaIngreso': forms.DateInput(attrs={'class': 'form-control'}),
-            'fechaEgreso': forms.DateInput(attrs={'class': 'form-control'}),
+            'fechaIngreso': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'fechaEgreso': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'cantidadPersonas': forms.TextInput(attrs={'class': 'form-control'}),
             'idHabitacion': forms.Select(attrs={'class': 'form-control'}),
             'idCliente': forms.Select(attrs={'class': 'form-control'}),
@@ -53,7 +53,7 @@ class CajaForm(forms.ModelForm):
             'idTipoMovimiento': forms.Select(attrs={'class': 'form-control'}),
             'idConcepto': forms.Select(attrs={'class': 'form-control'}),
             'idFormaPago': forms.Select(attrs={'class': 'form-control'}),
-            'fecha': forms.DateInput(attrs={'class': 'form-control'}),
+            'fecha': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'monto': forms.NumberInput(attrs={'class': 'form-control'}),
             'numeroComprobante': forms.TextInput(attrs={'class': 'form-control'}),
             'idReserva': forms.Select(attrs={'class': 'form-control'})
@@ -66,8 +66,8 @@ class ListaPrecioForm(forms.ModelForm):
         fields = "__all__"
         widgets = {
             'idTipoLista': forms.Select(attrs={'class': 'form-control'}),
-            'vigenciaDesde': forms.DateInput(attrs={'class': 'form-control'}),
-            'vigenciaHasta': forms.DateInput(attrs={'class': 'form-control'})
+            'vigenciaDesde': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'vigenciaHasta': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'})
         }
 
 
