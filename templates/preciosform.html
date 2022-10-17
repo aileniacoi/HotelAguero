@@ -46,6 +46,10 @@
                 <div col-md-8 offset-md-4 mt-5>
                 <div class="d-flex py-1 inline {{ product_meta_formset.prefix }}">
 
+                    {% for hidden in i_formset.hidden_fields %}
+                    {{ hidden }}
+                    {% endfor %}
+
                     <div class="table-responsive">
                         <table class="table-bordered" style="text-align: center;">
                             <tr>
@@ -54,6 +58,11 @@
                                 <th>Eliminar</th>
                             </tr>
                             {% for form in i_formset %}
+
+                            {% for hidden in form.hidden_fields %}
+                            {{ hidden }}
+                            {% endfor %}
+
                             <tr>
                                 <td>{{ form.cantidadPersonas }}</td>
                                 <td>{{ form.precioPorDia }}</td>

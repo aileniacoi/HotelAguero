@@ -74,7 +74,7 @@ class ListaPrecioForm(forms.ModelForm):
 class DetalleListaPrecioForm(forms.ModelForm):
     class Meta:
         model = DetalleListaPrecio
-        fields = ('cantidadPersonas', 'precioPorDia')
+        fields = '__all__'
         widgets = {
             'cantidadPersonas': forms.NumberInput(attrs={'class': 'form-control'}),
             'precioPorDia': forms.NumberInput(attrs={'class': 'form-control'})
