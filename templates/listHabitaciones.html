@@ -58,7 +58,7 @@
         <tr>
             <td class="pointer" onclick="ViewItem({{ hab.pk }})">{{ hab.numero }}</td>
             <td class="pointer" onclick="ViewItem({{ hab.pk }})">{{ hab.plazas }}</td>
-            <td style="text-align: center; width: 2%;" class="pointer" onclick="ViewItem({{ hab.pk }})">
+            <td class="pointer" onclick="ViewItem({{ hab.pk }})">
                 {% if hab.habilitada %}
                     <i style="color: green;" class="fa-solid fa-check"></i>
                 {% else %}
