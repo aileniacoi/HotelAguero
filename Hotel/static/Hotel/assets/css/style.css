@@ -381,8 +381,11 @@ h6 {
 .logo span {
   font-size: 26px;
   font-weight: 700;
-  color: #012970;
+  color: #14213D;
   font-family: "Nunito", sans-serif;
+}
+.logo span:hover {
+  color: #FCA311;
 }
 
 .header {
