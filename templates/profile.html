@@ -1,9 +1,48 @@
 {% extends 'base.html' %}
 {% block content %}
+<main id="main" class="main">
 
+    <div class="pagetitle">
+      <h1>Clientes</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/index">Home</a></li>
+          <li class="breadcrumb-item">Clientes</li>
+          <li class="breadcrumb-item active">Lista</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
 <div>
-   <title>Perfil de usuario</title>
-    {{ request.user.username }}
+    <div class="row">
+        <div class="display-5 mt-4">Usuario</div>
+        <h4>Detalle</h4>
+        <div>
+            <table class="table table-bordered">
+                <tr>
+                    <td class="text-end col-1">Usuario</td>
+                    <td class="col-11">{{ request.user.username }}</td>
+                </tr>
+                <tr>
+                    <td class="text-end col-1">Nombre</td>
+                    <td class="col-11">{{ request.user.first_name }}</td>
+                </tr>
+                <tr>
+                    <td class="text-end col-1">Apellido</td>
+                    <td class="col-11">{{ request.user.last_name }}</td>
+                </tr>
+                <tr>
+                    <td class="text-end col-1">Email</td>
+                    <td class="col-11">{{ request.user.email }}</td>
+                </tr>
+                <tr>
+                    <td class="text-end col-1">Ultimo inicio de sesion</td>
+                    <td class="col-11">{{ request.user.last_login }}</td>
+                </tr>
+
+
+            </table>
+        </div>
+    </div>
 </div>
 
 {% endblock %}
