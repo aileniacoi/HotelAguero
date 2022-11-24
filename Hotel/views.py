@@ -9,9 +9,16 @@ from django.forms import inlineformset_factory
 from .forms import ClienteForm, HabitacionForm, ReservaForm, CajaForm, ListaPrecioForm, DetalleListaPrecioForm, ListaPrecioDetalleInlineFormset
 
 from django.views.generic.edit import FormView, UpdateView, DeleteView, CreateView
-from django.views.generic import DetailView
+from django.views.generic import DetailView, View
 from django.views import View
 
+from django.conf import settings
+from io import BytesIO
+from reportlab.pdfgen import canvas
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+from reportlab.lib.units import cm
+from reportlab.lib import colors
+import os
 
 # Create your views here.
 
@@ -154,7 +161,7 @@ def reserva_edit(request, pk=None):
                 messages.success(request, "La reserva \"{}\" fue creada.".format(updated_reserva))
             else:
                 messages.success(request, "La reserva \"{}\" fue modificada.".format(updated_reserva))
-            return redirect("/reservas/viewdetail/" + str(updated_reserva.pk), reserva_edit)
+            return redirect("/reservas/edit/" + str(updated_reserva.pk), reserva_edit)
     else:
         form = ReservaForm(instance=reserva)
     return render(request, "reservasForm.html", {"method": request.method, "form": form, })
@@ -178,7 +185,7 @@ def listaPrecio_edit(request, pk=None):
         t_form = ListaPrecioForm(request.POST, instance=lista)
         if t_form.is_valid():
             updated_lista = t_form.save(commit=False)
-            updated_lista.save()
+            #updated_lista.save()
 
             i_formset = ListaPrecioDetalleInlineFormset(request.POST, instance=updated_lista)
 
@@ -272,4 +279,51 @@ def caja_edit(request, pk=None):
     else:
         form = CajaForm(instance=mov)
     return render(request, "cajaform.html", {"method": request.method, "form": form, })
+
+
+#Reportes PDF
+
+class ReporteReservasPDF(View):
+
+    def cabecera(self, pdf):
+        archivo_imagen = os.path.join(settings.BASE_DIR, '/HotelAguero/Hotel/static/Hotel/logo-ha-rep.jpg')
+        pdf.drawImage(archivo_imagen, 40, 750, 120, 90, preserveAspectRatio=True)
+        pdf.setFont("Helvetica", 16)
+        pdf.drawString(230, 790, u"HOTEL AGÜERO")
+        pdf.setFont("Helvetica", 14)
+        pdf.drawString(200, 770, u"REPORTE DE RESERVAS")
+
+    def get(self, request, *args, **kwargs):
+        response = HttpResponse(content_type='application/pdf')
+        buffer = BytesIO()
+        pdf = canvas.Canvas(buffer)
+
+        self.cabecera(pdf)
+        y = 600
+        self.tabla(pdf, y)
+
+        pdf.showPage()
+        pdf.save()
+        pdf = buffer.getvalue()
+        buffer.close()
+        response.write(pdf)
+        return response
+
+    def tabla(self, pdf, y):
+        encabezados = ('Cliente', 'Habitacion', 'Fecha de ingreso', 'Precio total')
+        detalles = [(reserva.idCliente, reserva.idHabitacion, reserva.fechaIngreso, reserva.precioTotal) for reserva in
+                    Reserva.objects.all()]
+
+        detalle_orden = Table([encabezados] + detalles, colWidths=[2 * cm, 5 * cm, 5 * cm, 5 * cm])
+        detalle_orden.setStyle(TableStyle(
+            [
+                ('ALIGN', (0, 0), (3, 0), 'CENTER'),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                ('FONTSIZE', (0, 0), (-1, -1), 10),
+            ]
+        ))
+        detalle_orden.wrapOn(pdf, 800, 600)
+        detalle_orden.drawOn(pdf, 60, y)
+
+
 
