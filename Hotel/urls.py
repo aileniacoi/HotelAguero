@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from Hotel.views import ReservasDetalleView
+from Hotel.views import ReservasDetalleView, ReporteReservasPDF
 
 urlpatterns = [
     path('', views.inicio, name='vInicio'),
@@ -30,5 +30,5 @@ urlpatterns = [
     path('movimientoscaja/edit/<int:pk>/', views.caja_edit, name="modCaja"),
     path('movimientoscaja/viewdetail/<int:pk>/', views.caja_edit, name="detalleCaja"),
     path('movimientoscaja/delete/<int:pk>/', views.listasPrecio),
-
+    path(r'^reporte_reservas_pdf/$', ReporteReservasPDF.as_view(), name="reporte_reservas_pdf"),
 ]
