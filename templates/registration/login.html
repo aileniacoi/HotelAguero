@@ -6,66 +6,104 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
-    <title>Signin Template · Bootstrap v5.0</title>
+    <title>Iniciar Sesion</title>
+       <link rel="icon" href="{% static 'Hotel/logo-imagen.png' %}">
 
-    <!-- Custom styles for this template -->
-      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
-      integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+      <!-- Favicons -->
+  <link href="{% static 'Hotel/assets/img/favicon.png' %}" rel="icon">
+  <link href="{% static 'Hotel/assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
 
-    <!-- JavaScript Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" crossorigin="anonymous"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
 
+  <!-- Vendor CSS Files -->
+  <link href="{% static 'Hotel/assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'Hotel/assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'Hotel/assets/vendor/boxicons/css/boxicons.min.css' %}" rel="stylesheet">
+  <link href="{% static 'Hotel/assets/vendor/quill/quill.snow.css' %}" rel="stylesheet">
+  <link href="{% static 'Hotel/assets/vendor/quill/quill.bubble.css' %}" rel="stylesheet">
+  <link href="{% static 'Hotel/assets/vendor/remixicon/remixicon.css' %}" rel="stylesheet">
+  <link href="{% static 'Hotel/assets/vendor/simple-datatables/style.css' %}" rel="stylesheet">
+
+      <!-- Template Main CSS File -->
       <link href="{% static 'Hotel/assets/css/style.css' %}" rel="stylesheet">
-      <link href="{% static 'Hotel/assets/css/signin.css' %}" rel="stylesheet">
-
+      <link href="{% static 'Hotel/assets/css/probando.css' %}" rel="stylesheet">
   </head>
-<body class="text-center">
-{% if form.errors %}
-<p>Your username and password didn't match. Please try again.</p>
-{% endif %}
 
-{% if next %}
-    {% if user.is_authenticated %}
-    <p>Your account doesn't have access to this page. To proceed,
-    please login with an account that has access.</p>
-    {% else %}
-    <p>Please login to see this page.</p>
+    <body>
+    {% if form.errors %}
+    <p>Your username and password didn't match. Please try again.</p>
     {% endif %}
-{% endif %}
 
-<main class="form-signin mt-2">
+    {% if next %}
+        {% if user.is_authenticated %}
+        <p>Your account doesn't have access to this page. To proceed,
+        please login with an account that has access.</p>
+        {% else %}
+        <p>Please login to see this page.</p>
+        {% endif %}
+    {% endif %}
 
-    <form method="post" action="{% url 'login' %}">
-    {% csrf_token %}
+        <main>
+            <div class="container ">
+                <section class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center box">
 
-        <img class="mb-4" style="width: 200px;" src="{% static 'Hotel/logo-ha2.png' %}">
-        <h1 class="h3 mb-3 fw-normal">Iniciar sesion</h1>
+                                <div class="d-flex justify-content-center py-4">
+                                    <a href="/index" class="">
+                                      <img style="width: 200px;" src="{% static 'Hotel/logo-ha2.png' %}" alt="">
+                                    </a>
+                                </div><!-- End Logo -->
 
-    <div >
-      <td >{{ form.username.label_tag }}</td>
-      <td>{{ form.username }}</td>
-    </div>
-    <div>
-      <td>{{ form.password.label_tag }}</td>
-      <td>{{ form.password }}</td>
-    </div>
+                                <div class="card mb-3">
 
-        <div class="checkbox mb-3">
-          <label>
-            <input type="checkbox" value="recordar"> Recordar
-          </label>
-        </div>
+                                    <div class="card-body">
 
-    <div>
-      <input class="btn btn-lg btn-primary" type="submit" value="login" />
-      <input type="hidden" name="next" value="{{ next }}" />
-    </div>
-</form>
+                                        <div class="pt-4 pb-2">
+                                            <h5 class="card-title text-center pb-0 fs-4">Ingrese a su cuenta</h5>
+                                            <p class="text-center small">Ingrese su usuario y contraseña para iniciar</p>
+                                        </div>
 
-{# Assumes you setup the password_reset view in your URLconf #}
-<p><a href="{% url 'password_reset' %}">Lost password?</a></p>
+                                        <form class="row g-3 needs-validation" novalidate method="post" action="{% url 'login' %}">
+                                        {% csrf_token %}
 
-</main>
-  </body>
+                                            <div class="col-12">
+                                              <td >{{ form.username.label_tag }}</td>
+                                              <td>{{ form.username }}</td>
+                                            </div>
+
+                                            <div class="col-12">
+                                              <td>{{ form.password.label_tag }}</td>
+                                              <td>{{ form.password }}</td>
+                                            </div>
+
+                                            <div class="col-12">
+                                              <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="remember" value="true" id="rememberMe">
+                                                <label class="form-check-label" for="rememberMe">Recordar</label>
+                                              </div>
+                                            </div>
+
+                                            <div class="col-12">
+                                                <button class="btn btn-primary w-100" type="submit">Login</button>
+                                                <input type="hidden" name="next" value="{{ next }}" />
+                                            </div>
+
+                                            <div class="col-12">
+                                                {# Assumes you setup the password_reset view in your URLconf #}
+                                                <p class="small mb-0"><a href="{% url 'password_reset' %}">Olvidaste la contraseña?</a></p>
+                                            </div>
+                                    </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </body>
 {% endblock %}
