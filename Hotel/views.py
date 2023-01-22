@@ -6,11 +6,16 @@ from django.contrib import messages
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.forms import inlineformset_factory
-from .forms import ClienteForm, HabitacionForm, ReservaForm, CajaForm, ListaPrecioForm, DetalleListaPrecioForm, ListaPrecioDetalleInlineFormset
+from .forms import ClienteForm, HabitacionForm, ReservaForm, CajaForm, ListaPrecioForm, DetalleListaPrecioForm, \
+    ListaPrecioDetalleInlineFormset
+from .serializers import ReservaSerializer
 
 from django.views.generic.edit import FormView, UpdateView, DeleteView, CreateView
 from django.views.generic import DetailView, View
 from django.views import View
+from django.urls import reverse
+from django.db.models import Q
+
 
 from django.conf import settings
 from io import BytesIO
@@ -19,6 +24,12 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from reportlab.lib.units import cm
 from reportlab.lib import colors
 import os
+import json
+from django.core import serializers
+#from multi_form_view import MultiModelFormView
+
+from datetime import datetime, date, time
+import calendar
 
 # Create your views here.
 
@@ -46,6 +57,8 @@ def index(request):
     context = {}
     return render(request, 'index.html', context)
 
+
+# ------ HABITACIONES ------
 
 def habitaciones(request):
     habitaciones = Habitacion.objects.all()
@@ -85,6 +98,8 @@ def habitacion_edit(request, pk=None):
     return render(request, "habitacionform.html", {"method": request.method,
                                                    "form": form,})
 
+
+# ------ CLIENTES ------
 
 def clientes(request):
     clientes = Cliente.objects.all()
@@ -136,16 +151,96 @@ def cliente_edit(request, pk=None):
     return render(request, "clienteForm.html", {"method": request.method, "form": form, })
 
 
+# ------ RESERVAS ------
+
 def reservas(request):
     reservas = Reserva.objects.all()
     context = {'reservas': reservas, }
     return render(request, 'listReservas.html', context)
 
 
+def reservasCalendario(request, mes=None, anio=None):
+
+    rangoFecha = calendar.monthrange(anio,mes)
+    cantidadDias = rangoFecha[1]
+
+
+    habitaciones = Habitacion.objects.all().order_by('numero')
+    reservasQuery = Reserva.objects.filter(Q(fechaIngreso__month=mes, fechaIngreso__year=anio) |
+                                           Q(fechaEgreso__month=mes, fechaEgreso__year=anio))
+    reservas = ReservaSerializer(reservasQuery, many=True)
+
+    context = {'reservas': json.dumps(reservas.data), 'habitaciones': habitaciones,
+               'cantidadDias': range(1, cantidadDias + 1), 'mes': mes, 'anio': anio}
+    return render(request, 'reservasCalendario.html', context)
+
+
 class ReservasDetalleView(DetailView):
     model = Reserva
     form_class = ReservaForm
     template_name = 'reservasForm.html'
+
+
+# class ReservasData(MultiModelFormView):
+#     form_classes = {
+#         'cliente_form': ClienteForm,
+#         'reserva_form': ReservaForm,
+#     }
+#     template_name = 'nuevareserva.html'
+#
+#     def get_success_url(self):
+#         return reverse('index')
+#
+#     def get_form_kwargs(self):
+#         kwargs = super().get_form_kwargs()
+#         kwargs.update(instance={
+#             'reserva_form': get_objects(),
+#             'cliente_form': self.object.idCliente,
+#         })
+#         return kwargs
+#
+#     def forms_valid(self, forms):
+#         cliente = forms['cliente_form'].save()
+#         reserva = forms['reserva_form'].save(commit=False)
+#
+#         reserva.idCliente = cliente
+#         forms['reserva_form'].save()
+#
+#         return super(ReservasData, self).forms_valid(forms)
+
+def edit_reserva(request, pk):
+    reserva = Reserva.objects.get(pk=pk)
+    cliente = Cliente.objects.get(pk=reserva.idCliente.pk)
+    if request.method == 'POST':
+        form_reserva = ReservaForm(request.POST, instance=reserva)
+        form_cliente = ClienteForm(request.POST, instance=cliente)
+        if form_reserva.is_valid() and form_cliente.is_valid():
+            form_reserva.save()
+            form_cliente.save()
+            return redirect('index')
+    else:
+        form_reserva = ReservaForm(instance=reserva)
+        form_cliente = ClienteForm(instance=cliente)
+    return render(request, 'nuevareserva.html', {'form_reserva': form_reserva, 'form_cliente': form_cliente})
+
+
+def alta_reserva(request):
+    reserva = None
+    cliente = None
+    if request.method == 'POST':
+        form_reserva = ReservaForm(request.POST, instance=reserva)
+        form_cliente = ClienteForm(request.POST, instance=cliente)
+        if form_cliente.is_valid() and form_reserva.is_valid():
+            cliente = form_cliente.save()
+            reserva = form_reserva.save(commit=False)
+            reserva.idCliente = cliente
+            form_reserva.save()
+
+            return redirect('index')
+    else:
+        form_reserva = ReservaForm(instance=reserva)
+        form_cliente = ClienteForm(instance=cliente)
+    return render(request, 'nuevareserva.html', {'form_reserva': form_reserva, 'form_cliente': form_cliente})
 
 
 def reserva_edit(request, pk=None):
@@ -166,6 +261,8 @@ def reserva_edit(request, pk=None):
         form = ReservaForm(instance=reserva)
     return render(request, "reservasForm.html", {"method": request.method, "form": form, })
 
+
+# ------ LISTAS DE PRECIO ------
 
 def listasPrecio(request):
     listas = ListaPrecio.objects.all()
@@ -200,7 +297,7 @@ def listaPrecio_edit(request, pk=None):
     else:
         t_form = ListaPrecioForm(instance=lista)
         i_formset = ListaPrecioDetalleInlineFormset(instance=lista)
-        i_formset.extra = 4 if i_formset.queryset.count() < 1 else 0
+        i_formset.extra = 4 if i_formset.queryset.count() < 1 else 1
 
     return render(request, "preciosform.html", {"method": request.method, "t_form": t_form, 'i_formset': i_formset})
 
@@ -255,6 +352,8 @@ def listaPrecio_edit(request, pk=None):
 #
 #     })
 
+
+# ------ CAJA ------
 
 def movimientosCaja(request):
     cajaMov = MovimientoCaja.objects.all()

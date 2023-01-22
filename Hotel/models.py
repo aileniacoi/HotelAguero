@@ -12,7 +12,7 @@ class Habitacion(models.Model):
     habilitada = models.BooleanField()
 
     def __str__(self):
-        return f'N° {self.numero}'
+        return str(self.numero)
 
 
 class Cliente(models.Model):
@@ -26,22 +26,25 @@ class Cliente(models.Model):
     def __str__(self):
         return self.nombreYApellido
 
-
     def get_absolute_url(self):
         return reverse('detailCliente', kwargs={'pk': self.pk})
 
 
 class Reserva(models.Model):
     """Reservas realizadas"""
+    fechaRegistro = models.DateField(verbose_name='Fecha de registro')
     fechaIngreso = models.DateField(verbose_name='Fecha de Ingreso')
     fechaEgreso = models.DateField(verbose_name='Fecha de Egreso')
-    cantidadPersonas = models.IntegerField(verbose_name='Cantidad de personas')
-    idHabitacion = models.ForeignKey(Habitacion, on_delete=models.CASCADE, null=True)
+    cantidadPersonas = models.IntegerField(verbose_name='Personas')
+    idHabitacion = models.ForeignKey(Habitacion, on_delete=models.CASCADE, verbose_name='Habitación', null=True, blank=True)
     idCliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, verbose_name='Cliente')
-    senia = models.DecimalField(decimal_places=2, max_digits=10, null=True, verbose_name='Seña')
-    precioTotal = models.DecimalField(decimal_places=2, max_digits=10, null=True)
-    precioPorDia = models.DecimalField(decimal_places=2, max_digits=10)
-    incluyeDesayuno = models.BooleanField()
+    seniaSolicitada = models.DecimalField(decimal_places=2, max_digits=10, null=True, verbose_name='Seña solicitada')
+    precioTotal = models.DecimalField(decimal_places=2, max_digits=10, null=True, verbose_name='Precio total')
+    precioPorDia = models.DecimalField(decimal_places=2, max_digits=10, verbose_name='Precio por día')
+    incluyeDesayuno = models.BooleanField(verbose_name="Desayuno")
+    porcentajeDescuento = models.IntegerField(null=True, blank=True, verbose_name='Porcentaje de descuento')
+    importeDescuento = models.DecimalField(decimal_places=2, max_digits=10, null=True, blank=True, verbose_name='Importe de descuento')
+    descuentoPorPorcentaje = models.BooleanField(null=True, verbose_name='Descuento por porcentaje')
     observaciones = models.TextField(max_length=500, blank=True)
 
 

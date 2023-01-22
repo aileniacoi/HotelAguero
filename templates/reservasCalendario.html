@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% block title %}Reservas{% endblock %}
+
+{% block content %}
+
+
+<main id="main" class="main">
+
+  <h3>Reservas</h3>
+
+
+<div class="table-responsive">
+    <table class="table-bordered" >
+    <thead>
+    <tr>
+        <th colspan="{{ cantidadDias|length|add:1 }}" style="text-align:center">
+            <h4>
+      {% if mes == 1 %}
+      <a href="/reservas/calendar/12/{{ anio|add:-1 }}"><i class="fa-solid fa-chevron-left"></i></a>
+      {% else %}
+      <a href="/reservas/calendar/{{ mes|add:-1}}/{{ anio }}"><i class="fa-solid fa-chevron-left"></i></a>
+      {% endif %}
+      <span id="nombreMes"></span>
+      {% if mes == 12 %}
+      <a href="/reservas/calendar/1/{{ anio|add:1 }}"><i class="fa-solid fa-chevron-right"></i></a>
+      {% else %}
+      <a href="/reservas/calendar/{{ mes|add:1}}/{{ anio }}"><i class="fa-solid fa-chevron-right"></i></a>
+      {% endif %}
+  </h4>
+        </th>
+    </tr>
+      <tr>
+        <th class="columnasCal"></th>
+        {% for dia in cantidadDias %}
+        <th class="columnasCal">{{ dia }}</th>
+        {% endfor %}
+      </tr>
+      <tr>
+          <th class="columnasCal"></th>
+        {% for dia in cantidadDias %}
+        <th id="res_dia_{{ dia }}" class="columnasCal"></th>
+        {% endfor %}
+      </tr>
+    </thead>
+
+    <tbody>
+
+      {% for hab in habitaciones %}
+      <tr>
+        <td class="columnasCal">{{ hab.numero }}</td>
+
+        {% for dia in cantidadDias %}
+        <td id="res_{{ hab.numero }}_{{ dia }}" class="columnasCal" ></td>
+        {% endfor %}
+
+      </tr>
+      {% endfor %}
+
+    </tbody>
+  </table>
+
+</div>
+
+</main>
+
+
+<script type="text/javascript">
+
+var reservasJs = JSON.parse('{{ reservas|safe }}');
+
+function ConvertirFecha(fechaString){
+    fecha = fechaString.split("-");
+    return new Date(fecha[0], fecha[1] - 1, fecha[2]);
+}
+
+function GetColorSegunReserva(nHab, fecha) {
+
+        var reservas = reservasJs.filter(f =>
+            f.idHabitacion.numero == nHab && ConvertirFecha(f.fechaIngreso) <= fecha && ConvertirFecha(f.fechaEgreso) >= fecha);
+
+        if (!reservas || reservas.length === 0)
+            return;
+
+        var reserva = reservas[0];
+        if (reserva.seniaSolicitada > 0) {
+            if (ConvertirFecha(reserva.fechaIngreso).getTime() == fecha.getTime()){
+                return '#73DD71';
+            } else{
+                return '#84FD82';
+            }
+        } else {
+            if (ConvertirFecha(reserva.fechaIngreso).getTime() == fecha.getTime()){
+                return '#E1E56D';
+            } else{
+                return '#FBFF8A';
+            }
+        }
+}
+
+function CargarColoresCalendario(){
+    {% for dia in cantidadDias %}
+        {% for hab in habitaciones %}
+
+            var celda = document.getElementById('res_' + {{ hab.numero }} + '_' + {{ dia }});
+            var fecha = new Date({{ anio }}, {{ mes }} - 1, {{ dia }});
+            var color = GetColorSegunReserva( {{ hab.numero }}, fecha);
+            celda.setAttribute('style', 'background-color: ' + color);
+
+        {% endfor %}
+    {% endfor %}
+}
+
+
+function ObtenerNombreMes() {
+  let fecha = new Date();
+  let mesInt = {{ mes }};
+  let mes = '';
+  if (0 < mesInt && mesInt <= 12) {
+    fecha.setMonth(mesInt - 1);
+    mes = new Intl.DateTimeFormat('es-ES', { month: 'long'}).format(fecha);
+  }
+  document.getElementById('nombreMes').innerHTML = mes.toUpperCase() + ' ' + {{ anio }};
+}
+
+function CargarDiasDeSemana(){
+    var fecha = new Date({{ anio }}, {{ mes }} - 1, 1);
+    var dia = fecha.getDay();
+
+    var diasSemana = {
+        0: "Dom",
+        1: "Lun",
+        2: "Mar",
+        3: "Mie",
+        4: "Jue",
+        5: "Vie",
+        6: "Sab"
+    };
+
+    {% for dia in cantidadDias %}
+        var celda = document.getElementById('res_dia_' + {{ dia }});
+        celda.innerHTML = diasSemana[dia];
+
+        if (dia < 6)
+            dia += 1;
+        else
+            dia = 0;
+    {% endfor %}
+}
+
+window.addEventListener('load', ObtenerNombreMes())
+window.addEventListener('load', CargarColoresCalendario())
+window.addEventListener('load', CargarDiasDeSemana())
+
+</script>
+{% endblock %}

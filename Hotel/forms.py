@@ -1,4 +1,5 @@
 from django import forms
+from datetime import datetime
 from .models import Cliente, Reserva, Habitacion, MovimientoCaja, ListaPrecio, DetalleListaPrecio
 
 
@@ -31,19 +32,29 @@ class ReservaForm(forms.ModelForm):
     class Meta:
         model = Reserva
         fields = "__all__"
+        exclude = ['idCliente', ]
         widgets = {
+            'fechaRegistro': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'fechaIngreso': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'fechaEgreso': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'cantidadPersonas': forms.TextInput(attrs={'class': 'form-control'}),
             'idHabitacion': forms.Select(attrs={'class': 'form-control'}),
-            'idCliente': forms.Select(attrs={'class': 'form-control'}),
-            'senia': forms.NumberInput(attrs={'class': 'form-control'}),
+            #'idCliente': forms.Select(attrs={'class': 'form-control'}),
+            'seniaSolicitada': forms.NumberInput(attrs={'class': 'form-control'}),
             'precioTotal': forms.NumberInput(attrs={'class': 'form-control'}),
             'precioPorDia': forms.NumberInput(attrs={'class': 'form-control'}),
             'incluyeDesayuno': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'observaciones': forms.Textarea(attrs={'class': 'form-control'}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['fechaRegistro'].initial = datetime.now().date()
+        self.fields['incluyeDesayuno'].initial = True
+
+# class ReservaMultiForm(forms.Form):
+#     cliente_form = ClienteForm()
+#     reserva_form = ReservaForm()
 
 class CajaForm(forms.ModelForm):
     class Meta:

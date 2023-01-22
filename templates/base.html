@@ -43,6 +43,19 @@
   <!-- Template Main CSS File -->
   <link href="{% static 'Hotel/assets/css/style.css' %}" rel="stylesheet">
 
+  <script>
+    var date = new Date()
+    const mes = date.getMonth() + 1;
+    const anio = date.getFullYear();
+
+    window.addEventListener('load', function(){
+      var a = document.getElementById("resCalendario");
+      var url = '/reservas/calendar/' + mes + '/' + anio;
+      a.setAttribute('href', url);
+    })
+
+  </script>
+
 </head>
 <body>
 <!--
@@ -366,7 +379,7 @@
             </a>
           </li>
           <li>
-            <a href="#">
+            <a href="" id="resCalendario">
               <i class="bi bi-circle"></i><span>Calendario</span>
             </a>
           </li>
