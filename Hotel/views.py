@@ -7,8 +7,11 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.forms import inlineformset_factory
 from .forms import ClienteForm, HabitacionForm, ReservaForm, CajaForm, ListaPrecioForm, DetalleListaPrecioForm, \
-    ListaPrecioDetalleInlineFormset
-from .serializers import ReservaSerializer
+    ListaPrecioDetalleInlineFormset, PagosReservaInlineFormset
+from .serializers import ReservaSerializer, HabitacionSerializer
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
 from django.views.generic.edit import FormView, UpdateView, DeleteView, CreateView
 from django.views.generic import DetailView, View
@@ -25,6 +28,7 @@ from reportlab.lib.units import cm
 from reportlab.lib import colors
 import os
 import json
+from django.http import JsonResponse
 from django.core import serializers
 #from multi_form_view import MultiModelFormView
 
@@ -97,6 +101,17 @@ def habitacion_edit(request, pk=None):
         form = HabitacionForm(instance=habitacion)
     return render(request, "habitacionform.html", {"method": request.method,
                                                    "form": form,})
+
+
+class HabitacionesDisponiblesView(APIView):
+    def get(self, request):
+        fecha_ingreso = request.GET.get('fecha_ingreso')
+        fecha_egreso = request.GET.get('fecha_egreso')
+        habitaciones_ocupadas = Reserva.objects.filter(fechaIngreso__lte=fecha_egreso, fechaIngreso__gte=fecha_egreso)\
+            .values_list('idHabitacion', flat=True)
+        habitaciones_disponibles = Habitacion.objects.exclude(id__in=habitaciones_ocupadas)
+        serializer = HabitacionSerializer(habitaciones_disponibles, many=True)
+        return Response(serializer.data)
 
 
 # ------ CLIENTES ------
@@ -221,7 +236,25 @@ def edit_reserva(request, pk):
     else:
         form_reserva = ReservaForm(instance=reserva)
         form_cliente = ClienteForm(instance=cliente)
-    return render(request, 'nuevareserva.html', {'form_reserva': form_reserva, 'form_cliente': form_cliente})
+    return render(request, 'reservaDetail.html', {'form_reserva': form_reserva, 'form_cliente': form_cliente})
+
+
+def edit_reserva2(request, pk):
+    reserva = Reserva.objects.get(pk=pk)
+    cliente = Cliente.objects.get(pk=reserva.idCliente.pk)
+    pagos = MovimientoCaja.objects.filter(idReserva=reserva)
+    if request.method == 'POST':
+        form_reserva = ReservaForm(request.POST, instance=reserva)
+        form_cliente = ClienteForm(request.POST, instance=cliente)
+        if form_reserva.is_valid() and form_cliente.is_valid():
+            form_reserva.save()
+            form_cliente.save()
+            return redirect('index')
+    else:
+        form_reserva = ReservaForm(instance=reserva)
+        form_cliente = ClienteForm(instance=cliente)
+        p_formset = PagosReservaInlineFormset(instance=reserva)
+    return render(request, 'nuevareserva.html', {'form_reserva': form_reserva, 'form_cliente': form_cliente, 'formset_pagos': p_formset})
 
 
 def alta_reserva(request):
@@ -236,33 +269,35 @@ def alta_reserva(request):
             reserva.idCliente = cliente
             form_reserva.save()
 
-            return redirect('index')
+            messages.success(request, "La reserva \"{}\" fue creada.".format(reserva))
+
+            return redirect("/reservas/edit/" + str(reserva.pk), edit_reserva())
     else:
         form_reserva = ReservaForm(instance=reserva)
         form_cliente = ClienteForm(instance=cliente)
     return render(request, 'nuevareserva.html', {'form_reserva': form_reserva, 'form_cliente': form_cliente})
 
 
-def reserva_edit(request, pk=None):
-    if pk is not None:
-        reserva = get_object_or_404(Reserva, pk=pk)
-    else:
-        reserva = None
-    if request.method == "POST":
-        form = ReservaForm(request.POST, instance=reserva)
-        if form.is_valid():
-            updated_reserva = form.save()
-            if reserva is None:
-                messages.success(request, "La reserva \"{}\" fue creada.".format(updated_reserva))
-            else:
-                messages.success(request, "La reserva \"{}\" fue modificada.".format(updated_reserva))
-            return redirect("/reservas/edit/" + str(updated_reserva.pk), reserva_edit)
-    else:
-        form = ReservaForm(instance=reserva)
-    return render(request, "reservasForm.html", {"method": request.method, "form": form, })
-
+# def reserva_edit(request, pk=None):
+#     if pk is not None:
+#         reserva = get_object_or_404(Reserva, pk=pk)
+#     else:
+#         reserva = None
+#     if request.method == "POST":
+#         form = ReservaForm(request.POST, instance=reserva)
+#         if form.is_valid():
+#             updated_reserva = form.save()
+#             if reserva is None:
+#                 messages.success(request, "La reserva \"{}\" fue creada.".format(updated_reserva))
+#             else:
+#                 messages.success(request, "La reserva \"{}\" fue modificada.".format(updated_reserva))
+#             return redirect("/reservas/edit/" + str(updated_reserva.pk), reserva_edit)
+#     else:
+#         form = ReservaForm(instance=reserva)
+#     return render(request, "reservasForm.html", {"method": request.method, "form": form, })
 
 # ------ LISTAS DE PRECIO ------
+
 
 def listasPrecio(request):
     listas = ListaPrecio.objects.all()
@@ -282,7 +317,7 @@ def listaPrecio_edit(request, pk=None):
         t_form = ListaPrecioForm(request.POST, instance=lista)
         if t_form.is_valid():
             updated_lista = t_form.save(commit=False)
-            #updated_lista.save()
+            updated_lista.save()
 
             i_formset = ListaPrecioDetalleInlineFormset(request.POST, instance=updated_lista)
 
@@ -425,4 +460,22 @@ class ReporteReservasPDF(View):
         detalle_orden.drawOn(pdf, 60, y)
 
 
+#------SOLICITUDES------
+
+
+def get_price(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        fecha_ingreso = data.get('fechaIngreso')
+        fecha_egreso = data.get('fechaEgreso')
+        personas = data.get('cantidadPersonas')
+        lista_precio = ListaPrecio.objects.filter(vigenciaDesde__lte=fecha_ingreso, vigenciaHasta__gte=fecha_egreso).first()
+        if lista_precio:
+
+            detalle_precio = DetalleListaPrecio.objects.filter(idListaPrecio=lista_precio, cantidadPersonas=personas).first()
+
+            if detalle_precio:
+                print(detalle_precio)
+                return JsonResponse({'precio':detalle_precio.precioPorDia})
+        return JsonResponse({'precio': None})
 

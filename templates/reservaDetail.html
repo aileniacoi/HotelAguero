@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% block title %}Reserva{% endblock %}
+
+{% block content %}
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Reservas</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/index">Home</a></li>
+          <li class="breadcrumb-item"><a href="/reservas">Reservas</a></li>
+          <li class="breadcrumb-item active">Agregar</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+<div class="container-fluid m-3">
+
+    {% if messages %}
+        {% for message in messages %}
+    <div class="row">
+           <div class="alert {{ message.tags }} alert-dismissible col-md-6">
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                {{ message }}
+            </div>
+    </div>
+
+        {% endfor %}
+    {% endif %}
+
+        <div class="col-md-12 offset-md-0 m-0">
+        <div class="card">
+            <div class="card-body">
+
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="row justify-content-between container" style="margin-top: 15px;">
+
+                <div class="col-md-5">
+                    <div class="row">
+
+                        <div class="col-4">
+                            <label>{{ form_reserva.idHabitacion.label }}</label>
+                            {{ form_reserva.idHabitacion}}
+                        </div>
+                        <div class="col-7" style="margin-top: 25px;">
+                            Fecha de registro: {{ form_reserva.fechaRegistro.value|date:"d/m/Y" }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-3" style="float:right; margin-top: 15px; font-size:25;">
+                    <div>Total: {{ form_reserva.precioTotal.value}}</div>
+                    <div style="color: red;">Saldo: {{ form_reserva.precioTotal.value}}</div>
+                </div>
+
+
+            </div>
+
+            <h5 class="card-title">Datos del cliente</h5>
+            <div class="row">
+<!--                <div class="col-md-12">-->
+<!--                    {{ form_cliente.as_p }}-->
+<!--                </div>-->
+                <div class="col-md-6" style="margin-top: 15px">
+                    <label>{{ form_cliente.nombreYApellido.label }}</label>
+                    <span>{{ form_cliente.nombreYApellido}}</span>
+                </div>
+               <div class="col-md-6" style="margin-top: 15px">
+                    <label>{{ form_cliente.dni.label }}</label>
+                    <span>{{ form_cliente.dni}}</span>
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col-md-6" style="margin-top: 15px">
+                    <label>{{ form_cliente.email.label }}</label>
+                    <span>{{ form_cliente.email}}</span>
+                </div>
+               <div class="col-md-6" style="margin-top: 15px">
+                    <label>{{ form_cliente.telefono.label }}</label>
+                    <span>{{ form_cliente.telefono}}</span>
+                </div>
+
+            </div>
+            <div class="row">
+
+                <div class="col-md-8" style="margin-top: 15px">
+                    <label>{{ form_cliente.direccion.label }}</label>
+                    <span>{{ form_cliente.direccion}}</span>
+                </div>
+
+            </div>
+            <h5 class="card-title">Datos de la Reserva</h5>
+
+            <div class="row"  style="margin-top: 15px">
+                <div class="col-md-5">
+                    <label>{{ form_reserva.fechaIngreso.label }}</label>
+                    <span>{{ form_reserva.fechaIngreso }}</span>
+                </div>
+                <div class="col-md-5">
+                    <label>{{ form_reserva.fechaEgreso.label }}</label>
+                    <span>{{ form_reserva.fechaEgreso }}</span>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 15px">
+                <div class="col-md-2">
+                    <label>{{ form_reserva.cantidadPersonas.label }}</label>
+                    <span>{{ form_reserva.cantidadPersonas }}</span>
+                </div>
+                <div class="col-md-4">
+                     <label>{{ form_reserva.precioPorDia.label }}</label>
+                    <span>{{ form_reserva.precioPorDia }}</span>
+                </div>
+            </div>
+            <div class="row"  style="margin-top: 15px">
+                <div class="col-md-5">
+                     <label>{{ form_reserva.seniaSolicitada.label }}</label>
+                    <span>{{ form_reserva.seniaSolicitada }}</span>
+                </div>
+
+            </div>
+
+            <div class="row" style="margin-top:15px">
+                 <div class="col-md-5">
+                     <label>{{ form_reserva.incluyeDesayuno.label }}</label>
+                    <span>{{ form_reserva.incluyeDesayuno }}</span>
+                </div>
+            </div>
+
+            <div class="row"  style="margin-top: 15px">
+                <div class="col-mf-8">
+                    <label>{{ form_reserva.observaciones.label }}</label>
+                    <span> {{ form_reserva.observaciones }}</span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-success" style="margin-top:15px;">Enviar</button>
+        </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+</main>
+
+
+{% endblock %}

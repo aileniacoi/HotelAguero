@@ -41,8 +41,8 @@ class ReservaForm(forms.ModelForm):
             'idHabitacion': forms.Select(attrs={'class': 'form-control'}),
             #'idCliente': forms.Select(attrs={'class': 'form-control'}),
             'seniaSolicitada': forms.NumberInput(attrs={'class': 'form-control'}),
-            'precioTotal': forms.NumberInput(attrs={'class': 'form-control'}),
-            'precioPorDia': forms.NumberInput(attrs={'class': 'form-control'}),
+            'precioTotal': forms.NumberInput(attrs={'class': 'form-control', 'disabled': 'disabled'}),
+            'precioPorDia': forms.NumberInput(attrs={'class': 'form-control', 'disabled': 'disabled'}),
             'incluyeDesayuno': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'observaciones': forms.Textarea(attrs={'class': 'form-control'}),
         }
@@ -55,6 +55,27 @@ class ReservaForm(forms.ModelForm):
 # class ReservaMultiForm(forms.Form):
 #     cliente_form = ClienteForm()
 #     reserva_form = ReservaForm()
+
+
+class PagosFormset():
+    class Meta:
+        model = MovimientoCaja
+        fields = '__all__'
+        widgets = {
+            'idConcepto': forms.Select(attrs={'class': 'form-control'}),
+            'idFormaPago': forms.Select(attrs={'class': 'form-control'}),
+            'fecha': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'monto': forms.NumberInput(attrs={'class': 'form-control'}),
+        }
+
+
+PagosReservaInlineFormset = forms.inlineformset_factory(
+    Reserva,
+    MovimientoCaja,
+    form=PagosFormset,
+    extra=1
+)
+
 
 class CajaForm(forms.ModelForm):
     class Meta:

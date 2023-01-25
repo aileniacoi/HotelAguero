@@ -249,6 +249,14 @@ h6 {
   font-family: "Poppins", sans-serif;
 }
 
+.card-title-calendar {
+  padding: 20px 0 15px 0;
+  font-size: 30px;
+  font-weight: 500;
+  color: #14213D;
+  font-family: "Poppins", sans-serif;
+}
+
 .card-title span {
   color: #899bbd;
   font-size: 14px;

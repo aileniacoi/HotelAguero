@@ -9,7 +9,7 @@ class ClienteSerializer(serializers.ModelSerializer):
 class HabitacionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Habitacion
-        fields = ('pk', 'numero')
+        fields = ('pk', 'numero', 'plazas')
 
 class ReservaSerializer(serializers.ModelSerializer):
     idCliente = ClienteSerializer()
