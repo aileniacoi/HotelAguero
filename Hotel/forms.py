@@ -57,24 +57,16 @@ class ReservaForm(forms.ModelForm):
 #     reserva_form = ReservaForm()
 
 
-class PagosFormset():
-    class Meta:
-        model = MovimientoCaja
-        fields = '__all__'
-        widgets = {
-            'idConcepto': forms.Select(attrs={'class': 'form-control'}),
-            'idFormaPago': forms.Select(attrs={'class': 'form-control'}),
-            'fecha': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'monto': forms.NumberInput(attrs={'class': 'form-control'}),
-        }
-
-
-PagosReservaInlineFormset = forms.inlineformset_factory(
-    Reserva,
-    MovimientoCaja,
-    form=PagosFormset,
-    extra=1
-)
+# class PagosFormset():
+#     class Meta:
+#         model = MovimientoCaja
+#         fields = '__all__'
+#         widgets = {
+#             'idConcepto': forms.Select(attrs={'class': 'form-control'}),
+#             'idFormaPago': forms.Select(attrs={'class': 'form-control'}),
+#             'fecha': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+#             'monto': forms.NumberInput(attrs={'class': 'form-control'}),
+#         }
 
 
 class CajaForm(forms.ModelForm):
@@ -90,6 +82,14 @@ class CajaForm(forms.ModelForm):
             'numeroComprobante': forms.TextInput(attrs={'class': 'form-control'}),
             'idReserva': forms.Select(attrs={'class': 'form-control'})
         }
+
+
+PagosReservaInlineFormset = forms.inlineformset_factory(
+    Reserva,
+    MovimientoCaja,
+    form=CajaForm,
+    extra=0
+)
 
 
 class ListaPrecioForm(forms.ModelForm):

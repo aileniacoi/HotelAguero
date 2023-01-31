@@ -62,7 +62,7 @@
         <td class="columnasCal">{{ hab.numero }}</td>
 
         {% for dia in cantidadDias %}
-        <td id="res_{{ hab.numero }}_{{ dia }}" class="columnasCal" ></td>
+        <td id="res_{{ hab.numero }}_{{ dia }}" class="columnasCal" data-toggle="popover" onclick="SetPopoverReserva({{ dia }}, {{ hab.numero }})"></td>
         {% endfor %}
 
       </tr>
@@ -87,15 +87,28 @@ function ConvertirFecha(fechaString){
     return new Date(fecha[0], fecha[1] - 1, fecha[2]);
 }
 
+function SetPopoverReserva(dia, hab) {
+
+    var celda = document.getElementById('res_' + hab + '_' + dia);
+    var fecha = new Date({{ anio }}, {{ mes }} - 1, dia);
+
+    var reserva = reservasJs.find(f =>
+            f.idHabitacion.numero == hab && ConvertirFecha(f.fechaIngreso) <= fecha && ConvertirFecha(f.fechaEgreso) >= fecha);
+
+    if(!reserva) return;
+
+    celda.setAttribute('data-content', reserva.cantidadPersonas + ' pax - Saldo: ' + reserva.seniaSolicitada);
+    celda.setAttribute('title', reserva.idCliente);
+}
+
 function GetColorSegunReserva(nHab, fecha) {
 
-        var reservas = reservasJs.filter(f =>
+        var reserva = reservasJs.find(f =>
             f.idHabitacion.numero == nHab && ConvertirFecha(f.fechaIngreso) <= fecha && ConvertirFecha(f.fechaEgreso) >= fecha);
 
-        if (!reservas || reservas.length === 0)
+        if (!reserva)
             return;
 
-        var reserva = reservas[0];
         if (reserva.seniaSolicitada > 0) {
             if (ConvertirFecha(reserva.fechaIngreso).getTime() == fecha.getTime()){
                 return '#73DD71';
@@ -161,9 +174,18 @@ function CargarDiasDeSemana(){
     {% endfor %}
 }
 
-window.addEventListener('load', ObtenerNombreMes())
-window.addEventListener('load', CargarColoresCalendario())
-window.addEventListener('load', CargarDiasDeSemana())
+function CargarDatosDeInicio(){
+    ObtenerNombreMes();
+    CargarColoresCalendario();
+    CargarDiasDeSemana();
+}
+
+window.addEventListener('load', CargarDatosDeInicio());
+
+var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+  return new bootstrap.Popover(popoverTriggerEl)
+})
 
 </script>
 {% endblock %}

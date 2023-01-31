@@ -54,8 +54,8 @@
                 </div>
 
                 <div class="col-3" style="float:right; margin-top: 15px; font-size:25;">
-                    <div>Total: {{ form_reserva.precioTotal.value}}</div>
-                    <div style="color: red;">Saldo: {{ form_reserva.precioTotal.value}}</div>
+                    <div>Total: ${{ form_reserva.precioTotal.value}}</div>
+                    <div style="color: red;">Saldo: ${{ saldo }}</div>
                 </div>
 
 
@@ -138,6 +138,42 @@
                     <label>{{ form_reserva.observaciones.label }}</label>
                     <span> {{ form_reserva.observaciones }}</span>
                 </div>
+            </div>
+
+            <h5 class="card-title">Pagos</h5>
+
+            {{ formset_pagos.management_form }}
+                <div col-md-8 offset-md-4 mt-5>
+                <div class="d-flex py-1 inline {{ product_meta_formset.prefix }}">
+
+                    {% for hidden in formset_pagos.hidden_fields %}
+                    {{ hidden }}
+                    {% endfor %}
+
+                    <div class="table-responsive">
+                        <table class="table table-hover" style="text-align: center; width: 800px;">
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Monto</th>
+                                <th>Concepto</th>
+                            </tr>
+                            {% for form in formset_pagos %}
+
+                            {% for hidden in form.hidden_fields %}
+                            {{ hidden }}
+                            {% endfor %}
+
+                            <tr>
+                                <td>{{ form.fecha.value|date:"d/m/Y" }}</td>
+                                <td>$ {{ form.monto.value }}</td>
+                                <td>{{ form.idConcepto.value }}</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+
+                </div>
+
             </div>
 
             <button type="submit" class="btn btn-success" style="margin-top:15px;">Enviar</button>

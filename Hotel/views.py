@@ -14,11 +14,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from django.views.generic.edit import FormView, UpdateView, DeleteView, CreateView
-from django.views.generic import DetailView, View
+from django.views.generic import DetailView, View, ListView
 from django.views import View
 from django.urls import reverse
-from django.db.models import Q
-
+from django.db.models import Q, Sum
 
 from django.conf import settings
 from io import BytesIO
@@ -58,16 +57,35 @@ def inicio(request):
     return render(request, 'base.html', context)
 
 def index(request):
-    context = {}
+    hoy = datetime.now().date()
+
+    ingresos = Reserva.objects.filter(fechaIngreso=hoy)
+    egresos = Reserva.objects.filter(fechaEgreso=hoy)
+
+    cantidadHabitaciones = Habitacion.objects.count()
+
+    reservasActuales = Reserva.objects.filter(fechaIngreso__lte=hoy, fechaEgreso__gte=hoy)
+
+    habitaciones_ocupadas = reservasActuales.values_list('idHabitacion', flat=True)
+    habitaciones_disponibles = Habitacion.objects.exclude(id__in=habitaciones_ocupadas)
+
+    context = {'ingresos': ingresos, 'egresos': egresos, 'cantidadHabitaciones':cantidadHabitaciones,
+               'habitacionesDisponibles': habitaciones_disponibles }
     return render(request, 'index.html', context)
 
 
 # ------ HABITACIONES ------
 
-def habitaciones(request):
-    habitaciones = Habitacion.objects.all()
-    context = {'habitaciones': habitaciones}
-    return render(request, 'listHabitaciones.html', context)
+# def habitaciones(request):
+#     habitaciones = Habitacion.objects.all()
+#     context = {'habitaciones': habitaciones}
+#     return render(request, 'listHabitaciones.html', context)
+
+class HabitacionesView(ListView):
+    template_name = 'listHabitaciones.html'
+    model = Habitacion
+    paginate_by = 10
+    context_object_name = 'habitaciones'
 
 
 # def detHabitacion(request, id):
@@ -107,7 +125,10 @@ class HabitacionesDisponiblesView(APIView):
     def get(self, request):
         fecha_ingreso = request.GET.get('fecha_ingreso')
         fecha_egreso = request.GET.get('fecha_egreso')
-        habitaciones_ocupadas = Reserva.objects.filter(fechaIngreso__lte=fecha_egreso, fechaIngreso__gte=fecha_egreso)\
+        # habitaciones_ocupadas = Reserva.objects.filter(fechaIngreso__lte=fecha_egreso, fechaIngreso__gte=fecha_egreso)\
+        #     .values_list('idHabitacion', flat=True)
+        habitaciones_ocupadas = Reserva.objects.filter(Q(fechaIngreso__range=[fecha_ingreso, fecha_egreso]) |
+                                                       Q(fechaIngreso__range=[fecha_ingreso, fecha_egreso]))\
             .values_list('idHabitacion', flat=True)
         habitaciones_disponibles = Habitacion.objects.exclude(id__in=habitaciones_ocupadas)
         serializer = HabitacionSerializer(habitaciones_disponibles, many=True)
@@ -116,10 +137,18 @@ class HabitacionesDisponiblesView(APIView):
 
 # ------ CLIENTES ------
 
-def clientes(request):
-    clientes = Cliente.objects.all()
-    context = {'clientes': clientes, }
-    return render(request, 'listClientes.html', context)
+
+# def clientes(request):
+#     clientes = Cliente.objects.all()
+#     context = {'clientes': clientes, }
+#     return render(request, 'listClientes.html', context)
+
+
+class ClientesView(ListView):
+    template_name = 'listClientes.html'
+    model = Cliente
+    paginate_by = 10
+    context_object_name = 'clientes'
 
 
 # class ClienteNuevoView(FormView):
@@ -168,10 +197,16 @@ def cliente_edit(request, pk=None):
 
 # ------ RESERVAS ------
 
-def reservas(request):
-    reservas = Reserva.objects.all()
-    context = {'reservas': reservas, }
-    return render(request, 'listReservas.html', context)
+# def reservas(request):
+#     reservas = Reserva.objects.all()
+#     context = {'reservas': reservas, }
+#     return render(request, 'listReservas.html', context)
+
+class ReservasView(ListView):
+    template_name = 'listReservas.html'
+    model = Reserva
+    paginate_by = 10
+    context_object_name = 'reservas'
 
 
 def reservasCalendario(request, mes=None, anio=None):
@@ -196,50 +231,23 @@ class ReservasDetalleView(DetailView):
     template_name = 'reservasForm.html'
 
 
-# class ReservasData(MultiModelFormView):
-#     form_classes = {
-#         'cliente_form': ClienteForm,
-#         'reserva_form': ReservaForm,
-#     }
-#     template_name = 'nuevareserva.html'
+# def edit_reserva(request, pk):
+#     reserva = Reserva.objects.get(pk=pk)
+#     cliente = Cliente.objects.get(pk=reserva.idCliente.pk)
+#     if request.method == 'POST':
+#         form_reserva = ReservaForm(request.POST, instance=reserva)
+#         form_cliente = ClienteForm(request.POST, instance=cliente)
+#         if form_reserva.is_valid() and form_cliente.is_valid():
+#             form_reserva.save()
+#             form_cliente.save()
+#             return redirect('index')
+#     else:
+#         form_reserva = ReservaForm(instance=reserva)
+#         form_cliente = ClienteForm(instance=cliente)
+#     return render(request, 'reservaDetail.html', {'form_reserva': form_reserva, 'form_cliente': form_cliente})
 #
-#     def get_success_url(self):
-#         return reverse('index')
-#
-#     def get_form_kwargs(self):
-#         kwargs = super().get_form_kwargs()
-#         kwargs.update(instance={
-#             'reserva_form': get_objects(),
-#             'cliente_form': self.object.idCliente,
-#         })
-#         return kwargs
-#
-#     def forms_valid(self, forms):
-#         cliente = forms['cliente_form'].save()
-#         reserva = forms['reserva_form'].save(commit=False)
-#
-#         reserva.idCliente = cliente
-#         forms['reserva_form'].save()
-#
-#         return super(ReservasData, self).forms_valid(forms)
 
 def edit_reserva(request, pk):
-    reserva = Reserva.objects.get(pk=pk)
-    cliente = Cliente.objects.get(pk=reserva.idCliente.pk)
-    if request.method == 'POST':
-        form_reserva = ReservaForm(request.POST, instance=reserva)
-        form_cliente = ClienteForm(request.POST, instance=cliente)
-        if form_reserva.is_valid() and form_cliente.is_valid():
-            form_reserva.save()
-            form_cliente.save()
-            return redirect('index')
-    else:
-        form_reserva = ReservaForm(instance=reserva)
-        form_cliente = ClienteForm(instance=cliente)
-    return render(request, 'reservaDetail.html', {'form_reserva': form_reserva, 'form_cliente': form_cliente})
-
-
-def edit_reserva2(request, pk):
     reserva = Reserva.objects.get(pk=pk)
     cliente = Cliente.objects.get(pk=reserva.idCliente.pk)
     pagos = MovimientoCaja.objects.filter(idReserva=reserva)
@@ -254,7 +262,10 @@ def edit_reserva2(request, pk):
         form_reserva = ReservaForm(instance=reserva)
         form_cliente = ClienteForm(instance=cliente)
         p_formset = PagosReservaInlineFormset(instance=reserva)
-    return render(request, 'nuevareserva.html', {'form_reserva': form_reserva, 'form_cliente': form_cliente, 'formset_pagos': p_formset})
+        pagosRealizados = pagos.aggregate(valor_total=Sum('monto'))['valor_total']
+        saldo = reserva.precioTotal - pagosRealizados
+    return render(request, 'reservaDetail.html', {'form_reserva': form_reserva, 'form_cliente': form_cliente, 'formset_pagos': p_formset,
+                                                  'saldo': saldo})
 
 
 def alta_reserva(request):
@@ -263,6 +274,9 @@ def alta_reserva(request):
     if request.method == 'POST':
         form_reserva = ReservaForm(request.POST, instance=reserva)
         form_cliente = ClienteForm(request.POST, instance=cliente)
+
+        print(form_reserva.errors)
+        print(form_cliente.errors)
         if form_cliente.is_valid() and form_reserva.is_valid():
             cliente = form_cliente.save()
             reserva = form_reserva.save(commit=False)
@@ -271,7 +285,8 @@ def alta_reserva(request):
 
             messages.success(request, "La reserva \"{}\" fue creada.".format(reserva))
 
-            return redirect("/reservas/edit/" + str(reserva.pk), edit_reserva())
+            return redirect("")
+            #return redirect("/reservas/edit/" + str(reserva.pk), edit_reserva())
     else:
         form_reserva = ReservaForm(instance=reserva)
         form_cliente = ClienteForm(instance=cliente)
@@ -296,6 +311,7 @@ def alta_reserva(request):
 #         form = ReservaForm(instance=reserva)
 #     return render(request, "reservasForm.html", {"method": request.method, "form": form, })
 
+
 # ------ LISTAS DE PRECIO ------
 
 
@@ -303,6 +319,13 @@ def listasPrecio(request):
     listas = ListaPrecio.objects.all()
     context = {'listas': listas, }
     return render(request, 'listPrecios.html', context)
+
+
+class ListaPrecioView(ListView):
+    template_name = 'listPrecios.html'
+    model = ListaPrecio
+    paginate_by = 10
+    context_object_name = 'listas'
 
 
 def listaPrecio_edit(request, pk=None):
@@ -390,10 +413,17 @@ def listaPrecio_edit(request, pk=None):
 
 # ------ CAJA ------
 
-def movimientosCaja(request):
-    cajaMov = MovimientoCaja.objects.all()
-    context = {'cajaMov': cajaMov, }
-    return render(request, 'listCaja.html', context)
+# def movimientosCaja(request):
+#     cajaMov = MovimientoCaja.objects.all()
+#     context = {'cajaMov': cajaMov, }
+#     return render(request, 'listCaja.html', context)
+
+
+class MovimientosCajaView(ListView):
+    template_name = 'listCaja.html'
+    model = MovimientoCaja
+    paginate_by = 15
+    context_object_name = 'cajaMov'
 
 
 def caja_edit(request, pk=None):

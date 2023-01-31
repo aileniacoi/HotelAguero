@@ -61,8 +61,8 @@
         <tbody>
         {% for lista in listas %}
         <tr>
-            <td>{{ lista.vigenciaDesde }}</td>
-            <td>{{ lista.vigenciaHasta }}</td>
+            <td>{{ lista.vigenciaDesde|date:"d/m/Y" }}</td>
+            <td>{{ lista.vigenciaHasta|date:"d/m/Y" }}</td>
             <td>{{ lista.get_idTipoLista_display}}</td>
             <td style="width:1%"><a class="btn btn-outline-primary btn-sm" href="edit/{{ lista.pk }}">Editar</a></td>
             <td style="width:1%"><a class="btn btn-outline-danger btn-sm" href="delete/{{ lista.pk }}">Borrar</a></td>
@@ -76,6 +76,8 @@
 </div>
     </div>
 </div>
+
+    {% include 'paginator.html' %}
 </div>
 
 </main>

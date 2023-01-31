@@ -176,7 +176,7 @@ function GetPrice(fechaIngreso, fechaEgreso, cantidadPersonas) {
 
     if (!fechaIngreso || !fechaEgreso || !cantidadPersonas) return;
 
-    var data = {
+    var jsonObject = {
         fechaIngreso: fechaIngreso,
         fechaEgreso: fechaEgreso,
         cantidadPersonas: cantidadPersonas };
@@ -186,7 +186,7 @@ function GetPrice(fechaIngreso, fechaEgreso, cantidadPersonas) {
     fetch("/get_precio/", {
         method: "POST",
         headers: { "Content-Type": "application/json" , "X-CSRFToken": csrftoken },
-        body: JSON.stringify(data)
+        body: JSON.stringify(jsonObject)
     })
         .then(response => response.json())
         .then(data => {

@@ -1,13 +1,15 @@
 from django.urls import path
 from . import views
-from Hotel.views import ReservasDetalleView, ReporteReservasPDF, HabitacionesDisponiblesView
+from Hotel.views import ReservasDetalleView, ReporteReservasPDF, HabitacionesDisponiblesView, HabitacionesView, \
+    ClientesView, ReservasView, ListaPrecioView, MovimientosCajaView
 
 urlpatterns = [
     path('', views.inicio, name='vInicio'),
     path('index/', views.index, name='index'),
 
     #HABITACIONES
-    path('habitaciones/', views.habitaciones, name='habitaciones'),
+    #path('habitaciones/', views.habitaciones, name='habitaciones'),
+    path('habitaciones/', HabitacionesView.as_view(), name='habitaciones'),
     path('habitaciones/add/', views.habitacion_edit, name='newHabitacion'),
     path('habitaciones/viewdetail/<int:pk>/', views.habitacion_edit, name='detailHabitacion'),
     path('habitaciones/edit/<int:pk>/', views.habitacion_edit, name='modHabitacion'),
@@ -16,7 +18,8 @@ urlpatterns = [
     path('api/habitaciones/disponibles/', HabitacionesDisponiblesView.as_view()),
 
     #CLIENTES
-    path('clientes/', views.clientes, name='clientes'),
+    #path('clientes/', views.clientes, name='clientes'),
+    path('clientes/', views.ClientesView.as_view(), name='clientes'),
     path('clientes/add/', views.cliente_edit, name='newCliente'),
     path('clientes/edit/<int:pk>/', views.cliente_edit, name='modCliente'),
     path('clientes/viewdetail/<int:pk>/', views.cliente_edit, name='detailCliente'),
@@ -24,7 +27,8 @@ urlpatterns = [
 
 
     #RESERVAS
-    path('reservas/', views.reservas, name='reservas'),
+    #path('reservas/', views.reservas, name='reservas'),
+    path('reservas/', views.ReservasView.as_view(), name='reservas'),
     path('reservas/calendar/<int:mes>/<int:anio>/', views.reservasCalendario, name='reservasCalendario'),
     #path('reservas/add/', views.reserva_edit, name='newReserva'),
     path('reservas/add/', views.alta_reserva, name='nuevaReserva'),
@@ -35,7 +39,7 @@ urlpatterns = [
 
 
     #LISTAS DE PRECIO
-    path('listasprecio/', views.listasPrecio, name='listasPrecio'),
+    path('listasprecio/', views.ListaPrecioView.as_view(), name='listasPrecio'),
     path('listasprecio/add/', views.listaPrecio_edit, name='newPrecio'),
     path('listasprecio/edit/<int:pk>/', views.listaPrecio_edit, name='modlistasPrecio'),
     path('listasprecio/viewdetail/<int:pk>/', views.listaPrecio_edit, name='deleteListasPrecio'),
@@ -43,7 +47,7 @@ urlpatterns = [
 
 
     #CAJA
-    path('movimientoscaja/', views.movimientosCaja, name='movimientosCaja'),
+    path('movimientoscaja/', views.MovimientosCajaView.as_view(), name='movimientosCaja'),
     path('movimientoscaja/add/', views.caja_edit, name="newCaja"),
     path('movimientoscaja/edit/<int:pk>/', views.caja_edit, name="modCaja"),
     path('movimientoscaja/viewdetail/<int:pk>/', views.caja_edit, name="detalleCaja"),
