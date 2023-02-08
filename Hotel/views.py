@@ -7,7 +7,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.forms import inlineformset_factory
 from .forms import ClienteForm, HabitacionForm, ReservaForm, CajaForm, ListaPrecioForm, DetalleListaPrecioForm, \
-    ListaPrecioDetalleInlineFormset, PagosReservaInlineFormset
+    ListaPrecioDetalleInlineFormset, PagosReservaInlineFormset, FiltrosCajaForm
 from .serializers import ReservaSerializer, HabitacionSerializer
 
 from rest_framework.views import APIView
@@ -24,6 +24,7 @@ from io import BytesIO
 from reportlab.pdfgen import canvas
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from reportlab.lib.units import cm
+from reportlab.lib.pagesizes import landscape, A4
 from reportlab.lib import colors
 import os
 import json
@@ -128,9 +129,9 @@ class HabitacionesDisponiblesView(APIView):
         # habitaciones_ocupadas = Reserva.objects.filter(fechaIngreso__lte=fecha_egreso, fechaIngreso__gte=fecha_egreso)\
         #     .values_list('idHabitacion', flat=True)
         habitaciones_ocupadas = Reserva.objects.filter(Q(fechaIngreso__range=[fecha_ingreso, fecha_egreso]) |
-                                                       Q(fechaIngreso__range=[fecha_ingreso, fecha_egreso]))\
+                                                       Q(fechaEgreso__range=[fecha_ingreso, fecha_egreso]))\
             .values_list('idHabitacion', flat=True)
-        habitaciones_disponibles = Habitacion.objects.exclude(id__in=habitaciones_ocupadas)
+        habitaciones_disponibles = Habitacion.objects.exclude(pk__in=habitaciones_ocupadas)
         serializer = HabitacionSerializer(habitaciones_disponibles, many=True)
         return Response(serializer.data)
 
@@ -425,6 +426,31 @@ class MovimientosCajaView(ListView):
     paginate_by = 15
     context_object_name = 'cajaMov'
 
+    def get_queryset(self):
+        form = FiltrosCajaForm(self.request.GET or None)
+        queryset = super().get_queryset()
+        if form.is_valid():
+            fecha_desde = form.cleaned_data['fechaDesde']
+            fecha_hasta = form.cleaned_data['fechaHasta']
+            ingresos = form.cleaned_data['ingresos']
+            egresos = form.cleaned_data['egresos']
+            if fecha_desde and fecha_hasta:
+                queryset = queryset.filter(fecha__range=(fecha_desde, fecha_hasta))
+            elif fecha_desde:
+                queryset = queryset.filter(fecha__gte=fecha_desde)
+            elif fecha_hasta:
+                queryset = queryset.filter(fecha__lte=fecha_hasta)
+            if not ingresos:
+                queryset = queryset.exclude(idTipoMovimiento="IN")
+            if not egresos:
+                queryset = queryset.exclude(idTipoMovimiento="EG")
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = FiltrosCajaForm(self.request.GET or None)
+        return context
+
 
 def caja_edit(request, pk=None):
     if pk is not None:
@@ -451,7 +477,7 @@ class ReporteReservasPDF(View):
 
     def cabecera(self, pdf):
         archivo_imagen = os.path.join(settings.BASE_DIR, '/HotelAguero/Hotel/static/Hotel/logo-ha-rep.jpg')
-        pdf.drawImage(archivo_imagen, 40, 750, 120, 90, preserveAspectRatio=True)
+        pdf.drawImage(archivo_imagen, 40, 740, 120, 90, preserveAspectRatio=True)
         pdf.setFont("Helvetica", 16)
         pdf.drawString(230, 790, u"HOTEL AGÜERO")
         pdf.setFont("Helvetica", 14)
@@ -463,7 +489,7 @@ class ReporteReservasPDF(View):
         pdf = canvas.Canvas(buffer)
 
         self.cabecera(pdf)
-        y = 600
+        y = 680
         self.tabla(pdf, y)
 
         pdf.showPage()
@@ -474,6 +500,7 @@ class ReporteReservasPDF(View):
         return response
 
     def tabla(self, pdf, y):
+
         encabezados = ('Cliente', 'Habitacion', 'Fecha de ingreso', 'Precio total')
         detalles = [(reserva.idCliente, reserva.idHabitacion, reserva.fechaIngreso, reserva.precioTotal) for reserva in
                     Reserva.objects.all()]
@@ -488,6 +515,120 @@ class ReporteReservasPDF(View):
         ))
         detalle_orden.wrapOn(pdf, 800, 600)
         detalle_orden.drawOn(pdf, 60, y)
+
+
+def ReporteReservasCalendarioPDF(request, mes, anio):
+
+    response = HttpResponse(content_type='application/pdf')
+    buffer = BytesIO()
+    pdf = canvas.Canvas(buffer, landscape(A4))
+
+    archivo_imagen = os.path.join(settings.BASE_DIR, '/HotelAguero/Hotel/static/Hotel/logo-ha-rep.jpg')
+    pdf.drawImage(archivo_imagen, 100, 490, 120, 90, preserveAspectRatio=True)
+    pdf.setFont("Helvetica", 16)
+    pdf.drawString(350, 540, u"HOTEL AGÜERO")
+    pdf.setFont("Helvetica", 14)
+    pdf.drawString(330, 510, u"REPORTE DE RESERVAS")
+
+    y = 200
+
+    rangoFecha = calendar.monthrange(anio, mes)
+    cantidadDias = rangoFecha[1]
+
+    habitaciones = Habitacion.objects.all().order_by('numero')
+    reservas = Reserva.objects.filter(Q(fechaIngreso__month=mes, fechaIngreso__year=anio) |
+                                      Q(fechaEgreso__month=mes, fechaEgreso__year=anio))
+
+    estado_reserva = {hab.numero: [False for i in range(cantidadDias)] for hab in habitaciones}
+    print(estado_reserva)
+
+    for res in reservas:
+        habitacion = res.idHabitacion.numero
+        ingreso = res.fechaIngreso.day
+        egreso = res.fechaEgreso.day
+        for i in range(ingreso - 1, egreso):
+            estado_reserva[habitacion][i] = True
+
+    datosTabla = [[''] + [(dia + 1) for dia in range(cantidadDias)]]
+
+    for hab in habitaciones:
+        row = [hab.numero] + ['' if not estado_reserva[hab.numero][i] else 'X' for i in range(cantidadDias)]
+        datosTabla.append(row)
+
+    detalle_orden = Table(datosTabla, colWidths=[0.9 * cm])
+    detalle_orden.setStyle(TableStyle(
+        [
+            ('ALIGN', (0, 0), (3, 0), 'CENTER'),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ]
+    ))
+    detalle_orden.wrapOn(pdf, 800, 400)
+    detalle_orden.drawOn(pdf, 20, y)
+
+    pdf.showPage()
+    pdf.save()
+    pdf = buffer.getvalue()
+    buffer.close()
+    response.write(pdf)
+    return response
+
+
+def ReporteCajaPDF(request):
+    form = FiltrosCajaForm(request.GET or None)
+    if form.is_valid():
+        fecha_desde = form.cleaned_data.get('fechaDesde')
+        fecha_hasta = form.cleaned_data.get('fechaHasta')
+        ingresos = form.cleaned_data.get('ingresos')
+        egresos = form.cleaned_data.get('egresos')
+        movimientos = MovimientoCaja.objects.filter(fecha__gte=fecha_desde, fecha__lte=fecha_hasta)
+        if not ingresos:
+            movimientos = movimientos.exclude(idTipoMovimiento='IN')
+        if not egresos:
+            movimientos = movimientos.exclude(idTipoMovimiento='IG')
+
+        buffer = BytesIO()
+        pdf = canvas.Canvas(buffer)
+
+        #Cabecera
+        archivo_imagen = os.path.join(settings.BASE_DIR, '/HotelAguero/Hotel/static/Hotel/logo-ha-rep.jpg')
+        pdf.drawImage(archivo_imagen, 40, 740, 120, 90, preserveAspectRatio=True)
+        pdf.setFont("Helvetica", 16)
+        pdf.drawString(230, 790, u"HOTEL AGÜERO")
+        pdf.setFont("Helvetica", 14)
+        pdf.drawString(200, 770, u"REPORTE DE CAJA")
+
+        y = 680
+
+
+        #tabla
+        encabezados = ('Fecha', 'Tipo', 'Concepto', 'Monto', 'N° Reserva')
+        detalles = [(mov.fecha, mov.idTipoMovimiento, mov.idConvepto, mov.idReserva) for mov in
+                    movimientos]
+
+        detalle_orden = Table([encabezados] + detalles, colWidths=[2 * cm, 5 * cm, 5 * cm, 5 * cm])
+        detalle_orden.setStyle(TableStyle(
+            [
+                ('ALIGN', (0, 0), (3, 0), 'CENTER'),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                ('FONTSIZE', (0, 0), (-1, -1), 10),
+            ]
+        ))
+        detalle_orden.wrapOn(pdf, 800, 600)
+        detalle_orden.drawOn(pdf, 60, y)
+
+        pdf.showPage()
+        pdf.save()
+        pdf = buffer.getvalue()
+        buffer.close()
+        response.write(pdf)
+
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="movimientos.pdf"'
+        return response
+
+    print(form.errors)
+    return render(request, 'listCaja.html', {'form': form})
 
 
 #------SOLICITUDES------
@@ -508,4 +649,16 @@ def get_price(request):
                 print(detalle_precio)
                 return JsonResponse({'precio':detalle_precio.precioPorDia})
         return JsonResponse({'precio': None})
+
+
+def BuscarReservaCliente(request):
+    if request.method == "POST":
+        cliente_buscado = request.POST['cliente_buscado']
+        clientes = Cliente.objects.filter(Q(nombreYApellido__contains=cliente_buscado) |
+                                          Q(dni__contains=cliente_buscado))
+
+        reservas = Reserva.objects.filter(idCliente__in=clientes)
+        return render(request, 'listReservas.html', {'cliente_buscado': cliente_buscado, 'reservas': reservas})
+    else:
+        return render(request, 'listReservas.html', {})
 

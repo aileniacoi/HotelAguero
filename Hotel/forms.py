@@ -41,8 +41,8 @@ class ReservaForm(forms.ModelForm):
             'idHabitacion': forms.Select(attrs={'class': 'form-control'}),
             #'idCliente': forms.Select(attrs={'class': 'form-control'}),
             'seniaSolicitada': forms.NumberInput(attrs={'class': 'form-control'}),
-            'precioTotal': forms.NumberInput(attrs={'class': 'form-control', 'disabled': 'disabled'}),
-            'precioPorDia': forms.NumberInput(attrs={'class': 'form-control', 'disabled': 'disabled'}),
+            'precioTotal': forms.NumberInput(attrs={'class': 'form-control'}),
+            'precioPorDia': forms.NumberInput(attrs={'class': 'form-control'}),
             'incluyeDesayuno': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'observaciones': forms.Textarea(attrs={'class': 'form-control'}),
         }
@@ -83,6 +83,12 @@ class CajaForm(forms.ModelForm):
             'idReserva': forms.Select(attrs={'class': 'form-control'})
         }
 
+
+class FiltrosCajaForm(forms.Form):
+    fechaDesde = forms.DateField(required=False, widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}))
+    fechaHasta = forms.DateField(required=False, widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}))
+    ingresos = forms.BooleanField(required=False, initial=True, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
+    egresos = forms.BooleanField(required=False, initial=True, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
 
 PagosReservaInlineFormset = forms.inlineformset_factory(
     Reserva,
