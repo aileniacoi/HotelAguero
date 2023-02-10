@@ -27,9 +27,9 @@
             <a class="btn btn-success m-3" href="add" style="float: right;"><i class="fa-solid fa-plus"></i> Agregar</a>
        </div>
        <div class="col-md-1">
-            <a href="{% url 'reporte_caja_pdf' %}" class="btn btn-secondary btn-block" style="margin-top:15px;">
+            <button onclick="GenerarPDF()" class="btn btn-secondary btn-block" style="margin-top:15px;">
                 <i class="fa-regular fa-file-pdf"></i> PDF
-            </a>
+            </button>
         </div>
    </div>
 
@@ -155,16 +155,25 @@ function LimpiarFiltros(){
     });
 }
 
-/*function GenerarPDF(){
+function GenerarPDF(){
 
-   var fechaDesde = document.getElementById("fechaDesde").value;
-   var fechaHasta = document.getElementById("fechaHasta").value;
-   var ingresos = document.getElementById("ingresos").value;
-   var egresos = document.getElementById("egresos").value;
+   var fechaDesde = document.getElementById("id_fechaDesde").value;
+   var fechaHasta = document.getElementById("id_fechaHasta").value;
+   var ingresos = document.getElementById("id_ingresos").checked;
+   var egresos = document.getElementById("id_egresos").checked;
 
-   fetch(´reporte_caja_pdf?fechaDesde=${fechaDesde}&fechaHasta=${fechaHasta}&ingresos=${ingresos}&egresos=${egresos}´)
+   var token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
 
-}*/
+   var url = '/reporte_caja_pdf?csrfmiddlewaretoken=' + token + '&fechaDesde=' + fechaDesde + '&fechaHasta=' + fechaHasta +
+   '&ingresos=' + ingresos + '&egresos=' + egresos;
+
+   fetch(url)
+        .then(response => response.blob())
+        .then(blob => {
+        let url = window.URL.createObjectURL(blob);
+        window.open(url);
+        });
+}
 
 </script>
 {% endblock %}

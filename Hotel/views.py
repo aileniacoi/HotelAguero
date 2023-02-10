@@ -575,61 +575,64 @@ def ReporteReservasCalendarioPDF(request, mes, anio):
 
 
 def ReporteCajaPDF(request):
-    form = FiltrosCajaForm(request.GET or None)
-    if form.is_valid():
-        fecha_desde = form.cleaned_data.get('fechaDesde')
-        fecha_hasta = form.cleaned_data.get('fechaHasta')
-        ingresos = form.cleaned_data.get('ingresos')
-        egresos = form.cleaned_data.get('egresos')
-        movimientos = MovimientoCaja.objects.filter(fecha__gte=fecha_desde, fecha__lte=fecha_hasta)
-        if not ingresos:
-            movimientos = movimientos.exclude(idTipoMovimiento='IN')
-        if not egresos:
-            movimientos = movimientos.exclude(idTipoMovimiento='IG')
 
-        buffer = BytesIO()
-        pdf = canvas.Canvas(buffer)
+    fecha_desde = request.GET.get('fechaDesde')
+    fecha_hasta = request.GET.get('fechaHasta')
+    ingresos = request.GET.get('ingresos')
+    egresos = request.GET.get('egresos')
 
-        #Cabecera
-        archivo_imagen = os.path.join(settings.BASE_DIR, '/HotelAguero/Hotel/static/Hotel/logo-ha-rep.jpg')
-        pdf.drawImage(archivo_imagen, 40, 740, 120, 90, preserveAspectRatio=True)
-        pdf.setFont("Helvetica", 16)
-        pdf.drawString(230, 790, u"HOTEL AGÜERO")
-        pdf.setFont("Helvetica", 14)
-        pdf.drawString(200, 770, u"REPORTE DE CAJA")
+    response = HttpResponse(content_type='application/pdf')
 
-        y = 680
+    movimientos = MovimientoCaja.objects.all()
+
+    if fecha_desde != '':
+        movimientos = movimientos.filter(fecha__gte=fecha_desde)
+    if fecha_hasta != '':
+        movimientos = movimientos.filter(fecha__lte=fecha_hasta)
+
+    if ingresos != 'true':
+        movimientos = movimientos.exclude(idTipoMovimiento='IN')
+    if egresos != 'true':
+        movimientos = movimientos.exclude(idTipoMovimiento='EG')
+
+    buffer = BytesIO()
+    pdf = canvas.Canvas(buffer)
+
+    #Cabecera
+    archivo_imagen = os.path.join(settings.BASE_DIR, '/HotelAguero/Hotel/static/Hotel/logo-ha-rep.jpg')
+    pdf.drawImage(archivo_imagen, 40, 740, 120, 90, preserveAspectRatio=True)
+    pdf.setFont("Helvetica", 16)
+    pdf.drawString(230, 790, u"HOTEL AGÜERO")
+    pdf.setFont("Helvetica", 14)
+    pdf.drawString(228, 770, u"REPORTE DE CAJA")
+
+    y = 650
+
+    #tabla
+    encabezados = ('Fecha', 'Tipo', 'Concepto', 'Monto', 'N° Reserva')
+    detalles = [(mov.fecha.strftime("%d/%m/%Y"), mov.get_idTipoMovimiento_display(), mov.get_idConcepto_display(),'$ ' + str(mov.monto),
+                 mov.idReserva) for mov in movimientos]
+
+    detalle_orden = Table([encabezados] + detalles, colWidths=[3 * cm, 3 * cm, 3.5 * cm, 3.5 * cm, 5 *cm])
+    detalle_orden.setStyle(TableStyle(
+        [
+            ('ALIGN', (0, 0), (3, 0), 'CENTER'),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ]
+    ))
+    detalle_orden.wrapOn(pdf, 800, 600)
+    detalle_orden.drawOn(pdf, 60, y)
 
 
-        #tabla
-        encabezados = ('Fecha', 'Tipo', 'Concepto', 'Monto', 'N° Reserva')
-        detalles = [(mov.fecha, mov.idTipoMovimiento, mov.idConvepto, mov.idReserva) for mov in
-                    movimientos]
+    pdf.showPage()
+    pdf.save()
+    pdf = buffer.getvalue()
+    buffer.close()
+    response.write(pdf)
 
-        detalle_orden = Table([encabezados] + detalles, colWidths=[2 * cm, 5 * cm, 5 * cm, 5 * cm])
-        detalle_orden.setStyle(TableStyle(
-            [
-                ('ALIGN', (0, 0), (3, 0), 'CENTER'),
-                ('GRID', (0, 0), (-1, -1), 1, colors.black),
-                ('FONTSIZE', (0, 0), (-1, -1), 10),
-            ]
-        ))
-        detalle_orden.wrapOn(pdf, 800, 600)
-        detalle_orden.drawOn(pdf, 60, y)
-
-        pdf.showPage()
-        pdf.save()
-        pdf = buffer.getvalue()
-        buffer.close()
-        response.write(pdf)
-
-        response = HttpResponse(pdf, content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="movimientos.pdf"'
-        return response
-
-    print(form.errors)
-    return render(request, 'listCaja.html', {'form': form})
-
+    response['Content-Disposition'] = 'attachment; filename="movimientos.pdf"'
+    return response
 
 #------SOLICITUDES------
 
