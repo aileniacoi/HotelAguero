@@ -30,9 +30,9 @@ import os
 import json
 from django.http import JsonResponse
 from django.core import serializers
-#from multi_form_view import MultiModelFormView
+from django.utils import timezone
 
-from datetime import datetime, date, time
+from datetime import datetime, date, time, timedelta
 import calendar
 
 # Create your views here.
@@ -208,6 +208,25 @@ class ReservasView(ListView):
     model = Reserva
     paginate_by = 10
     context_object_name = 'reservas'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        now = timezone.now().date()
+
+        pagos = MovimientoCaja.objects.filter(idReserva__in= context['reservas'].values_list('pk', flat=True))
+        suma_pagos = pagos.aggregate(valor_total=Sum('monto'))['valor_total']
+
+        for reserva in context['reservas']:
+            pagosReserva = pagos.filter(idReserva = reserva.pk)
+
+            reserva_vencida = False
+            if reserva.fechaRegistro + timedelta(days=2) < now and not pagosReserva.exists():
+                reserva_vencida = True
+
+            reserva.reserva_vencida = reserva_vencida
+            reserva.saldo = reserva.precioTotal - suma_pagos
+
+        return context
 
 
 def reservasCalendario(request, mes=None, anio=None):

@@ -49,7 +49,7 @@ class Reserva(models.Model):
 
 
     def __str__(self):
-        return f'{self.idCliente} - {self.fechaIngreso}'
+        return f'{self.pk} - {self.idCliente}'
 
 
 class ListaPrecio(models.Model):
@@ -78,28 +78,6 @@ class DetalleListaPrecio(models.Model):
     
     def __str__(self):
         return f'{self.cantidadPersonas} pers. - $ {self.precioPorDia}'
-    
-#
-# class DescuentoDetalleListaPrecio(models.Model):
-#     """Descuento sobre los detalles en listas de precio"""
-#     CINCOPORCIENTO = 'CP'
-#     DIEZPORCIENTO = 'DP'
-#     QUINCEPORCIENTO = 'QP'
-#     VEINTEPORCIENTO = 'VP'
-#     DESCUENTO = [
-#         (CINCOPORCIENTO, '5%'),
-#         (DIEZPORCIENTO, '10%'),
-#         (QUINCEPORCIENTO, '15%'),
-#         (VEINTEPORCIENTO, '20%'),
-#     ]
-#     idDescuento = models.CharField(choices=DESCUENTO, verbose_name='Porcentaje de descuento', max_length=3)
-#     precioTotalRedondeado = models.DecimalField(decimal_places=2, max_digits=10)
-#     precioPorDia = models.DecimalField(decimal_places=2, max_digits=10)
-#     idDetalleListaPrecio = models.ForeignKey(DetalleListaPrecio, on_delete=models.CASCADE)
-#     cantidadDias = models.IntegerField()
-#
-#     def __str__(self):
-#         return f'{self.cantidadDias} días - ${self.precioTotalRedondeado}'
 
 
 class MovimientoCaja(models.Model):

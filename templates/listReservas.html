@@ -44,44 +44,53 @@
         {% endfor %}
     {% endif %}
 
-  <div id="accordion">
 
-      {% for reserva in reservas %}
-    <div class="card">
-      <div class="card-header">
-        <a class="btn" data-bs-toggle="collapse" href="#collapse{{ forloop.counter }}">
-            {{ reserva.idCliente }} - {{ reserva.fechaIngreso }}
-        </a>
-          <div style="float: right;">
-            <a class="btn btn-outline-primary btn-sm" href="edit/{{ reserva.pk }}">Editar</a>
-            <a class="btn btn-outline-danger btn-sm" href="delete/{{ reserva.pk }}">Borrar</a>
-          </div>
-      </div>
-      <div id="collapse{{ forloop.counter }}" class="collapse" data-bs-parent="#accordion">
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+
+
         <div class="card-body">
+
+            <h5 class="card-title">Tabla de Reservas</h5>
+
             <div class="table-responsive">
-                <table class="table table-bordered table-striped mx-5" style="width: 300px">
+                <table class="table table-hover" >
                     <tr>
-                        <td style="width: 80px;"><i class="fa-sharp fa-solid fa-person" title="Cantidad de personas"></i></td>
-                        <td>{{ reserva.cantidadPersonas }} pax</td>
+                        <th>Id</th>
+                        <th>Hab</th>
+                        <th>Pax</th>
+                        <th>Cliente</th>
+                        <th>Check-in</th>
+                        <th>Check-out</th>
+                        <th>Saldo</th>
+                        <th style="width: 1%"></th>
+                        <th style="width: 1%"></th>
                     </tr>
-                    <tr>
-                        <td style="width: 80px;"><i class="fa-solid fa-bed" title="N° de habitación"></i></td>
+                    {% for reserva in reservas %}
+                    <tr {% if reserva.reserva_vencida %}style="background-color:#FFE4E4;" title="Esta reserva fue registrada hace 2 días o más pero aún no se registra una seña"{% endif %}>
+                        <td>{{ reserva.pk }}</td>
+                        {% if reserva.idHabitacion is None %}
+                        <td class="text-warning blink" style="font-size:23"><i class="fa-solid fa-triangle-exclamation"></i></td>
+                        {% else %}
                         <td>{{ reserva.idHabitacion }}</td>
+                        {% endif %}
+                        <td>{{ reserva.cantidadPersonas }}</td>
+                        <td>{{ reserva.idCliente }}</td>
+                        <td>{{ reserva.fechaIngreso|date:"d/m/Y" }}</td>
+                        <td>{{ reserva.fechaEgreso|date:"d/m/Y" }}</td>
+                        <td>{{ reserva.saldo }}</td>
+                        <td><a class="btn btn-outline-primary btn-sm" href="edit/{{ reserva.pk }}">Editar</a></td>
+                        <td><a class="btn btn-outline-danger btn-sm" href="delete/{{ reserva.pk }}">Borrar</a></td>
                     </tr>
-                    <tr>
-                        <td style="width: 80px;"><i class="fa-solid fa-money-bill-1" title="Precio total"></i></td>
-                        <td>$ {{ reserva.precioTotal }}</td>
-                    </tr>
+                    {% endfor %}
                 </table>
-                <a type="button" class="btn btn-secondary ms-5" href="viewdetail/{{ reserva.pk }}">Ver mas</a>
             </div>
         </div>
-      </div>
+        </div>
     </div>
+</div>
 
-      {% endfor %}
-  </div>
 
     {% include 'paginator.html' %}
 </div>
