@@ -28,6 +28,12 @@ class HabitacionForm(forms.ModelForm):
         }
 
 
+class FiltrosReservaForm(forms.Form):
+    fechaDesde = forms.DateField(required=False, widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}))
+    fechaHasta = forms.DateField(required=False, widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}))
+    mostrarHistoricas = forms.BooleanField(required=False, initial=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
+    soloGestionPendiente = forms.BooleanField(required=False, initial=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
+
 class ReservaForm(forms.ModelForm):
     class Meta:
         model = Reserva
@@ -51,22 +57,6 @@ class ReservaForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['fechaRegistro'].initial = datetime.now().date()
         self.fields['incluyeDesayuno'].initial = True
-
-# class ReservaMultiForm(forms.Form):
-#     cliente_form = ClienteForm()
-#     reserva_form = ReservaForm()
-
-
-# class PagosFormset():
-#     class Meta:
-#         model = MovimientoCaja
-#         fields = '__all__'
-#         widgets = {
-#             'idConcepto': forms.Select(attrs={'class': 'form-control'}),
-#             'idFormaPago': forms.Select(attrs={'class': 'form-control'}),
-#             'fecha': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-#             'monto': forms.NumberInput(attrs={'class': 'form-control'}),
-#         }
 
 
 class CajaForm(forms.ModelForm):

@@ -50,12 +50,18 @@
                         <div class="col-7" style="margin-top: 25px;">
                             Fecha de registro: {{ form_reserva.fechaRegistro.value|date:"d/m/Y" }}
                         </div>
+                        <div hidden>
+                            {{ form_reserva.fechaRegistro }}
+                        </div>
                     </div>
                 </div>
 
                 <div class="col-3" style="float:right; margin-top: 15px; font-size:25;">
                     <div>Total: ${{ form_reserva.precioTotal.value}}</div>
                     <div style="color: red;">Saldo: ${{ saldo }}</div>
+                </div>
+                <div hidden>
+                    {{ form_reserva.precioTotal }}
                 </div>
 
 
@@ -159,6 +165,7 @@
                             </tr>
                             {% for form in formset_pagos %}
 
+
                             {% for hidden in form.hidden_fields %}
                             {{ hidden }}
                             {% endfor %}
@@ -168,6 +175,12 @@
                                 <td>$ {{ form.monto.value }}</td>
                                 <td>{{ form.idConcepto.value }}</td>
                             </tr>
+
+                            {% empty %}
+                                    <tr>
+                                        <td colspan="3"> <i>*** No hay pagos registrados ***</i></td>
+                                    </tr>
+
                             {% endfor %}
                         </table>
                     </div>

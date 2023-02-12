@@ -7,7 +7,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.forms import inlineformset_factory
 from .forms import ClienteForm, HabitacionForm, ReservaForm, CajaForm, ListaPrecioForm, DetalleListaPrecioForm, \
-    ListaPrecioDetalleInlineFormset, PagosReservaInlineFormset, FiltrosCajaForm
+    ListaPrecioDetalleInlineFormset, PagosReservaInlineFormset, FiltrosCajaForm, FiltrosReservaForm
 from .serializers import ReservaSerializer, HabitacionSerializer
 
 from rest_framework.views import APIView
@@ -209,15 +209,54 @@ class ReservasView(ListView):
     paginate_by = 10
     context_object_name = 'reservas'
 
+    def get_queryset(self):
+        form = FiltrosReservaForm(self.request.GET or None)
+        queryset = super().get_queryset()
+        now = timezone.now().date()
+        if form.is_valid():
+            fecha_desde = form.cleaned_data['fechaDesde']
+            fecha_hasta = form.cleaned_data['fechaHasta']
+            mostrar_historicas = form.cleaned_data['mostrarHistoricas']
+            solo_gestion_pendiente = form.cleaned_data['soloGestionPendiente']
+
+            if fecha_desde and fecha_hasta:
+                queryset = queryset.filter(Q(fechaIngreso__range=(fecha_desde, fecha_hasta))|
+                                           Q(fechaEngreso__range=(fecha_desde, fecha_hasta)))
+            elif fecha_desde:
+                queryset = queryset.filter(fechaIngreso__gte=fecha_desde)
+            elif fecha_hasta:
+                queryset = queryset.filter(fechaEgreso__lte=fecha_hasta)
+            if not mostrar_historicas:
+                queryset = queryset.exclude(fechaEgreso__lte=now)
+            if solo_gestion_pendiente:
+                pagos_reservas = MovimientoCaja.objects.filter(idReserva__isnull=False).values_list('idReserva', flat=True).distinct()
+                reservasVencidas = Reserva.objects.filter(fechaRegistro__lte=now-timedelta(days=2))\
+                    .exclude(pk__in=pagos_reservas).values_list('pk', flat=True).distinct()
+
+                print(reservasVencidas)
+
+                queryset = queryset.filter(Q(idHabitacion__isnull=True) | Q(pk__in=reservasVencidas))
+        else:
+            queryset = queryset.exclude(fechaEgreso__lte=now)
+        return queryset
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        context['form'] = FiltrosReservaForm(self.request.GET or None)
+
         now = timezone.now().date()
 
-        pagos = MovimientoCaja.objects.filter(idReserva__in= context['reservas'].values_list('pk', flat=True))
-        suma_pagos = pagos.aggregate(valor_total=Sum('monto'))['valor_total']
+        pagos = MovimientoCaja.objects.filter(idReserva__in=context['reservas'].values_list('pk', flat=True))
 
         for reserva in context['reservas']:
-            pagosReserva = pagos.filter(idReserva = reserva.pk)
+            pagosReserva = pagos.filter(idReserva=reserva.pk)
+
+            suma_pagos = pagosReserva.aggregate(valor_total=Sum('monto'))
+            if suma_pagos['valor_total']:
+                suma_pagos = suma_pagos['valor_total']
+            else:
+                suma_pagos = 0
 
             reserva_vencida = False
             if reserva.fechaRegistro + timedelta(days=2) < now and not pagosReserva.exists():
@@ -271,18 +310,31 @@ def edit_reserva(request, pk):
     reserva = Reserva.objects.get(pk=pk)
     cliente = Cliente.objects.get(pk=reserva.idCliente.pk)
     pagos = MovimientoCaja.objects.filter(idReserva=reserva)
+
+    pagosRealizados = pagos.aggregate(valor_total=Sum('monto'))
+
+    if pagosRealizados['valor_total']:
+        pagosRealizados = pagosRealizados['valor_total']
+    else:
+        pagosRealizados = 0
+
     if request.method == 'POST':
         form_reserva = ReservaForm(request.POST, instance=reserva)
         form_cliente = ClienteForm(request.POST, instance=cliente)
+        p_formset = PagosReservaInlineFormset(instance=reserva)
+
+        saldo = reserva.precioTotal - pagosRealizados
+
         if form_reserva.is_valid() and form_cliente.is_valid():
             form_reserva.save()
             form_cliente.save()
-            return redirect('index')
+            return redirect(request, 'index')
+
     else:
         form_reserva = ReservaForm(instance=reserva)
         form_cliente = ClienteForm(instance=cliente)
         p_formset = PagosReservaInlineFormset(instance=reserva)
-        pagosRealizados = pagos.aggregate(valor_total=Sum('monto'))['valor_total']
+
         saldo = reserva.precioTotal - pagosRealizados
     return render(request, 'reservaDetail.html', {'form_reserva': form_reserva, 'form_cliente': form_cliente, 'formset_pagos': p_formset,
                                                   'saldo': saldo})
@@ -305,8 +357,7 @@ def alta_reserva(request):
 
             messages.success(request, "La reserva \"{}\" fue creada.".format(reserva))
 
-            return redirect("")
-            #return redirect("/reservas/edit/" + str(reserva.pk), edit_reserva())
+            return redirect(request, "/reservas/edit/" + str(reserva.pk), edit_reserva())
     else:
         form_reserva = ReservaForm(instance=reserva)
         form_cliente = ClienteForm(instance=cliente)
