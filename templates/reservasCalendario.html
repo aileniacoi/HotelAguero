@@ -9,83 +9,75 @@
   <h3>Reservas</h3>
 
     <div class="container-fluid my-3">
-<div class="row justify-content-end">
-    <div class="col-md-1">
-            <a href="/calendario_reservas_pdf/{{ mes }}/{{ anio }}" class="btn btn-secondary btn-block " style="float: right;">
-                <i class="fa-regular fa-file-pdf"></i> PDF
-            </a>
+        <div class="row justify-content-end">
+            <div class="col-md-1">
+                <a href="/calendario_reservas_pdf/{{ mes }}/{{ anio }}" class="btn btn-secondary btn-block " style="float: right;">
+                    <i class="fa-regular fa-file-pdf"></i> PDF
+                </a>
+            </div>
         </div>
+    </div>
 
-</div>
-        </div>
   <div class="card">
-
     <div class="card-body">
-
         <div class="row justify-content-center">
             <div class="col-md-4">
-                            <h4 class="card-header" >
-              {% if mes == 1 %}
-      <a href="/reservas/calendar/12/{{ anio|add:-1 }}"><i class="fa-solid fa-chevron-left"></i></a>
-      {% else %}
-      <a href="/reservas/calendar/{{ mes|add:-1}}/{{ anio }}"><i class="fa-solid fa-chevron-left"></i></a>
-      {% endif %}
-      <span id="nombreMes"></span>
-      {% if mes == 12 %}
-      <a href="/reservas/calendar/1/{{ anio|add:1 }}"><i class="fa-solid fa-chevron-right"></i></a>
-      {% else %}
-      <a href="/reservas/calendar/{{ mes|add:1}}/{{ anio }}"><i class="fa-solid fa-chevron-right"></i></a>
-      {% endif %}
-      </h4>
+                <h4 class="card-header" >
+                  {% if mes == 1 %}
+                    <a href="/reservas/calendar/12/{{ anio|add:-1 }}"><i class="fa-solid fa-chevron-left" style="color: #223868;"></i></a>
+                        {% else %}
+                    <a href="/reservas/calendar/{{ mes|add:-1}}/{{ anio }}"><i class="fa-solid fa-chevron-left" style="color: #F79B03;"></i></a>
+                        {% endif %}
+                    <span id="nombreMes" style="font-family: 'PT Sans', sans-serif; Color: #2B4A84;"></span>
+                        {% if mes == 12 %}
+                    <a href="/reservas/calendar/1/{{ anio|add:1 }}"><i class="fa-solid fa-chevron-right" style="color: #223868;"></i></a>
+                        {% else %}
+                    <a href="/reservas/calendar/{{ mes|add:1}}/{{ anio }}"><i class="fa-solid fa-chevron-right" style="color: #F79B03;"></i></a>
+                        {% endif %}
+                </h4>
             </div>
-
         </div>
-<div class="table-responsive">
-    <table class="table table-hover table-bordered" >
-    <thead>
-<!--    <tr>-->
-<!--        <th colspan="{{ cantidadDias|length|add:1 }}" style="text-align:center">-->
-<!--            <h4>-->
 
-<!--  </h4>-->
-<!--        </th>-->
-<!--    </tr>-->
-      <tr>
-        <th class="columnasCal"></th>
-        {% for dia in cantidadDias %}
-        <th class="columnasCal">{{ dia }}</th>
-        {% endfor %}
-      </tr>
-      <tr>
-          <th class="columnasCal"></th>
-        {% for dia in cantidadDias %}
-        <th id="res_dia_{{ dia }}" class="columnasCal"></th>
-        {% endfor %}
-      </tr>
-    </thead>
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered" >
+                <thead>
+            <!--    <tr>-->
+            <!--        <th colspan="{{ cantidadDias|length|add:1 }}" style="text-align:center">-->
+            <!--            <h4>-->
 
-    <tbody>
+            <!--  </h4>-->
+            <!--        </th>-->
+            <!--    </tr>-->
+                  <tr>
+                    <th class="columnasCal"></th>
+                    {% for dia in cantidadDias %}
+                    <th class="columnasCal">{{ dia }}</th>
+                    {% endfor %}
+                  </tr>
+                  <tr>
+                      <th class="columnasCal"></th>
+                    {% for dia in cantidadDias %}
+                    <th id="res_dia_{{ dia }}" class="columnasCal"></th>
+                    {% endfor %}
+                  </tr>
+                </thead>
 
-      {% for hab in habitaciones %}
-      <tr>
-        <td class="columnasCal">{{ hab.numero }}</td>
+            <tbody>
+              {% for hab in habitaciones %}
+              <tr>
+                <td class="columnasCal">{{ hab.numero }}</td>
 
-        {% for dia in cantidadDias %}
-        <td id="res_{{ hab.numero }}_{{ dia }}" class="columnasCal" data-toggle="popover" onclick="SetPopoverReserva({{ dia }}, {{ hab.numero }})"></td>
-        {% endfor %}
-
-      </tr>
-      {% endfor %}
-
-    </tbody>
-  </table>
-
-</div>
+                {% for dia in cantidadDias %}
+                <td id="res_{{ hab.numero }}_{{ dia }}" class="columnasCal" data-toggle="popover" onclick="SetPopoverReserva({{ dia }}, {{ hab.numero }})"></td>
+                {% endfor %}
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
     </div>
   </div>
-
 </main>
-
 
 <script type="text/javascript">
 
