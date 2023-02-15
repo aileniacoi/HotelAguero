@@ -392,7 +392,7 @@ def alta_reserva(request):
 
             messages.success(request, "La reserva \"{}\" fue creada.".format(reserva))
 
-            return redirect(request, "/reservas/edit/" + str(reserva.pk), edit_reserva())
+            return redirect("reservaEdit", pk=reserva.pk)
     else:
         form_reserva = ReservaForm(instance=reserva)
         form_cliente = ClienteForm(instance=cliente)
@@ -645,7 +645,6 @@ def ReporteReservasCalendarioPDF(request, mes, anio):
                                       Q(fechaEgreso__month=mes, fechaEgreso__year=anio))
 
     estado_reserva = {hab.numero: [False for i in range(cantidadDias)] for hab in habitaciones}
-    print(estado_reserva)
 
     for res in reservas:
         habitacion = res.idHabitacion.numero
