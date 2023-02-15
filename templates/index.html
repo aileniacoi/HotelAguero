@@ -3,61 +3,233 @@
 {% block content %}
 
 <main id="main" class="main">
-   <div>
-      <div>
+    <div>
+        <div>
 
-   <div>
+            <div>
 
-      <div class="row">
-       <div class="col-md-5">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Ocupación</h5>
-                <table>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="row">
+                                            <div class="col-12 text-center">
+                                                <h5 class="card-title">Actividad de hoy</h5>
+                                            </div>
 
-                </table>
-            </div>
-         </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6 text-center">
+                                                <h5 class="card-title">Check-in</h5>
+                                                <table class="table table-hover table-bordered">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>Hab</th>
+                                                        <th>Pax</th>
+                                                        <th>Cliente</th>
+                                                        <th>Saldo</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {% for ing in ingresos %}
+                                                    <tr>
+                                                        <td>{{ ing.idHabitacion }}</td>
+                                                        <td>{{ ing.cantidadPersonas }}</td>
+                                                        <td>{{ ing.idCliente }}</td>
+                                                        <td {% if ing.saldo > 0 %} class="text-danger" {% endif %}> ${{
+                                                            ing.saldo }}
+                                                        </td>
+                                                    </tr>
+                                                    {% empty %}
+                                                    <tr>
+                                                        <td colspan="4"><i>*** No se registraron ingresos para hoy
+                                                            ***</i></td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="col-md-6 text-center">
+                                                <h5 class="card-title">Check-out</h5>
+                                                <table class="table table-hover table-bordered">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>Hab</th>
+                                                        <th>Pax</th>
+                                                        <th>Cliente</th>
+                                                        <th>Saldo</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {% for eg in egresos %}
+                                                    <tr>
+                                                        <td>{{ eg.idHabitacion }}</td>
+                                                        <td>{{ eg.cantidadPersonas }}</td>
+                                                        <td>{{ eg.idCliente }}</td>
+                                                        <td {% if eg.saldo > 0 %} class="text-danger" {% endif %}>
+                                                           $ {{ eg.saldo }}
+                                                        </td>
+                                                    </tr>
+                                                    {% empty %}
+                                                    <tr>
+                                                        <td colspan="4"><i>*** Hoy no hay egresos ***</i></td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="row">
+                                            <div class="col-12 text-center">
+                                                <h5 class="card-title">Ocupación de hoy</h5>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <table class="table table-hover table-bordered">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>Hab</th>
+                                                        <th>Pax</th>
+                                                        <th>Cliente</th>
+                                                        <th>Saldo</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {% for res in reservasActuales %}
+                                                    <tr>
+                                                        <td>{{ res.idHabitacion }}</td>
+                                                        <td>{{ res.cantidadPersonas }}</td>
+                                                        <td>{{ res.idCliente }}</td>
+                                                        <td {% if res.saldo > 0 %} class="text-danger" {% endif %}>
+                                                            $ {{ res.saldo }}
+                                                        </td>
+                                                    </tr>
+                                                    {% empty %}
+                                                    <tr>
+                                                        <td colspan="4"><i>*** Hoy no hay habitaciones ocupadas ***</i>
+                                                        </td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="m-3" style="width: 90%;">
+                                                    <canvas id="pie-chart" height="200" width="300"></canvas>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 text-center">
+                                                <br>
+                                                <span style="font-size:50;"
+                                                      title="{% for hab in habitacionesDisponibles %}N° {{ hab.numero}}: {{ hab.plazas }} pax&#10{% endfor %}">
+                                            {{ habitacionesDisponibles|length }}
+                                                    <h5>Hab. libres</h5>
+                                        </span>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4 text-center">
+                                        <h5>Precios vigentes</h5>
+                                        <hr style="border-top: dotted 3px;">
+                                        <table class="table table-hover text-center">
+                                            {% for det in detallePrecios %}
+                                            <tr>
+                                                <td>{{ det.cantidadPersonas }} pax.</td>
+                                                <td>$ {{ det.precioPorDia }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </table>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="row">
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-       </div>
-          <div class="col-md-7">
-              <div class="row">
-                  <div class="col-md-12">
-                      <div class="card">
-                          <div class="card-body">
-                                <table class="table table-bordered">
-                                    <tr>
-                                        <th colspan="3">Check-in</th>
-                                    </tr>
-                                    <tr>
-                                        <th>Habitación</th>
-                                        <th>Cliente</th>
-                                        <th>Saldo</th>
-                                    </tr>
-                                    {% for ingreso in ingresos %}
-                                    <tr>
-                                        <td> {{ ingreso.idHabitacion }}</td>
-                                        <td> {{ ingreso.idCliente }}</td>
-                                        <td></td>
-                                    </tr>
-                                    {% empty %}
-                                    <tr>
-                                        <td colspan="3"> <i>*** Hoy no hay ingresos ***</i></td>
-                                    </tr>
-                                    {% endfor %}
-                                </table>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </div>
-   </div>
-</div>
-   </div>
+        </div>
+    </div>
 </main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.7.0"></script>
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.7.0/dist/chartjs-plugin-datalabels.css">
+
+<script type="text/javascript">
+  var ctx = document.getElementById('pie-chart').getContext('2d');
+  var ocupacion = Math.floor(({{ cantidadHabitaciones }} - {{ habitacionesDisponibles|length }}) * 100 / {{ cantidadHabitaciones }})
+  var pieChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Ocupado', 'Disponible'],
+      datasets: [{
+        data: [ocupacion, 100 - ocupacion],
+        backgroundColor: ['#F3CB38', '#F1F1F1'],
+        borderWidth: 0,
+      }],
+    },
+    options: {
+      cutoutPercentage: 70,
+      legend: {
+        display: false
+      },
+      tooltips: {
+        callbacks: {
+          label: function(tooltipItem, data) {
+            var allData = data.datasets[tooltipItem.datasetIndex].data;
+            var tooltipLabel = data.labels[tooltipItem.index];
+            var tooltipData = allData[tooltipItem.index];
+            var total = 0;
+            for (var i in allData) {
+              total += allData[i];
+            }
+            var tooltipPercentage = Math.round((tooltipData / total) * 100);
+            return tooltipLabel + ': ' + tooltipPercentage + '%';
+          }
+        }
+      }
+    },
+    plugins: [{
+    id: 'text',
+    beforeDraw: function(chart, a, b) {
+      var width = chart.width,
+        height = chart.height,
+        ctx = chart.ctx;
+
+      ctx.restore();
+      var fontSize = (height / 114).toFixed(2);
+      ctx.font = fontSize + "em sans-serif";
+      ctx.textBaseline = "middle";
+
+      var text = ocupacion + "%",
+        textX = Math.round((width - ctx.measureText(text).width) / 2),
+        textY = height / 2;
+
+      ctx.fillText(text, textX, textY);
+      ctx.save();
+    }
+  }]
+  });
+
+
+</script>
 
 {% endblock %}

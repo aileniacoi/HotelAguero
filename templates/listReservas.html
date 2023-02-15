@@ -26,7 +26,7 @@
             <a class="btn btn-success" href="add" style="float: right;"><i class="fa-solid fa-plus"></i> Agregar</a>
        </div>
        <div class="col-md-1">
-            <a href="{% url 'reporte_reservas_pdf' %}" class="btn btn-secondary btn-block " style="float: right;">
+            <a href="{% url 'reporte_reservas_pdf' %}" class="btn btn-secondary btn-block" style="float: right;">
                 <i class="fa-regular fa-file-pdf"></i> PDF
             </a>
         </div>
@@ -112,7 +112,7 @@
                         <th style="width: 1%"></th>
                     </tr>
                     {% for reserva in reservas %}
-                    <tr {% if reserva.reserva_vencida %}style="background-color:#FFE4E4;" title="Esta reserva fue realizada hace 2 días o más pero aún no se registra una seña"{% endif %}>
+                    <tr {% if reserva.reserva_vencida %}style="background-color:#FFE4E4;" title="Esta reserva fue realizada hace 2 días o&#10más pero aún no se registra una seña"{% endif %}>
                         <td>{{ reserva.pk }}</td>
                         {% if reserva.idHabitacion is None %}
                         <td class="text-warning blink" style="font-size:23"><i class="fa-solid fa-triangle-exclamation"></i></td>

@@ -4,8 +4,8 @@ from Hotel.views import ReservasDetalleView, ReporteReservasPDF, HabitacionesDis
     ClientesView, ReservasView, ListaPrecioView, MovimientosCajaView, ReporteReservasCalendarioPDF
 
 urlpatterns = [
-    path('', views.inicio, name='vInicio'),
-    path('index/', views.index, name='index'),
+    #path('', views.inicio, name='vInicio'),
+    path('', views.index, name='index'),
 
     #HABITACIONES
     #path('habitaciones/', views.habitaciones, name='habitaciones'),
