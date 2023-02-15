@@ -137,9 +137,9 @@
     </div><!-- End Logo -->
 
     <div class="search-bar">
-      <form class="search-form d-flex align-items-center" method="POST" action="{% url 'buscarReservaCliente' %}">
+      <form class="search-form d-flex align-items-center m-2" method="POST" action="{% url 'buscarReservaCliente' %}">
         {% csrf_token %}
-        <input type="text" name="cliente_buscado" placeholder="Buscar" title="Enter search keyword">
+        <input type="text" name="cliente_buscado" placeholder="Ingrese nombre o DNI del cliente" title="Buscar reservas">
         <button type="submit" title="Buscar"><i class="bi bi-search"></i></button>
       </form>
     </div><!-- End Search Bar -->
@@ -363,7 +363,7 @@
       <img class="img-head-side pb-3" style="width: 250px;" src="{% static 'Hotel/logo-ha2.png' %}">
 
       <li class="nav-item">
-        <a class="nav-link collapsed" href="/index">
+        <a class="nav-link collapsed" href="/">
           <i class="bi bi-grid"></i>
           <span>Inicio</span>
         </a>

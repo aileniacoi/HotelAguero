@@ -63,15 +63,58 @@ def index(request):
     ingresos = Reserva.objects.filter(fechaIngreso=hoy)
     egresos = Reserva.objects.filter(fechaEgreso=hoy)
 
+    pagos = MovimientoCaja.objects.filter(idReserva__isnull=False)
+
+    for ingreso in ingresos:
+        pagosReserva = pagos.filter(idReserva=ingreso)
+        suma_pagos = pagosReserva.aggregate(valor_total=Sum('monto'))
+        if suma_pagos['valor_total']:
+            suma_pagos = suma_pagos['valor_total']
+        else:
+            suma_pagos = 0
+
+        ingreso.saldo= ingreso.precioTotal - suma_pagos
+        ingreso.reserva_sin_senia = suma_pagos == 0
+
+    for egreso in egresos:
+        pagosReserva = pagos.filter(idReserva=egreso)
+        suma_pagos = pagosReserva.aggregate(valor_total=Sum('monto'))
+        if suma_pagos['valor_total']:
+            suma_pagos = suma_pagos['valor_total']
+        else:
+            suma_pagos = 0
+
+        egreso.saldo= egreso.precioTotal - suma_pagos
+
+
     cantidadHabitaciones = Habitacion.objects.count()
 
-    reservasActuales = Reserva.objects.filter(fechaIngreso__lte=hoy, fechaEgreso__gte=hoy)
+    reservasActuales = Reserva.objects.filter(Q(fechaIngreso__lt=hoy) & Q(fechaEgreso__gt=hoy)).exclude(idHabitacion__isnull=True)
+
+    for reserva in reservasActuales:
+        pagosReserva = pagos.filter(idReserva=reserva)
+        suma_pagos = pagosReserva.aggregate(valor_total=Sum('monto'))
+        if suma_pagos['valor_total']:
+            suma_pagos = suma_pagos['valor_total']
+        else:
+            suma_pagos = 0
+
+        reserva.saldo= reserva.precioTotal - suma_pagos
 
     habitaciones_ocupadas = reservasActuales.values_list('idHabitacion', flat=True)
-    habitaciones_disponibles = Habitacion.objects.exclude(id__in=habitaciones_ocupadas)
+    if habitaciones_ocupadas.exists():
+        habitaciones_disponibles = Habitacion.objects.exclude(pk__in=habitaciones_ocupadas)
+    else:
+        habitaciones_disponibles = Habitacion.objects.all()
+
+
+    lista_precio = ListaPrecio.objects.filter(Q(vigenciaDesde__lte=hoy) & Q(vigenciaHasta__gte=hoy))[0]
+    detalle_precios = DetalleListaPrecio.objects.filter(idListaPrecio=lista_precio)
 
     context = {'ingresos': ingresos, 'egresos': egresos, 'cantidadHabitaciones':cantidadHabitaciones,
-               'habitacionesDisponibles': habitaciones_disponibles }
+               'habitacionesDisponibles': habitaciones_disponibles, 'reservasActuales': reservasActuales,
+               'detallePrecios': detalle_precios}
+
     return render(request, 'index.html', context)
 
 
@@ -87,12 +130,6 @@ class HabitacionesView(ListView):
     model = Habitacion
     paginate_by = 10
     context_object_name = 'habitaciones'
-
-
-# def detHabitacion(request, id):
-#     habitacion = Habitacion.objects.filter(id=id).first()
-#     context = {'habitacion': habitacion}
-#     return render(request, 'habitacionform.html', context)
 
 
 class HabitacionBajaView(SuccessMessageMixin, DeleteView):
@@ -206,7 +243,7 @@ def cliente_edit(request, pk=None):
 class ReservasView(ListView):
     template_name = 'listReservas.html'
     model = Reserva
-    paginate_by = 10
+    paginate_by = 15
     context_object_name = 'reservas'
 
     def get_queryset(self):
@@ -232,8 +269,6 @@ class ReservasView(ListView):
                 pagos_reservas = MovimientoCaja.objects.filter(idReserva__isnull=False).values_list('idReserva', flat=True).distinct()
                 reservasVencidas = Reserva.objects.filter(fechaRegistro__lte=now-timedelta(days=2))\
                     .exclude(pk__in=pagos_reservas).values_list('pk', flat=True).distinct()
-
-                print(reservasVencidas)
 
                 queryset = queryset.filter(Q(idHabitacion__isnull=True) | Q(pk__in=reservasVencidas))
         else:
