@@ -8,7 +8,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.forms import inlineformset_factory
 from .forms import ClienteForm, HabitacionForm, ReservaForm, CajaForm, ListaPrecioForm, DetalleListaPrecioForm, \
-    ListaPrecioDetalleInlineFormset, PagosReservaInlineFormset, FiltrosCajaForm, FiltrosReservaForm
+    ListaPrecioDetalleInlineFormset, FiltrosCajaForm, FiltrosReservaForm
 from .serializers import ReservaSerializer, HabitacionSerializer
 
 from rest_framework.views import APIView
@@ -357,7 +357,7 @@ def edit_reserva(request, pk):
     if request.method == 'POST':
         form_reserva = ReservaForm(request.POST, instance=reserva)
         form_cliente = ClienteForm(request.POST, instance=cliente)
-        p_formset = PagosReservaInlineFormset(instance=reserva)
+        #p_formset = PagosReservaInlineFormset(instance=reserva)
 
         saldo = reserva.precioTotal - pagosRealizados
 
@@ -369,10 +369,10 @@ def edit_reserva(request, pk):
     else:
         form_reserva = ReservaForm(instance=reserva)
         form_cliente = ClienteForm(instance=cliente)
-        p_formset = PagosReservaInlineFormset(instance=reserva)
+        #p_formset = PagosReservaInlineFormset(instance=reserva)
 
         saldo = reserva.precioTotal - pagosRealizados
-    return render(request, 'reservaDetail.html', {'form_reserva': form_reserva, 'form_cliente': form_cliente, 'formset_pagos': p_formset,
+    return render(request, 'reservaDetail.html', {'form_reserva': form_reserva, 'form_cliente': form_cliente, 'pagos': pagos,
                                                   'saldo': saldo, 'id_reserva': pk})
 
 
@@ -589,6 +589,7 @@ def agregar_pago_reserva(request, reserva_id):
             return JsonResponse({'success': False, 'errors': form.errors})
     else:
         form = CajaForm(initial={'idReserva': reserva.pk, 'idTipoMovimiento': "IN"})
+        form.fields['idConcepto'].choices = [(MovimientoCaja.SENIA, 'Seña'), (MovimientoCaja.SALDO, 'Saldo')]
         return render(request, 'agregarpago.html', {'form_pago': form, 'id_reserva': reserva_id})
 
 

@@ -85,12 +85,12 @@ class FiltrosCajaForm(forms.Form):
     ingresos = forms.BooleanField(required=False, initial=True, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
     egresos = forms.BooleanField(required=False, initial=True, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
 
-PagosReservaInlineFormset = forms.inlineformset_factory(
-    Reserva,
-    MovimientoCaja,
-    form=CajaForm,
-    extra=0
-)
+# PagosReservaInlineFormset = forms.inlineformset_factory(
+#     Reserva,
+#     MovimientoCaja,
+#     form=CajaForm,
+#     extra=0
+# )
 
 
 class ListaPrecioForm(forms.ModelForm):

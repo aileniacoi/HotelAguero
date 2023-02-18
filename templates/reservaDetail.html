@@ -148,13 +148,10 @@
 
             <h5 class="card-title">Pagos</h5>
 
-            {{ formset_pagos.management_form }}
-                <div col-md-8 offset-md-4 mt-5>
-                <div class="d-flex py-1 inline {{ product_meta_formset.prefix }}">
 
-                    {% for hidden in formset_pagos.hidden_fields %}
-                    {{ hidden }}
-                    {% endfor %}
+                <div col-md-8 offset-md-4 mt-5>
+                <div>
+
 
                     <div class="table-responsive">
                         <table class="table table-hover" style="text-align: center; width: 800px;">
@@ -166,17 +163,13 @@
                                 </tr>
                             </thead>
                             <tbody>
-                            {% for form in formset_pagos %}
+                            {% for pago in pagos %}
 
-
-                            {% for hidden in form.hidden_fields %}
-                            {{ hidden }}
-                            {% endfor %}
 
                             <tr>
-                                <td>{{ form.fecha.value|date:"d/m/Y" }}</td>
-                                <td>$ {{ form.monto.value }}</td>
-                                <td>{{ form.idConcepto.value }}</td>
+                                <td>{{ pago.fecha|date:"d/m/Y" }}</td>
+                                <td>$ {{ pago.monto}}</td>
+                                <td>{{ pago.get_idConcepto_display }}</td>
                             </tr>
 
                             {% empty %}
@@ -215,7 +208,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title" id="agregar-pago-modal-label" >Agregar Pago</h4>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true"></span></button>
       </div>
       <div class="modal-body">
 
