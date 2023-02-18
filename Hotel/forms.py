@@ -40,6 +40,7 @@ class ReservaForm(forms.ModelForm):
         fields = "__all__"
         exclude = ['idCliente', ]
         widgets = {
+            'pk': forms.NumberInput(),
             'fechaRegistro': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'fechaIngreso': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'fechaEgreso': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
@@ -72,6 +73,10 @@ class CajaForm(forms.ModelForm):
             'numeroComprobante': forms.TextInput(attrs={'class': 'form-control'}),
             'idReserva': forms.Select(attrs={'class': 'form-control'})
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['fecha'].initial = datetime.now().date()
 
 
 class FiltrosCajaForm(forms.Form):

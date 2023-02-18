@@ -1,0 +1,6 @@
+
+<form method="post" id="agregar-pago-form" action="/reservas/add/pagos/{{ id_reserva }}/">
+  {% csrf_token %}
+  {{ form_pago.as_p }}
+  <button type="submit" class="btn btn-success">Agregar</button>
+</form>

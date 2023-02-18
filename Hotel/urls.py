@@ -53,6 +53,8 @@ urlpatterns = [
     path('movimientoscaja/viewdetail/<int:pk>/', views.caja_edit, name="detalleCaja"),
     path('movimientoscaja/delete/<int:pk>/', views.listasPrecio),
 
+    path('reservas/add/pagos/<int:reserva_id>/', views.agregar_pago_reserva, name='agregar_pago_reserva'),
+
 
     #SOLICITUDES
     path('get_precio/', views.get_price, name='get_price'),

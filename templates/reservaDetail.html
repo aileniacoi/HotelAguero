@@ -158,11 +158,14 @@
 
                     <div class="table-responsive">
                         <table class="table table-hover" style="text-align: center; width: 800px;">
-                            <tr>
-                                <th>Fecha</th>
-                                <th>Monto</th>
-                                <th>Concepto</th>
-                            </tr>
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Monto</th>
+                                    <th>Concepto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
                             {% for form in formset_pagos %}
 
 
@@ -182,6 +185,17 @@
                                     </tr>
 
                             {% endfor %}
+                            </tbody>
+
+
+                            <tfoot>
+                            <tr>
+                                <td colspan="3">
+                                    <button type="button" class="btn btn-outline-success" id="AgregarPago">Agregar pago</button>
+                                </td>
+
+                            </tr>
+                            </tfoot>
                         </table>
                     </div>
 
@@ -196,7 +210,60 @@
     </div>
 </div>
 
+    <div class="modal fade" id="agregar-pago-modal" tabindex="-1" role="dialog" aria-labelledby="agregar-pago-modal-label">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="agregar-pago-modal-label" >Agregar Pago</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-body">
+
+      </div>
+    </div>
+  </div>
+</div>
+
 </main>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+  $('#AgregarPago').click(function() {
+    var url = "/reservas/add/pagos/{{ id_reserva }}/"
+    $.get(url, function(data) {
+      $('#agregar-pago-modal .modal-body').html(data);
+      $('#agregar-pago-modal').modal('show');
+    });
+  });
+});
+
+$(document).on('submit', '#agregar-pago-form', function(e) {
+    e.preventDefault();
+    var form = $(this);
+    var url = form.attr('action');
+    console.log(url)
+    $.ajax({
+        type: 'POST',
+        url: url,
+        data: form.serialize(),
+        success: function(data) {
+            if (data.success) {
+                // Si se guardó correctamente, cerrar el modal y actualizar la página
+                $('#pago-modal').modal('hide');
+                location.reload();
+            } else {
+                // Si hubo errores, mostrar los mensajes de error
+                alert('Error: ' + data.errors);
+            }
+        },
+        error: function(xhr, status, error) {
+            alert('Error2: ' + error);
+        }
+    });
+});
+
+
+</script>
 
 
 {% endblock %}

@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from .models import Habitacion, Cliente, Reserva, ListaPrecio, MovimientoCaja, DetalleListaPrecio
+from django.views.decorators.csrf import csrf_exempt
 
 from django.contrib import messages
 from django.shortcuts import render, get_object_or_404, redirect
@@ -372,7 +373,7 @@ def edit_reserva(request, pk):
 
         saldo = reserva.precioTotal - pagosRealizados
     return render(request, 'reservaDetail.html', {'form_reserva': form_reserva, 'form_cliente': form_cliente, 'formset_pagos': p_formset,
-                                                  'saldo': saldo})
+                                                  'saldo': saldo, 'id_reserva': pk})
 
 
 def alta_reserva(request):
@@ -556,7 +557,7 @@ class MovimientosCajaView(ListView):
         context['form'] = FiltrosCajaForm(self.request.GET or None)
         return context
 
-
+@csrf_exempt
 def caja_edit(request, pk=None):
     if pk is not None:
         mov = get_object_or_404(MovimientoCaja, pk=pk)
@@ -574,6 +575,23 @@ def caja_edit(request, pk=None):
     else:
         form = CajaForm(instance=mov)
     return render(request, "cajaform.html", {"method": request.method, "form": form, })
+
+
+def agregar_pago_reserva(request, reserva_id):
+    reserva = get_object_or_404(Reserva, pk=reserva_id)
+
+    if request.method == "POST":
+        form = CajaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({'success': True})
+        else:
+            return JsonResponse({'success': False, 'errors': form.errors})
+    else:
+        form = CajaForm(initial={'idReserva': reserva.pk, 'idTipoMovimiento': "IN"})
+        return render(request, 'agregarpago.html', {'form_pago': form, 'id_reserva': reserva_id})
+
+
 
 
 #Reportes PDF
