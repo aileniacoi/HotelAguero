@@ -1,4 +1,6 @@
 from django import forms
+from django_select2.forms import Select2Widget, ModelSelect2Widget
+from django_select2 import forms as s2forms
 from datetime import datetime
 from .models import Cliente, Reserva, Habitacion, MovimientoCaja, ListaPrecio, DetalleListaPrecio
 
@@ -34,18 +36,46 @@ class FiltrosReservaForm(forms.Form):
     mostrarHistoricas = forms.BooleanField(required=False, initial=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
     soloGestionPendiente = forms.BooleanField(required=False, initial=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
 
+
+class ClienteWidget(s2forms.ModelSelect2Widget):
+    model=Cliente
+    search_fields = [
+        "nombreYApellido__icontains",
+        "dni__icontains",
+    ]
+
+
 class ReservaForm(forms.ModelForm):
+    idCliente = forms.ModelChoiceField(
+        queryset=Cliente.objects.all(),
+        widget=ModelSelect2Widget(
+            data_url='/admin/Hotel/cliente/autocomplete/',
+            data_view='select2_autoresponder',
+            data_view_kwargs={'field_id': 'idCliente'},
+            model=Cliente,
+            search_fields=['nombreYApellido__icontains'],
+            attrs={'class': 'form-control'}
+        )
+    )
+
+    # idCliente = s2forms.ModelSelect2Widget(
+    #     model=Cliente,
+    #     search_fields=['nombreYApellido__icontains'],
+    #     data_view='select2_autoresponder',
+    #     data_view_kwargs={'field_id': 'idCliente'}
+    # )
+
     class Meta:
         model = Reserva
         fields = "__all__"
-        exclude = ['idCliente', ]
+        #exclude = ['idCliente', ]
         widgets = {
             'fechaRegistro': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'fechaIngreso': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'fechaEgreso': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'cantidadPersonas': forms.TextInput(attrs={'class': 'form-control'}),
             'idHabitacion': forms.Select(attrs={'class': 'form-control'}),
-            #'idCliente': forms.Select(attrs={'class': 'form-control'}),
+            #'idCliente': ClienteWidget(attrs={'class': 'form-control'}),
             'seniaSolicitada': forms.NumberInput(attrs={'class': 'form-control'}),
             'precioTotal': forms.NumberInput(attrs={'class': 'form-control'}),
             'precioPorDia': forms.NumberInput(attrs={'class': 'form-control'}),

@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 from Hotel.views import ReservasDetalleView, ReporteReservasPDF, HabitacionesDisponiblesView, HabitacionesView, \
     ClientesView, ReservasView, ListaPrecioView, MovimientosCajaView, ReporteReservasCalendarioPDF
@@ -62,4 +62,8 @@ urlpatterns = [
     path('reporte_reservas_pdf/', ReporteReservasPDF.as_view(), name="reporte_reservas_pdf"),
     path('reporte_caja_pdf/', views.ReporteCajaPDF, name="reporte_caja_pdf"),
     path('calendario_reservas_pdf/<int:mes>/<int:anio>/', ReporteReservasCalendarioPDF, name="calendario_reservas_pdf"),
+
+
+    path("select2/", include("django_select2.urls")),
+    #path('select2/fields/auto.json', AutoResponseView.as_view(), name='select2_autoresponder'),
 ]

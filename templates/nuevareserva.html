@@ -3,6 +3,9 @@
 
 {% block content %}
 
+{% load static %}
+
+
 <main id="main" class="main">
 
     <div class="pagetitle">
@@ -85,6 +88,13 @@
                 </div>
 
             </div>
+            <div class="row">
+                {{ form_reserva.media.css }}
+                <div class="col-md-8" style="margin-top: 15px">
+                    <label>Cliente</label>
+                    {{ form_reserva.idCliente}}
+                </div>
+            </div>
             <h5 class="card-title">Datos de la Reserva</h5>
 
             <div class="row"  style="margin-top: 15px">
@@ -132,7 +142,7 @@
                     {{ form_reserva.observaciones }}
                 </div>
             </div>
-
+{{ form_reserva.media.js }}
             <button type="submit" class="btn btn-success" style="margin-top:15px;">Enviar</button>
         </form>
             </div>
@@ -142,7 +152,15 @@
 
 </main>
 
+<script src="{% static 'django_select2/django_select2.js' %}"></script>
+<link href="{% static 'django_select2/css/select2.min.css' %}" rel="stylesheet" type="text/css"/>
 <script type="text/javascript">
+
+$(document).ready(function() {
+    $("#id_idCliente").select2({
+      width: 'resolve'
+    });
+  });
 
 function CalcularSenia(precioTotal, precioPorDia, dias){
 

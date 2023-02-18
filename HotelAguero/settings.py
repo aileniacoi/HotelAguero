@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'Hotel',
+    'django_select2'
 ]
 
 MIDDLEWARE = [
@@ -127,6 +128,21 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'HotelAguero/media')
 MEDIA_URL = 'media/'
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    },
+
+    'select2': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'select2_cache_table',
+        'TIMEOUT': 60 * 60 * 24,
+    }
+}
+
+SELECT2_CACHE_BACKEND: str = 'select2'
 
 MESSAGE_TAGS = {
     messages.DEBUG: 'alert-info',

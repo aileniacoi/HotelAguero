@@ -38,8 +38,8 @@
                                                         <td>{{ ing.idHabitacion }}</td>
                                                         <td>{{ ing.cantidadPersonas }}</td>
                                                         <td>{{ ing.idCliente }}</td>
-                                                        <td {% if ing.saldo > 0 %} class="text-danger" {% endif %}> ${{
-                                                            ing.saldo }}
+                                                        <td {% if ing.saldo > 0 %} class="text-danger" {% endif %}>
+                                                            ${{ ing.saldo }}
                                                         </td>
                                                     </tr>
                                                     {% empty %}
