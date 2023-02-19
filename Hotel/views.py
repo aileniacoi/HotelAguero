@@ -131,6 +131,7 @@ class HabitacionesView(ListView):
     model = Habitacion
     paginate_by = 10
     context_object_name = 'habitaciones'
+    ordering = ['numero']
 
 
 class HabitacionBajaView(SuccessMessageMixin, DeleteView):
@@ -435,6 +436,13 @@ class ListaPrecioView(ListView):
     context_object_name = 'listas'
 
 
+class ListaPrecioBajaView(SuccessMessageMixin, DeleteView):
+    model = ListaPrecio
+    template_name = 'listapreciobaja.html'
+    success_url = '/listasprecio'
+    success_message = 'La lista de precios fue eliminada.'
+
+
 def listaPrecio_edit(request, pk=None):
     if pk is not None:
         lista = get_object_or_404(ListaPrecio, pk=pk)
@@ -575,6 +583,13 @@ def caja_edit(request, pk=None):
     else:
         form = CajaForm(instance=mov)
     return render(request, "cajaform.html", {"method": request.method, "form": form, })
+
+
+class CajaBajaView(SuccessMessageMixin, DeleteView):
+    model = MovimientoCaja
+    template_name = 'cajabaja.html'
+    success_url = '/movimientoscaja'
+    success_message = 'El movimiento de caja fue eliminado.'
 
 
 def agregar_pago_reserva(request, reserva_id):

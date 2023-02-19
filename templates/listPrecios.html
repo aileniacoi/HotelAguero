@@ -65,7 +65,7 @@
             <td>{{ lista.vigenciaHasta|date:"d/m/Y" }}</td>
             <td>{{ lista.get_idTipoLista_display}}</td>
             <td style="width:1%"><a class="btn btn-outline-primary btn-sm" href="edit/{{ lista.pk }}">Editar</a></td>
-            <td style="width:1%"><a class="btn btn-outline-danger btn-sm" href="delete/{{ lista.pk }}">Borrar</a></td>
+            <td style="width:1%"><button class="btn btn-outline-danger btn-sm eliminar-precio" data-id="{{ lista.pk }}">Borrar</button></td>
         </tr>
         {% endfor %}
         </tbody>
@@ -80,6 +80,56 @@
     {% include 'paginator.html' %}
 </div>
 
+    <div class="modal fade bg-danger bg-opacity-10 py-5 " id="baja-precio-modal" tabindex="-1" role="dialog" aria-labelledby="baja-precio-modal-label">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content rounded-4 shadow">
+      <div class="modal-header border-bottom-0">
+        <h4 class="modal-title fs-5" id="baja-precio-modal-label" >Eliminar Lista de Precios</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true"></span></button>
+      </div>
+      <div class="modal-body py-0">
+
+
+
+      </div>
+    </div>
+  </div>
+</div>
+
 </main>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+  $('.eliminar-precio').click(function() {
+    var idPrecio = $(this).data('id');
+    var url = "/listasprecio/delete/" + idPrecio + "/";
+    $.get(url, function(data) {
+      $('#baja-precio-modal .modal-body').html(data);
+      $('#baja-precio-modal').modal('show');
+    });
+  });
+});
+
+$(document).on('submit', '#baja-precio-form', function(e) {
+    e.preventDefault();
+    var form = $(this);
+    var url = form.attr('action');
+    console.log(url)
+    $.ajax({
+        type: 'POST',
+        url: url,
+        data: form.serialize(),
+        success: function(data) {
+                $('#baja-precio-modal').modal('hide');
+                location.reload();
+        },
+        error: function(xhr, status, error) {
+            alert('Error: ' + error);
+        }
+    });
+});
+
+
+</script>
 
 {% endblock %}

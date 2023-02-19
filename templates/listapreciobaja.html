@@ -1,13 +1,11 @@
-
-
-    <form method="post" id="baja-cliente-form" action="/clientes/delete/{{ object.pk }}/">
+<form method="post" id="baja-precio-form" action="/listasprecio/delete/{{ object.pk }}/">
         {% csrf_token %}
 
-        <p>¿Está seguro que desea eliminar el cliente {{ object.nombreYApellido }}?</p>
+        <p>¿Está seguro que desea eliminar la lista de precios {{ object }}?</p>
 
       <div class="modal-footer flex-column border-top-0">
         <button type="submit" class="btn btn-lg btn-danger w-100 mx-0 mb-2">Eliminar</button>
         <button type="button" class="btn btn-lg btn-light w-100 mx-0" data-bs-dismiss="modal" >Cancelar</button>
       </div>
-    </form>
 
+    </form>

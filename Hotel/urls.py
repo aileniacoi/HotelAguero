@@ -1,7 +1,8 @@
 from django.urls import path
 from . import views
 from Hotel.views import ReservasDetalleView, ReporteReservasPDF, HabitacionesDisponiblesView, HabitacionesView, \
-    ClientesView, ReservasView, ListaPrecioView, MovimientosCajaView, ReporteReservasCalendarioPDF
+    ClientesView, ReservasView, ListaPrecioView, MovimientosCajaView, ReporteReservasCalendarioPDF, ListaPrecioBajaView, \
+    CajaBajaView
 
 urlpatterns = [
     #path('', views.inicio, name='vInicio'),
@@ -43,7 +44,7 @@ urlpatterns = [
     path('listasprecio/add/', views.listaPrecio_edit, name='newPrecio'),
     path('listasprecio/edit/<int:pk>/', views.listaPrecio_edit, name='modlistasPrecio'),
     path('listasprecio/viewdetail/<int:pk>/', views.listaPrecio_edit, name='deleteListasPrecio'),
-    path('listasprecio/delete/<int:pk>/', views.listasPrecio, name='listasPrecio'),
+    path('listasprecio/delete/<int:pk>/', views.ListaPrecioBajaView.as_view(), name='listasPrecio'),
 
 
     #CAJA
@@ -51,7 +52,7 @@ urlpatterns = [
     path('movimientoscaja/add/', views.caja_edit, name="newCaja"),
     path('movimientoscaja/edit/<int:pk>/', views.caja_edit, name="modCaja"),
     path('movimientoscaja/viewdetail/<int:pk>/', views.caja_edit, name="detalleCaja"),
-    path('movimientoscaja/delete/<int:pk>/', views.listasPrecio),
+    path('movimientoscaja/delete/<int:pk>/', views.CajaBajaView.as_view(), name="cajaBaja"),
 
     path('reservas/add/pagos/<int:reserva_id>/', views.agregar_pago_reserva, name='agregar_pago_reserva'),
 
