@@ -798,7 +798,27 @@ def BuscarReservaCliente(request):
         clientes = Cliente.objects.filter(Q(nombreYApellido__contains=cliente_buscado) |
                                           Q(dni__contains=cliente_buscado))
 
-        reservas = Reserva.objects.filter(idCliente__in=clientes)
+        now = timezone.now().date()
+
+        reservas = Reserva.objects.filter(idCliente__in=clientes).order_by('-fechaIngreso')
+        pagos = MovimientoCaja.objects.filter(idReserva__in=reservas.values_list('pk', flat=True))
+
+        for reserva in reservas:
+            pagosReserva = pagos.filter(idReserva=reserva.pk)
+
+            suma_pagos = pagosReserva.aggregate(valor_total=Sum('monto'))
+            if suma_pagos['valor_total']:
+                suma_pagos = suma_pagos['valor_total']
+            else:
+                suma_pagos = 0
+
+            reserva_vencida = False
+            if reserva.fechaRegistro + timedelta(days=2) < now and not pagosReserva.exists():
+                reserva_vencida = True
+
+            reserva.reserva_vencida = reserva_vencida
+            reserva.saldo = reserva.precioTotal - suma_pagos
+
         return render(request, 'listReservas.html', {'cliente_buscado': cliente_buscado, 'reservas': reservas})
     else:
         return render(request, 'listReservas.html', {})

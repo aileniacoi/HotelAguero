@@ -124,8 +124,8 @@
                         <td>{{ reserva.fechaIngreso|date:"d/m/Y" }}</td>
                         <td>{{ reserva.fechaEgreso|date:"d/m/Y" }}</td>
                         <td>{{ reserva.saldo }}</td>
-                        <td><a class="btn btn-outline-primary btn-sm" href="edit/{{ reserva.pk }}">Editar</a></td>
-                        <td><a class="btn btn-outline-danger btn-sm" href="delete/{{ reserva.pk }}">Borrar</a></td>
+                        <td><a class="btn btn-outline-primary btn-sm" href="/reservas/edit/{{ reserva.pk }}">Editar</a></td>
+                        <td><a class="btn btn-outline-danger btn-sm" href="/reservas/delete/{{ reserva.pk }}">Borrar</a></td>
                     </tr>
                     {% endfor %}
                 </table>
