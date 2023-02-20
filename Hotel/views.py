@@ -104,9 +104,9 @@ def index(request):
 
     habitaciones_ocupadas = reservasActuales.values_list('idHabitacion', flat=True)
     if habitaciones_ocupadas.exists():
-        habitaciones_disponibles = Habitacion.objects.exclude(pk__in=habitaciones_ocupadas)
+        habitaciones_disponibles = Habitacion.objects.exclude(pk__in=habitaciones_ocupadas).order_by('numero')
     else:
-        habitaciones_disponibles = Habitacion.objects.all()
+        habitaciones_disponibles = Habitacion.objects.all().order_by('numero')
 
 
     lista_precio = ListaPrecio.objects.filter(Q(vigenciaDesde__lte=hoy) & Q(vigenciaHasta__gte=hoy))[0]
@@ -315,7 +315,8 @@ def reservasCalendario(request, mes=None, anio=None):
 
     habitaciones = Habitacion.objects.all().order_by('numero')
     reservasQuery = Reserva.objects.filter(Q(fechaIngreso__month=mes, fechaIngreso__year=anio) |
-                                           Q(fechaEgreso__month=mes, fechaEgreso__year=anio))
+                                           Q(fechaEgreso__month=mes, fechaEgreso__year=anio))\
+        .exclude(fechaCancelacion__isnull=False)
     reservas = ReservaSerializer(reservasQuery, many=True)
 
     context = {'reservas': json.dumps(reservas.data), 'habitaciones': habitaciones,
