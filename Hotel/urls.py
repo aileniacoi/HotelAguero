@@ -37,6 +37,7 @@ urlpatterns = [
     #path('reservas/edit/<int:pk>/', views.reserva_edit, name='modReserva'),
     path('reservas/viewdetail/<int:pk>/', ReservasDetalleView.as_view(), name='detalleReserva'),
     path('reservas/delete/<int:pk>/', ReservasDetalleView.as_view(), name='deleteReserva'),
+    path('reservas/cancel/<int:pk>/', views.cancelar_reserva, name='deleteReserva'),
 
 
     #LISTAS DE PRECIO

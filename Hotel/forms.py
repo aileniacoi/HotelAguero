@@ -51,7 +51,8 @@ class ReservaForm(forms.ModelForm):
             'precioTotal': forms.NumberInput(attrs={'class': 'form-control'}),
             'precioPorDia': forms.NumberInput(attrs={'class': 'form-control'}),
             'incluyeDesayuno': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'observaciones': forms.Textarea(attrs={'class': 'form-control'}),
+            'observaciones': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'fechaCancelacion': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'})
         }
 
     def __init__(self, *args, **kwargs):
@@ -59,6 +60,16 @@ class ReservaForm(forms.ModelForm):
         self.fields['fechaRegistro'].initial = datetime.now().date()
         self.fields['incluyeDesayuno'].initial = True
 
+
+class CancelacionReservaForm(forms.Form):
+    idReserva = forms.IntegerField(widget=forms.HiddenInput)
+    fecha = forms.DateField(required=True, label='Fecha', initial=datetime.now().date(), widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}))
+    montoDevuelto = forms.IntegerField(required=False, label='Monto devuelto', widget=forms.NumberInput(attrs={'class': 'form-control'}))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        idReserva = self.initial.get('idReserva')
+        self.fields['montoDevuelto'].initial = 0
 
 class CajaForm(forms.ModelForm):
     class Meta:

@@ -46,6 +46,7 @@ class Reserva(models.Model):
     importeDescuento = models.DecimalField(decimal_places=2, max_digits=10, null=True, blank=True, verbose_name='Importe de descuento')
     descuentoPorPorcentaje = models.BooleanField(null=True, verbose_name='Descuento por porcentaje')
     observaciones = models.TextField(max_length=500, blank=True)
+    fechaCancelacion = models.DateField(verbose_name='Fecha de Cancelacion', null=True, blank=True)
 
 
     def __str__(self):
@@ -93,12 +94,14 @@ class MovimientoCaja(models.Model):
     GASTOSVARIOS = 'GVS'
     LAVADERO = 'LAV'
     PANADERIA = 'PAN'
+    DEVOLUCION = 'DEV'
     CONCEPTO = [
         (SENIA, 'Seña'),
         (SALDO, 'Saldo'),
         (GASTOSVARIOS, 'Gastos varios'),
         (LAVADERO, 'Lavadero'),
-        (PANADERIA, 'Panaderia')
+        (PANADERIA, 'Panaderia'),
+        (DEVOLUCION, 'Devolución'),
     ]
     CREDITO = 'CRE'
     DEBITO = 'DEB'
