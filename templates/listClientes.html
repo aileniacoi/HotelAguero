@@ -63,7 +63,7 @@
             <td class="pointer" onclick="ViewItem({{ cliente.pk }})">{{ cliente.dni }}</td>
             <td class="pointer" onclick="ViewItem({{ cliente.pk }})">{{ cliente.telefono }}</td>
             <td style="width:1%"><a class="btn btn-outline-primary btn-sm" href="edit/{{ cliente.pk }}">Editar</a></td>
-            <td style="width:1%"><a class="btn btn-outline-danger btn-sm" href="delete/{{ cliente.pk }}">Borrar</a></td>
+            <td style="width:1%"><button  class="btn btn-outline-danger btn-sm eliminar-cliente" data-id="{{ cliente.pk }}">Borrar</button></td>
         </tr>
         {% endfor %}
         </tbody>
@@ -76,5 +76,55 @@
 </div>
     {% include 'paginator.html' %}
 </div>
+
+<div class="modal fade bg-danger bg-opacity-10 py-5 " id="baja-cliente-modal" tabindex="-1" role="dialog" aria-labelledby="baja-cliente-modal-label">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content rounded-4 shadow">
+      <div class="modal-header border-bottom-0">
+        <h4 class="modal-title fs-5" id="baja-cliente-modal-label" >Eliminar Cliente</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true"></span></button>
+      </div>
+      <div class="modal-body py-0">
+
+
+
+      </div>
+    </div>
+  </div>
+</div>
 </main>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+  $('.eliminar-cliente').click(function() {
+    var idCliente = $(this).data('id');
+    var url = "/clientes/delete/" + idCliente + "/";
+    $.get(url, function(data) {
+      $('#baja-cliente-modal .modal-body').html(data);
+      $('#baja-cliente-modal').modal('show');
+    });
+  });
+});
+
+$(document).on('submit', '#baja-cliente-form', function(e) {
+    e.preventDefault();
+    var form = $(this);
+    var url = form.attr('action');
+    console.log(url)
+    $.ajax({
+        type: 'POST',
+        url: url,
+        data: form.serialize(),
+        success: function(data) {
+                $('#baja-cliente-modal').modal('hide');
+                location.reload();
+        },
+        error: function(xhr, status, error) {
+            alert('Error: ' + error);
+        }
+    });
+});
+
+
+</script>
 {% endblock %}

@@ -1,7 +1,8 @@
 from django.urls import path
 from . import views
 from Hotel.views import ReservasDetalleView, ReporteReservasPDF, HabitacionesDisponiblesView, HabitacionesView, \
-    ClientesView, ReservasView, ListaPrecioView, MovimientosCajaView, ReporteReservasCalendarioPDF
+    ClientesView, ReservasView, ListaPrecioView, MovimientosCajaView, ReporteReservasCalendarioPDF, ListaPrecioBajaView, \
+    CajaBajaView
 
 urlpatterns = [
     #path('', views.inicio, name='vInicio'),
@@ -36,6 +37,7 @@ urlpatterns = [
     #path('reservas/edit/<int:pk>/', views.reserva_edit, name='modReserva'),
     path('reservas/viewdetail/<int:pk>/', ReservasDetalleView.as_view(), name='detalleReserva'),
     path('reservas/delete/<int:pk>/', ReservasDetalleView.as_view(), name='deleteReserva'),
+    path('reservas/cancel/<int:pk>/', views.cancelar_reserva, name='deleteReserva'),
 
 
     #LISTAS DE PRECIO
@@ -43,7 +45,7 @@ urlpatterns = [
     path('listasprecio/add/', views.listaPrecio_edit, name='newPrecio'),
     path('listasprecio/edit/<int:pk>/', views.listaPrecio_edit, name='modlistasPrecio'),
     path('listasprecio/viewdetail/<int:pk>/', views.listaPrecio_edit, name='deleteListasPrecio'),
-    path('listasprecio/delete/<int:pk>/', views.listasPrecio, name='listasPrecio'),
+    path('listasprecio/delete/<int:pk>/', views.ListaPrecioBajaView.as_view(), name='listasPrecio'),
 
 
     #CAJA
@@ -51,7 +53,9 @@ urlpatterns = [
     path('movimientoscaja/add/', views.caja_edit, name="newCaja"),
     path('movimientoscaja/edit/<int:pk>/', views.caja_edit, name="modCaja"),
     path('movimientoscaja/viewdetail/<int:pk>/', views.caja_edit, name="detalleCaja"),
-    path('movimientoscaja/delete/<int:pk>/', views.listasPrecio),
+    path('movimientoscaja/delete/<int:pk>/', views.CajaBajaView.as_view(), name="cajaBaja"),
+
+    path('reservas/add/pagos/<int:reserva_id>/', views.agregar_pago_reserva, name='agregar_pago_reserva'),
 
 
     #SOLICITUDES

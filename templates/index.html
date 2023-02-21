@@ -138,7 +138,10 @@
                                             <div class="col-md-3 text-center">
                                                 <br>
                                                 <span style="font-size:50;"
-                                                      title="{% for hab in habitacionesDisponibles %}N° {{ hab.numero}}: {{ hab.plazas }} pax&#10{% endfor %}">
+                                                      data-bs-toggle="tooltip"
+                                                      data-bs-placement="left"
+                                                      data-bs-html="true"
+                                                      data-bs-title="<ul>{% for hab in habitacionesDisponibles %}<li><b>N° {{ hab.numero}}:</b> {{ hab.plazas }} pax</li>{% endfor %}</ul>">
                                             {{ habitacionesDisponibles|length }}
                                                     <h5>Hab. libres</h5>
                                         </span>
@@ -178,6 +181,9 @@
       href="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.7.0/dist/chartjs-plugin-datalabels.css">
 
 <script type="text/javascript">
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
   var ctx = document.getElementById('pie-chart').getContext('2d');
   var ocupacion = Math.floor(({{ cantidadHabitaciones }} - {{ habitacionesDisponibles|length }}) * 100 / {{ cantidadHabitaciones }})
   var pieChart = new Chart(ctx, {

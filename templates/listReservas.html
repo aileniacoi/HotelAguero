@@ -124,8 +124,12 @@
                         <td>{{ reserva.fechaIngreso|date:"d/m/Y" }}</td>
                         <td>{{ reserva.fechaEgreso|date:"d/m/Y" }}</td>
                         <td>{{ reserva.saldo }}</td>
-                        <td><a class="btn btn-outline-primary btn-sm" href="edit/{{ reserva.pk }}">Editar</a></td>
-                        <td><a class="btn btn-outline-danger btn-sm" href="delete/{{ reserva.pk }}">Borrar</a></td>
+                        <td><a class="btn btn-outline-primary btn-sm" href="/reservas/edit/{{ reserva.pk }}">Editar</a></td>
+                        <td>
+                            {% if not reserva.fechaCancelacion %}
+                            <button class="btn btn-outline-danger btn-sm cancelar-reserva"  data-id="{{ reserva.pk }}">Cancelar</button>
+                            {% endif %}
+                        </td>
                     </tr>
                     {% endfor %}
                 </table>
@@ -138,7 +142,21 @@
 
     {% include 'paginator.html' %}
 </div>
+<div class="modal fade bg-danger bg-opacity-10 py-5 " id="cancel-reserva-modal" tabindex="-1" role="dialog" aria-labelledby="cancel-reserva-modal-label">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content rounded-4 shadow">
+      <div class="modal-header border-bottom-0">
+        <h4 class="modal-title fs-5" id="cancel-reserva-modal-label" >Cancelar reserva</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true"></span></button>
+      </div>
+      <div class="modal-body py-0">
 
+
+
+      </div>
+    </div>
+  </div>
+</div>
 </main>
 
 <script type="text/javascript">
@@ -156,6 +174,39 @@ function LimpiarFiltros(){
         element.value = false;
     });
 }
+
+
+ $(document).ready(function() {
+  $('.cancelar-reserva').click(function() {
+    var idRes = $(this).data('id');
+    var url = "/reservas/cancel/" + idRes + "/";
+    $.get(url, function(data) {
+      $('#cancel-reserva-modal .modal-body').html(data);
+      $('#cancel-reserva-modal').modal('show');
+    });
+  });
+});
+
+$(document).on('submit', '#cancel-reserva-form', function(e) {
+    e.preventDefault();
+    var form = $(this);
+    var url = form.attr('action');
+    console.log(url)
+    $.ajax({
+        type: 'POST',
+        url: url,
+        data: form.serialize(),
+        success: function(data) {
+                $('#cancel-reserva-modal').modal('hide');
+                location.reload();
+
+
+        },
+        error: function(xhr, status, error) {
+            alert('Error: ' + error);
+        }
+    });
+});
 
 
 </script>
