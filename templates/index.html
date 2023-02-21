@@ -4,10 +4,17 @@
 
 <main id="main" class="main">
     <div>
+        <div class="pagetitle">
+          <h1>Inicio</h1>
+          <nav>
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="/index">Inicio</a></li>
+              <li class="breadcrumb-item active">Panel de inicio</li>
+            </ol>
+          </nav>
+        </div><!-- End Page Title -->
         <div>
-
             <div>
-
                 <div class="row">
                     <div class="col-md-12">
                         <div class="card">
@@ -15,14 +22,14 @@
                                 <div class="row">
                                     <div class="col-12">
                                         <div class="row">
-                                            <div class="col-12 text-center">
-                                                <h5 class="card-title">Actividad de hoy</h5>
+                                            <div class="col-12 text-center fs-3">
+                                                <h5 class="card-title fs-5">Actividad <span class="fs-4" style="color: #FCB643;">| Hoy</span></h5>
                                             </div>
-
                                         </div>
                                         <div class="row">
                                             <div class="col-md-6 text-center">
-                                                <h5 class="card-title">Check-in</h5>
+
+                                                <h5 class="card-title fs-5">Check <span class="fs-4"  style="color: #05C392;">- In</span></h5>
                                                 <table class="table table-hover table-bordered">
                                                     <thead>
                                                     <tr>
@@ -38,8 +45,7 @@
                                                         <td>{{ ing.idHabitacion }}</td>
                                                         <td>{{ ing.cantidadPersonas }}</td>
                                                         <td>{{ ing.idCliente }}</td>
-                                                        <td {% if ing.saldo > 0 %} class="text-danger" {% endif %}> ${{
-                                                            ing.saldo }}
+                                                        <td {% if ing.saldo > 0 %} class="text-danger" {% endif %}> ${{ ing.saldo }}
                                                         </td>
                                                     </tr>
                                                     {% empty %}
@@ -52,7 +58,7 @@
                                                 </table>
                                             </div>
                                             <div class="col-md-6 text-center">
-                                                <h5 class="card-title">Check-out</h5>
+                                                <h5 class="card-title fs-5" >Check <span class="fs-4"  style=" Color: #ef476f">- Out</span></h5>
                                                 <table class="table table-hover table-bordered">
                                                     <thead>
                                                     <tr>
@@ -84,11 +90,14 @@
                                     </div>
                                 </div>
                                 <br />
-                                <div class="row">
+                            </div>
+                        </div>
+                                <div class="card">
+                                <div class="card-body">
                                     <div class="col-12">
                                         <div class="row">
                                             <div class="col-12 text-center">
-                                                <h5 class="card-title">Ocupación de hoy</h5>
+                                                <h5 class="card-title fs-5">Ocupación <span class="fs-4" style="color: #FCB643;">| Hoy</span></h5>
                                             </div>
                                         </div>
                                         <div class="row">
@@ -133,7 +142,6 @@
                                             {{ habitacionesDisponibles|length }}
                                                     <h5>Hab. libres</h5>
                                         </span>
-
                                             </div>
                                         </div>
                                     </div>
@@ -153,12 +161,8 @@
                                     </div>
 
                                 </div>
-
-
                                 <div class="row">
-
                                 </div>
-
                             </div>
                         </div>
                     </div>
