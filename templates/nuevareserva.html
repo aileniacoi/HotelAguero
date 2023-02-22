@@ -141,6 +141,12 @@
                 </div>
 
             </div>
+            <div class="row" id="warning_precios" hidden>
+                <div class="col-md-7 alert alert-warning m-3" role="alert">
+                    <p><strong>Advertencia:</strong></p>
+                    <p>No hay precios cargados para las fechas solicitadas.</p>
+                </div>
+            </div>
 
             <div class="row" style="margin-top:15px">
                  <div class="col-md-5">
@@ -255,7 +261,12 @@ function GetPrice(fechaIngreso, fechaEgreso, cantidadPersonas) {
     })
         .then(response => response.json())
         .then(data => {
-            document.getElementById("id_precioPorDia").value = data.precio;
+            if (data.precio){
+                document.getElementById("id_precioPorDia").value = data.precio;
+            }
+            else{
+                document.getElementById("warning_precios").removeAttribute("hidden");
+            }
 
             CalcularPrecioTotal(fechaIngreso, fechaEgreso, data.precio);
         });
