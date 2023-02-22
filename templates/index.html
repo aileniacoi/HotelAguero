@@ -26,11 +26,10 @@
                                                 <h5 class="card-title fs-5">Actividad <span class="fs-4" style="color: #FCB643;">| Hoy</span></h5>
                                             </div>
                                         </div>
-                                        <div class="row">
+                                        <div class="row border-top">
                                             <div class="col-md-6 text-center">
-
                                                 <h5 class="card-title fs-5">Check <span class="fs-4"  style="color: #05C392;">- In</span></h5>
-                                                <table class="table table-hover table-bordered">
+                                                <table class="table table-striped table-hover border-right">
                                                     <thead>
                                                     <tr>
                                                         <th>Hab</th>
@@ -57,9 +56,9 @@
                                                     </tbody>
                                                 </table>
                                             </div>
-                                            <div class="col-md-6 text-center">
+                                            <div class="col-md-6 text-center border-left">
                                                 <h5 class="card-title fs-5" >Check <span class="fs-4"  style=" Color: #ef476f">- Out</span></h5>
-                                                <table class="table table-hover table-bordered">
+                                                <table class="table table-striped table-hover">
                                                     <thead>
                                                     <tr>
                                                         <th>Hab</th>
@@ -92,17 +91,41 @@
                                 <br />
                             </div>
                         </div>
-                                <div class="card">
+                        <div class="card">
                                 <div class="card-body">
                                     <div class="col-12">
-                                        <div class="row">
+                                        <div class="row border-bottom  mb-4">
                                             <div class="col-12 text-center">
                                                 <h5 class="card-title fs-5">Ocupación <span class="fs-4" style="color: #FCB643;">| Hoy</span></h5>
                                             </div>
                                         </div>
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <table class="table table-hover table-bordered">
+
+                                        <!-- numero de ocupacion y porcentaje -->
+
+                                        <div class="row justify-content-center border-bottom">
+                                            <div class="col-2 text-center">
+                                                <br>
+                                                <span style="font-size:50;"
+                                                      data-bs-toggle="tooltip"
+                                                      data-bs-placement="left"
+                                                      data-bs-html="true"
+                                                      data-bs-title="<ul>{% for hab in habitacionesDisponibles %}<li><b>N° {{ hab.numero}}:</b> {{ hab.plazas }} pax</li>{% endfor %}</ul>">
+                                                    {{ habitacionesDisponibles|length }}
+                                                    <h5>Hab. libres</h5>
+                                                </span>
+                                            </div>
+
+                                            <div class="col-3">
+                                                    <div class="mb-4" style="width: 130%;">
+                                                        <canvas id="pie-chart" ></canvas>
+                                                    </div>
+                                                </div>
+
+                                        </div>
+
+                                        <div class="row justify-content-center mt-4 border-bottom">
+                                            <div class="col-6">
+                                                <table class="table table-striped table-hover mb-5">
                                                     <thead>
                                                     <tr>
                                                         <th>Hab</th>
@@ -130,47 +153,32 @@
                                                     </tbody>
                                                 </table>
                                             </div>
-                                            <div class="col-md-3">
-                                                <div class="m-3" style="width: 90%;">
-                                                    <canvas id="pie-chart" height="200" width="300"></canvas>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3 text-center">
-                                                <br>
-                                                <span style="font-size:50;"
-                                                      data-bs-toggle="tooltip"
-                                                      data-bs-placement="left"
-                                                      data-bs-html="true"
-                                                      data-bs-title="<ul>{% for hab in habitacionesDisponibles %}<li><b>N° {{ hab.numero}}:</b> {{ hab.plazas }} pax</li>{% endfor %}</ul>">
-                                            {{ habitacionesDisponibles|length }}
-                                                    <h5>Hab. libres</h5>
-                                        </span>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-4 text-center">
-                                        <h5>Precios vigentes</h5>
-                                        <hr style="border-top: dotted 3px;">
-                                        <table class="table table-hover text-center">
-                                            {% for det in detallePrecios %}
-                                            <tr>
-                                                <td>{{ det.cantidadPersonas }} pax.</td>
-                                                <td>$ {{ det.precioPorDia }}</td>
-                                            </tr>
-                                            {% endfor %}
-                                        </table>
-                                    </div>
-
-                                </div>
-                                <div class="row">
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Lista de precio -->
+            <div class="col-xxl-4 col-md-6 text-center">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">Precios <span style="color: #FCB643;">| Vigentes</span></h5>
+                    <div class="ps-6">
+                        <table class="table table-hover text-center">
+                            {% for det in detallePrecios %}
+                            <tr>
+                                <td>{{ det.cantidadPersonas }} pax.</td>
+                                <td>$ {{ det.precioPorDia }}</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                  </div>
+                </div>
+            </div><!-- Fin de lista de precio -->
         </div>
     </div>
 </main>
