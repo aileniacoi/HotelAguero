@@ -16,6 +16,7 @@ class ClienteForm(forms.ModelForm):
         }
 
 
+
 class HabitacionForm(forms.ModelForm):
     class Meta:
         model = Habitacion
@@ -38,15 +39,15 @@ class ReservaForm(forms.ModelForm):
     class Meta:
         model = Reserva
         fields = "__all__"
-        exclude = ['idCliente', ]
+        #exclude = ['idCliente', ]
         widgets = {
-            'pk': forms.NumberInput(),
+            #'pk': forms.NumberInput(),
             'fechaRegistro': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'fechaIngreso': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'fechaEgreso': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'cantidadPersonas': forms.TextInput(attrs={'class': 'form-control'}),
             'idHabitacion': forms.Select(attrs={'class': 'form-control'}),
-            #'idCliente': forms.Select(attrs={'class': 'form-control'}),
+            'idCliente': forms.Select(attrs={'class': 'form-control select-search', 'style': 'width:350px;'}),
             'seniaSolicitada': forms.NumberInput(attrs={'class': 'form-control'}),
             'precioTotal': forms.NumberInput(attrs={'class': 'form-control'}),
             'precioPorDia': forms.NumberInput(attrs={'class': 'form-control'}),
@@ -59,6 +60,7 @@ class ReservaForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['fechaRegistro'].initial = datetime.now().date()
         self.fields['incluyeDesayuno'].initial = True
+        self.fields['idCliente'].required = False
 
 
 class CancelacionReservaForm(forms.Form):

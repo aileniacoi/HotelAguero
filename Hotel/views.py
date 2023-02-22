@@ -9,7 +9,7 @@ from django.http import HttpResponse
 from django.forms import inlineformset_factory
 from .forms import ClienteForm, HabitacionForm, ReservaForm, CajaForm, ListaPrecioForm, DetalleListaPrecioForm, \
     ListaPrecioDetalleInlineFormset, FiltrosCajaForm, FiltrosReservaForm, CancelacionReservaForm
-from .serializers import ReservaSerializer, HabitacionSerializer
+from .serializers import ReservaSerializer, HabitacionSerializer, ClienteSerializer
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -235,6 +235,25 @@ def cliente_edit(request, pk=None):
     return render(request, "clienteForm.html", {"method": request.method, "form": form, })
 
 
+def cliente_edit_reserva(request, pk):
+    if pk is not None:
+        cliente = get_object_or_404(Cliente, pk=pk)
+    else:
+        cliente = None
+    if request.method == "POST":
+        form = ClienteForm(request.POST, instance=cliente)
+        if form.is_valid():
+            updated_cliente = form.save()
+            return JsonResponse(ClienteSerializer(updated_cliente).data, safe=False)
+    else:
+        form = ClienteForm(instance=cliente)
+        form.fields['nombreYApellido'].widget.attrs['readonly'] = 'readonly'
+        form.fields['nombreYApellido'].widget.attrs['class'] = 'form-control-plaintext'
+        form.fields['dni'].widget.attrs['readonly'] = 'readonly'
+        form.fields['dni'].widget.attrs['class'] = 'form-control-plaintext'
+    return render(request, "clienteresForm.html", {"method": request.method, "form_existente": form, "id_cliente": pk })
+
+
 # ------ RESERVAS ------
 
 # def reservas(request):
@@ -389,15 +408,25 @@ def alta_reserva(request):
         form_reserva = ReservaForm(request.POST, instance=reserva)
         form_cliente = ClienteForm(request.POST, instance=cliente)
 
-        if form_cliente.is_valid() and form_reserva.is_valid():
-            cliente = form_cliente.save()
+        if form_reserva.is_valid():
             reserva = form_reserva.save(commit=False)
-            reserva.idCliente = cliente
-            form_reserva.save()
+            print(form_reserva)
+            if bool(request.POST['idCliente']):
+                form_reserva.save()
+
+            else:
+                if form_cliente.is_valid():
+                    cliente = form_cliente.save()
+                    reserva.idCliente = cliente
+                    form_reserva.save()
 
             messages.success(request, "La reserva \"{}\" fue creada.".format(reserva))
 
             return redirect("reservaEdit", pk=reserva.pk)
+        else:
+            print(form_reserva.errors)
+
+
     else:
         form_reserva = ReservaForm(instance=reserva)
         form_cliente = ClienteForm(instance=cliente)

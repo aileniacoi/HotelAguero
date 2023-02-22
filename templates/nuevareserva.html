@@ -51,7 +51,27 @@
             </div>
 
             <h5 class="card-title">Datos del cliente</h5>
+
             <div class="row">
+                <div class="col-md-4">
+                     <div class="form-check form-switch container" style="margin-left:10px; margin-top:10px;">
+                          <label>Buscar cliente existente</label>
+                          <input class="form-check-input" type="checkbox" role="switch" id="buscar_cliente" onchange="ActivarBuscarCliente()">
+                      </div>
+                </div>
+
+
+                <div class="col-md-8 form-group" hidden id="id_cliente">
+                    <label>{{ form_reserva.idCliente.label }}</label>
+                    <div>{{ form_reserva.idCliente}}</div>
+
+                </div>
+            </div>
+
+
+            <fieldset id="datos_cliente">
+
+                            <div class="row">
 <!--                <div class="col-md-12">-->
 <!--                    {{ form_cliente.as_p }}-->
 <!--                </div>-->
@@ -85,6 +105,9 @@
                 </div>
 
             </div>
+
+            </fieldset>
+
             <h5 class="card-title">Datos de la Reserva</h5>
 
             <div class="row"  style="margin-top: 15px">
@@ -140,9 +163,51 @@
     </div>
 </div>
 
+    <div class="modal fade" id="agregar-cliente-modal" tabindex="-1" role="dialog" aria-labelledby="agregar-cliente-modal-label">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="agregar-cliente-modal-label" >Actualizar datos del cliente</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true"></span></button>
+      </div>
+      <div class="modal-body">
+
+      </div>
+    </div>
+  </div>
+</div>
+
 </main>
 
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+
 <script type="text/javascript">
+
+jQuery(document).ready(function($){
+    $(document).ready(function() {
+        $('.select-search').select2({
+            theme: "bootstrap-5"
+        });
+    });
+});
+
+function ActivarBuscarCliente(){
+
+    var buscarCliente = document.getElementById("buscar_cliente").checked;
+
+    if (buscarCliente){
+        document.getElementById("datos_cliente").disabled = true;
+        document.getElementById("id_cliente").hidden = false;
+        document.getElementById("id_idCliente").setAttribute("required", "");
+    } else {
+        document.getElementById("datos_cliente").disabled = false;
+        document.getElementById("id_cliente").hidden = true;
+        document.getElementById("id_idCliente").removeAttribute("required");
+    }
+
+
+}
 
 function CalcularSenia(precioTotal, precioPorDia, dias){
 
@@ -226,6 +291,44 @@ function GetPrecioYComboHabitaciones(){
     GetPrice(fechaIngreso, fechaEgreso, cantidadPersonas);
     GetComboHabitaciones(fechaIngreso, fechaEgreso);
 }
+
+$(document).ready(function() {
+  $('#id_idCliente').on("select2:select", function(e) {
+    var idCliente = e.params.data.id;
+    var url = "/clientes/editreserva/" + idCliente + "/";
+    $.get(url, function(data) {
+      $('#agregar-cliente-modal .modal-body').html(data);
+      $('#agregar-cliente-modal').modal('show');
+    });
+  });
+});
+
+$(document).on('submit', '#agregar-cliente-form', function(e) {
+    e.preventDefault();
+    var form = $(this);
+    var url = form.attr('action');
+    console.log(url)
+    $.ajax({
+        type: 'POST',
+        url: url,
+        data: form.serialize(),
+        success: function(data) {
+            if (data) {
+                // Si se guardó correctamente, cerrar el modal y actualizar la página
+                $('#agregar-cliente-modal').modal('hide');
+                document.getElementById("id_nombreYApellido").value = data.nombreYApellido;
+                document.getElementById("id_dni").value = data.dni;
+                document.getElementById("id_telefono").value = data.telefono;
+                document.getElementById("id_direccion").value = data.direccion;
+                document.getElementById("id_email").value = data.email;
+            }
+
+        },
+        error: function(xhr, status, error) {
+            alert('Error: ' + error);
+        }
+    });
+});
 
 document.getElementById("id_fechaIngreso").addEventListener("change", GetPrecioYComboHabitaciones);
 document.getElementById("id_fechaEgreso").addEventListener("change", GetPrecioYComboHabitaciones);
