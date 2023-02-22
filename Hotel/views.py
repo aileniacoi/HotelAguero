@@ -170,7 +170,12 @@ class HabitacionesDisponiblesView(APIView):
         habitaciones_ocupadas = Reserva.objects.filter(Q(fechaIngreso__range=[fecha_ingreso, fecha_egreso]) |
                                                        Q(fechaEgreso__range=[fecha_ingreso, fecha_egreso]))\
             .values_list('idHabitacion', flat=True)
-        habitaciones_disponibles = Habitacion.objects.exclude(pk__in=habitaciones_ocupadas)
+
+        if habitaciones_ocupadas.exists():
+            habitaciones_disponibles = Habitacion.objects.exclude(pk__in=habitaciones_ocupadas)
+        else:
+            habitaciones_disponibles = Habitacion.objects.all()
+
         serializer = HabitacionSerializer(habitaciones_disponibles, many=True)
         return Response(serializer.data)
 

@@ -228,10 +228,10 @@ function CalcularSenia(precioTotal, precioPorDia, dias){
     }
 }
 
-function CalcularPrecioTotal(fechaIngreso, fechaEgreso, precio){
-    var fechaIngreso = new Date(fechaIngreso);
-    var fechaEgreso = new Date(fechaEgreso);
-    var precio = precio;
+function CalcularPrecioTotal(){
+    var fechaIngreso = new Date(document.getElementById("id_fechaIngreso").value);
+    var fechaEgreso = new Date(document.getElementById("id_fechaEgreso").value);
+    var precio = document.getElementById("id_precioPorDia").value;
 
     var difFechas = fechaEgreso - fechaIngreso;
     var difEnDias = difFechas / (1000 * 60 * 60 * 24);
@@ -268,7 +268,7 @@ function GetPrice(fechaIngreso, fechaEgreso, cantidadPersonas) {
                 document.getElementById("warning_precios").removeAttribute("hidden");
             }
 
-            CalcularPrecioTotal(fechaIngreso, fechaEgreso, data.precio);
+            //CalcularPrecioTotal(fechaIngreso, fechaEgreso, data.precio);
         });
 }
 
@@ -344,6 +344,7 @@ $(document).on('submit', '#agregar-cliente-form', function(e) {
 document.getElementById("id_fechaIngreso").addEventListener("change", GetPrecioYComboHabitaciones);
 document.getElementById("id_fechaEgreso").addEventListener("change", GetPrecioYComboHabitaciones);
 document.getElementById("id_cantidadPersonas").addEventListener("change", GetPrecioYComboHabitaciones);
+document.getElementById("id_precioPorDia").addEventListener("change", CalcularPrecioTotal)
 
 </script>
 {% endblock %}

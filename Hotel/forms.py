@@ -49,7 +49,7 @@ class ReservaForm(forms.ModelForm):
             'idHabitacion': forms.Select(attrs={'class': 'form-control'}),
             'idCliente': forms.Select(attrs={'class': 'form-control select-search', 'style': 'width:350px;'}),
             'seniaSolicitada': forms.NumberInput(attrs={'class': 'form-control'}),
-            'precioTotal': forms.NumberInput(attrs={'class': 'form-control'}),
+            'precioTotal': forms.NumberInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
             'precioPorDia': forms.NumberInput(attrs={'class': 'form-control'}),
             'incluyeDesayuno': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'observaciones': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
