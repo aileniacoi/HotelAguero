@@ -92,6 +92,7 @@
 <script type="text/javascript">
 
 var reservasJs = JSON.parse('{{ reservas|safe }}');
+var feriadosJs = {{ feriados|safe }}.filter(x => x.date.datetime.month === {{ mes }} && x.primary_type === "National holiday").map(s => s.date.datetime.day);
 
 function ConvertirFecha(fechaString){
     fecha = fechaString.split("/");
@@ -151,6 +152,21 @@ function CargarColoresCalendario(){
              i += 1;
         {% endfor %}
     {% endfor %}
+
+    for (var i = 0; i < feriadosJs.length; i++){
+        var feriado = feriadosJs[i];
+
+        celdaSem = document.getElementById('res_diaSem' + '_' + feriado)
+        celdaSem.classList.add('weekend');
+
+        celdaDia = document.getElementById('res_dia' + '_' + feriado)
+        celdaDia.classList.add('weekend');
+
+        {% for hab in habitaciones %}
+            celdaHab = document.getElementById('res_' + {{ hab.numero }} + '_' + feriado)
+            celdaHab.classList.add('weekend');
+        {% endfor %}
+    }
 }
 
 function ObtenerInfoReserva(res){

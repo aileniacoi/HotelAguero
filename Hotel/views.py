@@ -36,6 +36,9 @@ from django.utils import timezone
 from datetime import datetime, date, time, timedelta
 import calendar
 
+from django.core.cache import cache
+import requests
+
 # Create your views here.
 
 
@@ -333,6 +336,7 @@ class ReservasView(ListView):
 
 def reservasCalendario(request, mes=None, anio=None):
 
+    feriados = get_holidays(anio)
     rangoFecha = calendar.monthrange(anio,mes)
     cantidadDias = rangoFecha[1]
 
@@ -344,7 +348,7 @@ def reservasCalendario(request, mes=None, anio=None):
     reservas = ReservaSerializer(reservasQuery, many=True)
 
     context = {'reservas': json.dumps(reservas.data), 'habitaciones': habitaciones,
-               'cantidadDias': range(1, cantidadDias + 1), 'mes': mes, 'anio': anio}
+               'cantidadDias': range(1, cantidadDias + 1), 'mes': mes, 'anio': anio, 'feriados': json.dumps(feriados)}
     return render(request, 'reservasCalendario.html', context)
 
 
@@ -886,3 +890,20 @@ def BuscarReservaCliente(request):
     else:
         return render(request, 'listReservas.html', {})
 
+
+def get_holidays(year):
+    cache_key = f"holidays_{year}"
+    holidays = cache.get(cache_key)
+
+    if holidays is not None:
+        return holidays
+    else:
+        url = f"https://calendarific.com/api/v2/holidays?api_key=c19a938c72a4d126bb791e2f71fa75e329233903&country=AR&year={year}"
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            holidays = response.json()["response"]["holidays"]
+            cache.set(cache_key, holidays)
+            return holidays
+        else:
+            return None
