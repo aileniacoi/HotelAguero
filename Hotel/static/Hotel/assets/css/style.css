@@ -829,3 +829,23 @@ h6 {
     width: 45px;
     text-align: center;
 }
+
+.weekend {
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+}
+
+.resConfirmada{
+    background-color: #84FD82;
+}
+
+.resConfirmadaFirst{
+    background-color: #73DD71;
+}
+
+.resPendiente{
+
+}
+
+.resPendienteFirst{
+
+}

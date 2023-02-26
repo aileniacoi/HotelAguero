@@ -68,7 +68,7 @@
                 <td class="columnasCal">{{ hab.numero }}</td>
 
                 {% for dia in cantidadDias %}
-                <td id="res_{{ hab.numero }}_{{ dia }}" class="columnasCal" data-toggle="popover" onclick="SetPopoverReserva({{ dia }}, {{ hab.numero }})"></td>
+                <td id="res_{{ hab.numero }}_{{ dia }}" class="columnasCal reserva" data-bs-toggle="popover"></td>
                 {% endfor %}
               </tr>
               {% endfor %}
@@ -84,48 +84,52 @@
 var reservasJs = JSON.parse('{{ reservas|safe }}');
 
 function ConvertirFecha(fechaString){
-    fecha = fechaString.split("-");
-    return new Date(fecha[0], fecha[1] - 1, fecha[2]);
-}
-
-function SetPopoverReserva(dia, hab) {
-
-    var celda = document.getElementById('res_' + hab + '_' + dia);
-    var fecha = new Date({{ anio }}, {{ mes }} - 1, dia);
-
-    var reserva = reservasJs.find(f =>
-            f.idHabitacion.numero == hab && ConvertirFecha(f.fechaIngreso) <= fecha && ConvertirFecha(f.fechaEgreso) >= fecha);
-
-    if(!reserva) return;
-
-    celda.setAttribute('data-content', reserva.cantidadPersonas + ' pax - Saldo: ' + reserva.seniaSolicitada);
-    celda.setAttribute('title', reserva.idCliente);
+    fecha = fechaString.split("/");
+    return new Date(fecha[2], fecha[1] - 1, fecha[0]);
 }
 
 function GetColorSegunReserva(nHab, fecha) {
 
-        var reserva = reservasJs.find(f =>
+        var reserva = reservasJs.find(f => f.idHabitacion &&
             f.idHabitacion.numero == nHab && ConvertirFecha(f.fechaIngreso) <= fecha && ConvertirFecha(f.fechaEgreso) >= fecha);
 
         if (!reserva)
             return;
 
-        if (reserva.seniaSolicitada > 0) {
+        if (reserva.total_pagos > 0) {
             if (ConvertirFecha(reserva.fechaIngreso).getTime() == fecha.getTime()){
                 return '#73DD71';
             } else{
                 return '#84FD82';
             }
         } else {
-            if (ConvertirFecha(reserva.fechaIngreso).getTime() == fecha.getTime()){
-                return '#E1E56D';
+
+            var fechaVenc = new Date();
+            fechaVenc.setDate(fechaVenc.getDate() + 2);
+
+            if(ConvertirFecha(reserva.fechaRegistro).getTime() < fechaVenc.getTime()){
+
+                 if (ConvertirFecha(reserva.fechaIngreso).getTime() == fecha.getTime()){
+                    return '#C00E0E';
+                } else{
+                    return '#F13939';
+                }
+
             } else{
-                return '#FBFF8A';
+                if (ConvertirFecha(reserva.fechaIngreso).getTime() == fecha.getTime()){
+                    return '#E1E56D';
+                } else{
+                    return '#FBFF8A';
+                }
             }
+
+
         }
 }
 
+
 function CargarColoresCalendario(){
+ var i = 0;
     {% for dia in cantidadDias %}
         {% for hab in habitaciones %}
 
@@ -134,10 +138,66 @@ function CargarColoresCalendario(){
             var color = GetColorSegunReserva( {{ hab.numero }}, fecha);
             celda.setAttribute('style', 'background-color: ' + color);
 
+             i += 1;
         {% endfor %}
     {% endfor %}
 }
 
+function ObtenerInfoReserva(res){
+    var ret = "";
+
+    var saldo = parseInt(res.precioTotal, 10) - res.total_pagos;
+
+    ret += '<p><strong>Ingreso: </strong>' + res.fechaIngreso + '</p>';
+    ret += '<p><strong>Egreso: </strong>' + res.fechaEgreso + '</p>';
+    ret += '<p><strong>Pax: </strong>' + res.cantidadPersonas + '</p>';
+    ret += '<p><strong>Saldo: </strong>$' + saldo + '</p>';
+    ret += '<a class="btn btn-outline-primary" type="button" href="/reservas/edit/' + res.pk + '">Ir a Reserva</a>'
+
+    return ret;
+}
+
+/*function SetPopoverReserva(){
+
+    for (var i = 0; i < reservasJs.length; i++){
+        var reserva = reservasJs[i];
+
+        if (!reserva.idHabitacion) continue;
+
+        var fechaIngresoSplit = reserva.fechaIngreso.split("/");
+        var fechaEgresoSplit = reserva.fechaEgreso.split("/");
+        var hab = reserva.idHabitacion.numero;
+
+        var contentRes = ObtenerInfoReserva(reserva);
+        var contentTitle = reserva.idCliente.nombreYApellido;
+
+        var inicio = 1;
+        var fin = 1;
+
+        if (parseInt(fechaIngresoSplit[1], 10) === {{ mes }}){
+            inicio = fechaIngresoSplit[0];
+        }
+
+        if (parseInt(fechaEgresoSplit[1], 10) === {{ mes }}){
+            fin = fechaEgresoSplit[0];
+        }
+        else{
+            fin = {{ cantidadDias|length }};
+        }
+
+        for (var j = inicio; j < fin; j++){
+            var id = "res_" + j + "_" + hab;
+            var celda = document.getElementById(id);
+
+            var popover = new bootstrap.Popover(celda, {
+            toggle: 'popover',
+            trigger: 'click',
+            title: contentTitle,
+            html: true,
+            content: contentRes});
+        }
+    }
+}*/
 
 function ObtenerNombreMes() {
   let fecha = new Date();
@@ -152,7 +212,7 @@ function ObtenerNombreMes() {
 
 function CargarDiasDeSemana(){
     var fecha = new Date({{ anio }}, {{ mes }} - 1, 1);
-    var dia = fecha.getDay();
+    var diaSem = fecha.getDay();
 
     var diasSemana = {
         0: "Dom",
@@ -166,12 +226,13 @@ function CargarDiasDeSemana(){
 
     {% for dia in cantidadDias %}
         var celda = document.getElementById('res_dia_' + {{ dia }});
-        celda.innerHTML = diasSemana[dia];
+        celda.innerHTML = diasSemana[diaSem];
 
-        if (dia < 6)
-            dia += 1;
+        if (diaSem < 6)
+            diaSem += 1;
         else
-            dia = 0;
+            diaSem = 0;
+
     {% endfor %}
 }
 
@@ -181,9 +242,35 @@ function CargarDatosDeInicio(){
     CargarDiasDeSemana();
 }
 
+function SetPopover(celda){
+    var datos = celda.id.split("_")
+    var diaRes =  datos[2];
+    var nHab = datos[1];
+    var fecha = new Date({{ anio }}, {{ mes }} - 1, diaRes);
+
+    var reserva = reservasJs.find(f => f.idHabitacion &&
+            f.idHabitacion.numero == nHab && ConvertirFecha(f.fechaIngreso) <= fecha && ConvertirFecha(f.fechaEgreso) >= fecha);
+
+        if (!reserva)
+            return;
+
+    var contentRes = ObtenerInfoReserva(reserva);
+    var contentTitle = reserva.idCliente.nombreYApellido;
+
+    return new bootstrap.Popover(celda, {
+            toggle: 'popover',
+            trigger: 'click',
+            title: contentTitle,
+            html: true,
+            sanitize: false,
+            content: contentRes});
+}
+
 window.addEventListener('load', CargarDatosDeInicio());
+//window.addEventListener('DOMContentLoaded', SetPopoverReserva);
 
-
+const popoverTriggerList = document.getElementsByClassName('reserva')
+const popoverList = [...popoverTriggerList].map(popoverTriggerEl => SetPopover(popoverTriggerEl))
 
 </script>
 {% endblock %}
