@@ -6,7 +6,16 @@
 
 <main id="main" class="main">
 
-  <h3>Reservas</h3>
+      <div class="pagetitle">
+      <h1>Reservas</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/index">Home</a></li>
+          <li class="breadcrumb-item">Reservas</li>
+          <li class="breadcrumb-item active">Calendario</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
 
     <div class="container-fluid my-3">
         <div class="row justify-content-end">
@@ -39,7 +48,7 @@
         </div>
 
         <div class="table-responsive">
-            <table class="table table-hover table-bordered" >
+            <table class="table table-bordered" >
                 <thead>
             <!--    <tr>-->
             <!--        <th colspan="{{ cantidadDias|length|add:1 }}" style="text-align:center">-->
@@ -48,16 +57,17 @@
             <!--  </h4>-->
             <!--        </th>-->
             <!--    </tr>-->
-                  <tr>
-                    <th class="columnasCal"></th>
-                    {% for dia in cantidadDias %}
-                    <th class="columnasCal">{{ dia }}</th>
-                    {% endfor %}
-                  </tr>
+
                   <tr>
                       <th class="columnasCal"></th>
                     {% for dia in cantidadDias %}
-                    <th id="res_dia_{{ dia }}" class="columnasCal"></th>
+                    <th id="res_diaSem_{{ dia }}" class="columnasCal"></th>
+                    {% endfor %}
+                  </tr>
+                 <tr>
+                    <th class="columnasCal"></th>
+                    {% for dia in cantidadDias %}
+                    <th id="res_dia_{{ dia }}" class="columnasCal">{{ dia }}</th>
                     {% endfor %}
                   </tr>
                 </thead>
@@ -98,9 +108,9 @@ function GetColorSegunReserva(nHab, fecha) {
 
         if (reserva.total_pagos > 0) {
             if (ConvertirFecha(reserva.fechaIngreso).getTime() == fecha.getTime()){
-                return '#73DD71';
+                return 'resConfirmadaFirst';
             } else{
-                return '#84FD82';
+                return 'resConfirmada';
             }
         } else {
 
@@ -110,16 +120,16 @@ function GetColorSegunReserva(nHab, fecha) {
             if(ConvertirFecha(reserva.fechaRegistro).getTime() < fechaVenc.getTime()){
 
                  if (ConvertirFecha(reserva.fechaIngreso).getTime() == fecha.getTime()){
-                    return '#C00E0E';
+                    return 'resVencidaFirst';
                 } else{
-                    return '#F13939';
+                    return 'resVencida';
                 }
 
             } else{
                 if (ConvertirFecha(reserva.fechaIngreso).getTime() == fecha.getTime()){
-                    return '#E1E56D';
+                    return 'resPendienteFirst';
                 } else{
-                    return '#FBFF8A';
+                    return 'resPendiente';
                 }
             }
 
@@ -135,9 +145,9 @@ function CargarColoresCalendario(){
 
             var celda = document.getElementById('res_' + {{ hab.numero }} + '_' + {{ dia }});
             var fecha = new Date({{ anio }}, {{ mes }} - 1, {{ dia }});
-            var color = GetColorSegunReserva( {{ hab.numero }}, fecha);
-            celda.setAttribute('style', 'background-color: ' + color);
-
+            var clase = GetColorSegunReserva( {{ hab.numero }}, fecha);
+            //celda.setAttribute('style', 'background-color: ' + color);
+            celda.classList.add(clase)
              i += 1;
         {% endfor %}
     {% endfor %}
@@ -225,8 +235,24 @@ function CargarDiasDeSemana(){
     };
 
     {% for dia in cantidadDias %}
-        var celda = document.getElementById('res_dia_' + {{ dia }});
+        var celda = document.getElementById('res_diaSem_' + {{ dia }});
         celda.innerHTML = diasSemana[diaSem];
+
+
+         if (diaSem == 0 || diaSem == 6){
+
+         celda.classList.add('weekend');
+
+         var celdaDia = document.getElementById('res_dia_' + {{ dia }});
+         celdaDia.classList.add('weekend')
+
+            {% for hab in habitaciones %}
+
+            var celdaWeekend = document.getElementById('res_'+ {{ hab }} + '_' + {{ dia }});
+            celdaWeekend.classList.add('weekend');
+
+            {% endfor %}
+        }
 
         if (diaSem < 6)
             diaSem += 1;
