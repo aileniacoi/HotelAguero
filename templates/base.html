@@ -134,7 +134,7 @@
   <header id="header" class="header fixed-top d-flex align-items-center">
 
     <div class="d-flex align-items-center justify-content-between">
-      <a href="/index" class="logo d-flex align-items-center">
+      <a href="/" class="logo d-flex align-items-center">
         <img src="{% static 'Hotel/logo1.png' %}"  alt="">
         <span class="d-none d-lg-block">Hotel Aguero</span>
       </a>
@@ -347,7 +347,7 @@
             </li>
 
             <li>
-              <a class="dropdown-item d-flex align-items-center" href="#">
+              <a class="dropdown-item d-flex align-items-center" href="{% url 'logout' %}">
                 <i class="bi bi-box-arrow-right"></i>
                 <span>Cerrar sesion</span>
               </a>
@@ -436,9 +436,9 @@
       </li><!-- End Caja Page Nav -->
 
       <li class="nav-item">
-        <a class="nav-link collapsed" href="/accounts/login">
+        <a class="nav-link collapsed" href="{% url 'logout' %}  ">
           <i class="bi bi-box-arrow-in-right"></i>
-          <span>Login</span>
+          <span>Cerrar sesion</span>
         </a>
       </li><!-- End Login Page Nav -->
 

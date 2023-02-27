@@ -44,7 +44,6 @@ from django.utils.decorators import method_decorator
 
 
 from django.core.cache import cache
-import requests
 
 # Create your views here.
 
@@ -711,7 +710,7 @@ def agregar_pago_reserva(request, reserva_id):
 
 
 #Reportes PDF
-@method_decorator(login_required, name='dispatch')
+
 class ReporteReservasPDF(View):
 
     def cabecera(self, pdf):
@@ -923,20 +922,3 @@ def BuscarReservaCliente(request):
     else:
         return render(request, 'listReservas.html', {})
 
-
-def get_holidays(year):
-    cache_key = f"holidays_{year}"
-    holidays = cache.get(cache_key)
-
-    if holidays is not None:
-        return holidays
-    else:
-        url = f"https://calendarific.com/api/v2/holidays?api_key=c19a938c72a4d126bb791e2f71fa75e329233903&country=AR&year={year}"
-        response = requests.get(url)
-
-        if response.status_code == 200:
-            holidays = response.json()["response"]["holidays"]
-            cache.set(cache_key, holidays)
-            return holidays
-        else:
-            return None
