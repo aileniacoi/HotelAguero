@@ -922,6 +922,14 @@ def BuscarReservaCliente(request):
     else:
         return render(request, 'listReservas.html', {})
 
+
 def helppage(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     return render(request, 'helppage.html')
 
+
+def profile(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    return render(request, 'profile.html')
