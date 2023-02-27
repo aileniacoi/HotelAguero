@@ -9,7 +9,7 @@ from django.http import HttpResponse
 from django.forms import inlineformset_factory
 from .forms import ClienteForm, HabitacionForm, ReservaForm, CajaForm, ListaPrecioForm, DetalleListaPrecioForm, \
     ListaPrecioDetalleInlineFormset, FiltrosCajaForm, FiltrosReservaForm, CancelacionReservaForm
-from .serializers import ReservaSerializer, HabitacionSerializer
+from .serializers import ReservaSerializer, HabitacionSerializer, ClienteSerializer
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -42,6 +42,9 @@ from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
+
+from django.core.cache import cache
+import requests
 
 # Create your views here.
 
@@ -187,7 +190,12 @@ class HabitacionesDisponiblesView(APIView):
         habitaciones_ocupadas = Reserva.objects.filter(Q(fechaIngreso__range=[fecha_ingreso, fecha_egreso]) |
                                                        Q(fechaEgreso__range=[fecha_ingreso, fecha_egreso]))\
             .values_list('idHabitacion', flat=True)
-        habitaciones_disponibles = Habitacion.objects.exclude(pk__in=habitaciones_ocupadas)
+
+        if habitaciones_ocupadas.exists():
+            habitaciones_disponibles = Habitacion.objects.exclude(pk__in=habitaciones_ocupadas)
+        else:
+            habitaciones_disponibles = Habitacion.objects.all()
+
         serializer = HabitacionSerializer(habitaciones_disponibles, many=True)
         return Response(serializer.data)
 
@@ -252,6 +260,25 @@ def cliente_edit(request, pk=None):
     else:
         form = ClienteForm(instance=cliente)
     return render(request, "clienteForm.html", {"method": request.method, "form": form, })
+
+
+def cliente_edit_reserva(request, pk):
+    if pk is not None:
+        cliente = get_object_or_404(Cliente, pk=pk)
+    else:
+        cliente = None
+    if request.method == "POST":
+        form = ClienteForm(request.POST, instance=cliente)
+        if form.is_valid():
+            updated_cliente = form.save()
+            return JsonResponse(ClienteSerializer(updated_cliente).data, safe=False)
+    else:
+        form = ClienteForm(instance=cliente)
+        form.fields['nombreYApellido'].widget.attrs['readonly'] = 'readonly'
+        form.fields['nombreYApellido'].widget.attrs['class'] = 'form-control-plaintext'
+        form.fields['dni'].widget.attrs['readonly'] = 'readonly'
+        form.fields['dni'].widget.attrs['class'] = 'form-control-plaintext'
+    return render(request, "clienteresForm.html", {"method": request.method, "form_existente": form, "id_cliente": pk })
 
 
 # ------ RESERVAS ------
@@ -329,6 +356,8 @@ class ReservasView(ListView):
 def reservasCalendario(request, mes=None, anio=None):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+
+    feriados = get_holidays(anio)
     rangoFecha = calendar.monthrange(anio,mes)
     cantidadDias = rangoFecha[1]
 
@@ -340,7 +369,7 @@ def reservasCalendario(request, mes=None, anio=None):
     reservas = ReservaSerializer(reservasQuery, many=True)
 
     context = {'reservas': json.dumps(reservas.data), 'habitaciones': habitaciones,
-               'cantidadDias': range(1, cantidadDias + 1), 'mes': mes, 'anio': anio}
+               'cantidadDias': range(1, cantidadDias + 1), 'mes': mes, 'anio': anio, 'feriados': json.dumps(feriados)}
     return render(request, 'reservasCalendario.html', context)
 
 @method_decorator(login_required, name='dispatch')
@@ -413,15 +442,25 @@ def alta_reserva(request):
         form_reserva = ReservaForm(request.POST, instance=reserva)
         form_cliente = ClienteForm(request.POST, instance=cliente)
 
-        if form_cliente.is_valid() and form_reserva.is_valid():
-            cliente = form_cliente.save()
+        if form_reserva.is_valid():
             reserva = form_reserva.save(commit=False)
-            reserva.idCliente = cliente
-            form_reserva.save()
+            print(form_reserva)
+            if bool(request.POST['idCliente']):
+                form_reserva.save()
+
+            else:
+                if form_cliente.is_valid():
+                    cliente = form_cliente.save()
+                    reserva.idCliente = cliente
+                    form_reserva.save()
 
             messages.success(request, "La reserva \"{}\" fue creada.".format(reserva))
 
             return redirect("reservaEdit", pk=reserva.pk)
+        else:
+            print(form_reserva.errors)
+
+
     else:
         form_reserva = ReservaForm(instance=reserva)
         form_cliente = ClienteForm(instance=cliente)
@@ -884,3 +923,20 @@ def BuscarReservaCliente(request):
     else:
         return render(request, 'listReservas.html', {})
 
+
+def get_holidays(year):
+    cache_key = f"holidays_{year}"
+    holidays = cache.get(cache_key)
+
+    if holidays is not None:
+        return holidays
+    else:
+        url = f"https://calendarific.com/api/v2/holidays?api_key=c19a938c72a4d126bb791e2f71fa75e329233903&country=AR&year={year}"
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            holidays = response.json()["response"]["holidays"]
+            cache.set(cache_key, holidays)
+            return holidays
+        else:
+            return None

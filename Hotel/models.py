@@ -24,7 +24,7 @@ class Cliente(models.Model):
     direccion = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
-        return self.nombreYApellido
+        return self.nombreYApellido + " - " + self.dni
 
     def get_absolute_url(self):
         return reverse('detailCliente', kwargs={'pk': self.pk})

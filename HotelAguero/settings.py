@@ -137,3 +137,11 @@ MESSAGE_TAGS = {
 }
 
 LOGIN_URL = '/accounts/login'
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+        'TIMEOUT': 3600,
+    }
+}

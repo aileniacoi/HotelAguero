@@ -1,0 +1,5 @@
+<form method="post" id="agregar-cliente-form" action="/clientes/editreserva/{{ id_cliente }}/">
+  {% csrf_token %}
+  {{ form_existente.as_p }}
+  <button type="submit" class="btn btn-success">Confirmar</button>
+</form>

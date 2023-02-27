@@ -112,7 +112,12 @@
                         <th style="width: 1%"></th>
                     </tr>
                     {% for reserva in reservas %}
-                    <tr {% if reserva.reserva_vencida %}style="background-color:#FFE4E4;" title="Esta reserva fue realizada hace 2 días o&#10más pero aún no se registra una seña"{% endif %}>
+                    <tr {% if reserva.reserva_vencida %}
+                        style="background-color:#FFE4E4;"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="bottom"
+                        title="Esta reserva fue realizada hace 2 días o&#10más pero aún no se registra una seña"
+                        {% endif %}>
                         <td>{{ reserva.pk }}</td>
                         {% if reserva.idHabitacion is None %}
                         <td class="text-warning blink" style="font-size:23"><i class="fa-solid fa-triangle-exclamation"></i></td>
@@ -120,7 +125,7 @@
                         <td>{{ reserva.idHabitacion }}</td>
                         {% endif %}
                         <td>{{ reserva.cantidadPersonas }}</td>
-                        <td>{{ reserva.idCliente }}</td>
+                        <td>{{ reserva.idCliente.nombreYApellido }}</td>
                         <td>{{ reserva.fechaIngreso|date:"d/m/Y" }}</td>
                         <td>{{ reserva.fechaEgreso|date:"d/m/Y" }}</td>
                         <td>{{ reserva.saldo }}</td>
@@ -160,6 +165,10 @@
 </main>
 
 <script type="text/javascript">
+
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
 document.querySelectorAll('[name="fechaDesde"], [name="fechaHasta"], [name="mostrarHistoricas"], [name="soloGestionPendiente"]').forEach(function(element) {
   element.onchange = function() {
     document.getElementById('filtro-form').submit();

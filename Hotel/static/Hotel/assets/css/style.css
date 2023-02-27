@@ -829,3 +829,31 @@ h6 {
     width: 45px;
     text-align: center;
 }
+
+.weekend {
+  box-shadow: inset 5em 1em rgba(0, 0, 0, 0.025)!important;
+}
+
+.resConfirmada{
+    background-color: #84FD82 !important;
+}
+
+.resConfirmadaFirst{
+    background-color: #73DD71 !important;
+}
+
+.resPendiente{
+     background-color: #FBFF8A !important;
+}
+
+.resPendienteFirst{
+     background-color: #E1E56D !important;
+}
+
+.resVencida{
+     background-color: #F13939 !important;
+}
+
+.resVencidaFirst{
+     background-color: #C00E0E !important;
+}

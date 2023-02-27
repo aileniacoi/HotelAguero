@@ -23,6 +23,7 @@ urlpatterns = [
     path('clientes/', views.ClientesView.as_view(), name='clientes'),
     path('clientes/add/', views.cliente_edit, name='newCliente'),
     path('clientes/edit/<int:pk>/', views.cliente_edit, name='modCliente'),
+    path('clientes/editreserva/<int:pk>/', views.cliente_edit_reserva, name='modResCliente'),
     path('clientes/viewdetail/<int:pk>/', views.cliente_edit, name='detailCliente'),
     path('clientes/delete/<int:pk>/', views.ClienteBajaView.as_view(), name='deleteCliente'),
 
