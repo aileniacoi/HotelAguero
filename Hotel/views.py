@@ -929,7 +929,7 @@ def helppage(request):
     return render(request, 'helppage.html')
 
 
-def profile(request):
-    if not request.user.is_authenticated:
-        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
-    return render(request, 'profile.html')
+#def profile(request):
+ #   if not request.user.is_authenticated:
+  #      return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+   # return render(request, 'profile.html')

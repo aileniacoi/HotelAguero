@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 from Hotel.views import ReservasDetalleView, ReporteReservasPDF, HabitacionesDisponiblesView, HabitacionesView, \
     ClientesView, ReservasView, ListaPrecioView, MovimientosCajaView, ReporteReservasCalendarioPDF, ListaPrecioBajaView, \
-    CajaBajaView, helppage, profile
+    CajaBajaView, helppage
 
 urlpatterns = [
     #path('', views.inicio, name='vInicio'),
@@ -72,5 +72,5 @@ urlpatterns = [
     path('helppage/', views.helppage, name='helppage'),
 
     #PAGINA DE PERFIl
-    path('profile/', views.profile, name='profile')
+    #path('profile/', views.profile, name='profile')
 ]
