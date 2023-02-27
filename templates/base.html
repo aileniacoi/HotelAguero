@@ -304,13 +304,13 @@
 
           <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
             <img src="{% static 'Hotel/assets/img/profile-img.png' %}" alt="Profile" class="rounded-circle">
-            <span class="d-none d-md-block dropdown-toggle ps-2">Usuario</span>
+            <span class="d-none d-md-block dropdown-toggle ps-2">{{ request.user.username }}</span>
           </a><!-- End Profile Iamge Icon -->
 
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
             <li class="dropdown-header">
-              <h6>Usuario</h6>
-              <span>Django Developer</span>
+              <h6>{{ request.user.username }}</h6>
+              <span>{{ request.user.email }}</span>
             </li>
             <li>
               <hr class="dropdown-divider">
@@ -327,7 +327,7 @@
             </li>
 
             <li>
-              <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
+              <a class="dropdown-item d-flex align-items-center" href="/admin/">
                 <i class="bi bi-gear"></i>
                 <span>Configuracion</span>
               </a>
@@ -337,7 +337,7 @@
             </li>
 
             <li>
-              <a class="dropdown-item d-flex align-items-center" href="pages-faq.html">
+              <a class="dropdown-item d-flex align-items-center" href="/helppage/">
                 <i class="bi bi-question-circle"></i>
                 <span>Ayuda</span>
               </a>

@@ -922,3 +922,6 @@ def BuscarReservaCliente(request):
     else:
         return render(request, 'listReservas.html', {})
 
+def helppage(request):
+    return render(request, 'helppage.html')
+
