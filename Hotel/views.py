@@ -41,7 +41,7 @@ from django.conf import settings
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-
+from django.contrib import messages
 
 from django.core.cache import cache
 
@@ -157,7 +157,7 @@ class HabitacionBajaView(SuccessMessageMixin, DeleteView):
     success_url = '/habitaciones'
     success_message = 'La habitación fue eliminada.'
 
-@method_decorator(login_required, name='dispatch')
+
 def habitacion_edit(request, pk=None):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
@@ -232,14 +232,20 @@ class ClientesView(ListView):
 class ClienteBajaView(SuccessMessageMixin, DeleteView):
     model = Cliente
     template_name = 'clientebaja.html'
-    success_url = '/clientes'
+    success_url = '/clientemensaje'
     success_message = 'El cliente fue eliminado.'
+def clientemensaje(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    return render(request, 'clientemensaje.html')
+
+
 @method_decorator(login_required, name='dispatch')
 class ClienteDetalleView(DetailView):
     model = Cliente
     template_name = 'clienteForm.html'
 
-@method_decorator(login_required, name='dispatch')
+
 def cliente_edit(request, pk=None):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
@@ -535,7 +541,7 @@ class ListaPrecioBajaView(SuccessMessageMixin, DeleteView):
     success_url = '/listasprecio'
     success_message = 'La lista de precios fue eliminada.'
 
-@method_decorator(login_required, name='dispatch')
+
 def listaPrecio_edit(request, pk=None):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))

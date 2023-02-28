@@ -26,7 +26,7 @@ urlpatterns = [
     path('clientes/editreserva/<int:pk>/', views.cliente_edit_reserva, name='modResCliente'),
     path('clientes/viewdetail/<int:pk>/', views.cliente_edit, name='detailCliente'),
     path('clientes/delete/<int:pk>/', views.ClienteBajaView.as_view(), name='deleteCliente'),
-
+    path('clientemensaje/', views.clientemensaje, name='clientemensaje'),
 
     #RESERVAS
     #path('reservas/', views.reservas, name='reservas'),
