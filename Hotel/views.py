@@ -534,10 +534,14 @@ def listaPrecio_edit(request, pk=None):
                 else:
                     messages.success(request, "La lista de precio fue modificada.".format(updated_lista))
                 return redirect("/listasprecio/edit/" + str(updated_lista.pk), listaPrecio_edit)
+        else:
+            i_formset = ListaPrecioDetalleInlineFormset(request.POST, instance=lista)
+
     else:
         t_form = ListaPrecioForm(instance=lista)
         i_formset = ListaPrecioDetalleInlineFormset(instance=lista)
         i_formset.extra = 4 if i_formset.queryset.count() < 1 else 1
+
 
     return render(request, "preciosform.html", {"method": request.method, "t_form": t_form, 'i_formset': i_formset})
 

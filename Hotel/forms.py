@@ -1,6 +1,7 @@
 from django import forms
 from datetime import datetime
 from .models import Cliente, Reserva, Habitacion, MovimientoCaja, ListaPrecio, DetalleListaPrecio
+from django.db.models import Q
 
 
 class ClienteForm(forms.ModelForm):
@@ -115,6 +116,29 @@ class ListaPrecioForm(forms.ModelForm):
             'vigenciaDesde': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'vigenciaHasta': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'})
         }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        vigenciaDesde = cleaned_data.get('vigenciaDesde')
+        vigenciaHasta = cleaned_data.get('vigenciaHasta')
+
+        if vigenciaDesde and vigenciaHasta:
+            # Verificamos si ya existe una lista de precios para las fechas seleccionadas
+
+            listasExistentes = ListaPrecio.objects.filter(
+                Q(vigenciaDesde__range=(vigenciaDesde, vigenciaHasta)) |
+                Q(vigenciaHasta__range=(vigenciaDesde, vigenciaHasta))
+            ).exclude(pk=self.instance.pk)
+
+            if listasExistentes.exists():
+
+                datosLista = ''
+
+                for lista in listasExistentes:
+                    datosLista += f'<li>{lista.get_idTipoLista_display()} (desde: {lista.vigenciaDesde.strftime("%d/%m/%Y")}, ' \
+                                  f'hasta: {lista.vigenciaHasta.strftime("%d/%m/%Y")})</li>'
+
+                raise forms.ValidationError(f'Las fechas seleccionadas se superponen con otra lista de precios: <br> <ul>{datosLista}</ul>')
 
 
 class DetalleListaPrecioForm(forms.ModelForm):

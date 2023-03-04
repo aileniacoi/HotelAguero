@@ -28,7 +28,16 @@
 
         {% endfor %}
     {% endif %}
+{% if t_form.non_field_errors %}
+    <div class="row">
+        {% for error in t_form.non_field_errors %}
+        <div class="alert alert-danger alert-dismissible col-md-6" role="alert">
+            {{ error|safe }}
+        </div>
+        {% endfor %}
 
+    </div>
+{% endif %}
 
     <div class="col-md-5 offset-md-0 m-0">
              <form method="post">
@@ -37,8 +46,26 @@
 
             <div class="card-body">
                 <h5 class="card-title">Lista de precios</h5>
-                {{ form.non_form_errors }}
-                {{ t_form.as_p }}
+                <div class="row" style="margin-top: 15px">
+                    <div class="col-md-12">
+                    <label>Vigencia desde:</label>
+                    {{ t_form.vigenciaDesde}}
+                    </div>
+                </div>
+
+                <div class="row" style="margin-top: 15px">
+                    <div class="col-md-12">
+                    <label>Vigencia hasta:</label>
+                    {{ t_form.vigenciaHasta}}
+                </div>
+                </div>
+                <div class="row" style="margin-top: 15px">
+                    <div class="col-md-12">
+                    <label>Tipo de lista:</label>
+                    {{ t_form.idTipoLista}}
+                </div>
+                </div>
+
                 <br />
                 <h5>Precios</h5>
 
