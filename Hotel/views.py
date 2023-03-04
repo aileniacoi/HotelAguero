@@ -36,8 +36,14 @@ from django.utils import timezone
 from datetime import datetime, date, time, timedelta
 import calendar
 
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.conf import settings
+from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.contrib import messages
+
 from django.core.cache import cache
-import requests
 
 # Create your views here.
 
@@ -57,11 +63,19 @@ class SuccessMessageMixin:
 
 
 def inicio(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     cantidad = Habitacion.objects.count()
     context = {'cantidad': cantidad}
     return render(request, 'base.html', context)
 
+class MyView(LoginRequiredMixin, View):
+    login_url = '/accounts/login/'
+    redirect_field_name = 'redirect_to'
+
 def index(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     hoy = datetime.now().date()
 
     ingresos = Reserva.objects.filter(fechaIngreso=hoy)
@@ -128,7 +142,7 @@ def index(request):
 #     habitaciones = Habitacion.objects.all()
 #     context = {'habitaciones': habitaciones}
 #     return render(request, 'listHabitaciones.html', context)
-
+@method_decorator(login_required, name='dispatch')
 class HabitacionesView(ListView):
     template_name = 'listHabitaciones.html'
     model = Habitacion
@@ -136,7 +150,7 @@ class HabitacionesView(ListView):
     context_object_name = 'habitaciones'
     ordering = ['numero']
 
-
+@method_decorator(login_required, name='dispatch')
 class HabitacionBajaView(SuccessMessageMixin, DeleteView):
     model = Habitacion
     template_name = 'habitacionbaja.html'
@@ -145,6 +159,8 @@ class HabitacionBajaView(SuccessMessageMixin, DeleteView):
 
 
 def habitacion_edit(request, pk=None):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     if pk is not None:
         habitacion = get_object_or_404(Habitacion, pk=pk)
     else:
@@ -191,7 +207,7 @@ class HabitacionesDisponiblesView(APIView):
 #     context = {'clientes': clientes, }
 #     return render(request, 'listClientes.html', context)
 
-
+@method_decorator(login_required, name='dispatch')
 class ClientesView(ListView):
     template_name = 'listClientes.html'
     model = Cliente
@@ -212,19 +228,27 @@ class ClientesView(ListView):
 #         def get(self, request, *args, **kwargs):
 #             return HttpResponse("Cliente grabado exitosamente")
 
-
+@method_decorator(login_required, name='dispatch')
 class ClienteBajaView(SuccessMessageMixin, DeleteView):
     model = Cliente
     template_name = 'clientebaja.html'
-    success_url = '/clientes'
+    success_url = '/clientemensaje'
     success_message = 'El cliente fue eliminado.'
+def clientemensaje(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    return render(request, 'clientemensaje.html')
 
+
+@method_decorator(login_required, name='dispatch')
 class ClienteDetalleView(DetailView):
     model = Cliente
     template_name = 'clienteForm.html'
 
 
 def cliente_edit(request, pk=None):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     if pk is not None:
         cliente = get_object_or_404(Cliente, pk=pk)
     else:
@@ -268,7 +292,7 @@ def cliente_edit_reserva(request, pk):
 #     reservas = Reserva.objects.all()
 #     context = {'reservas': reservas, }
 #     return render(request, 'listReservas.html', context)
-
+@method_decorator(login_required, name='dispatch')
 class ReservasView(ListView):
     template_name = 'listReservas.html'
     model = Reserva
@@ -335,6 +359,8 @@ class ReservasView(ListView):
 
 
 def reservasCalendario(request, mes=None, anio=None):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
 
     feriados = get_holidays(anio)
     rangoFecha = calendar.monthrange(anio,mes)
@@ -351,7 +377,7 @@ def reservasCalendario(request, mes=None, anio=None):
                'cantidadDias': range(1, cantidadDias + 1), 'mes': mes, 'anio': anio, 'feriados': json.dumps(feriados)}
     return render(request, 'reservasCalendario.html', context)
 
-
+@method_decorator(login_required, name='dispatch')
 class ReservasDetalleView(DetailView):
     model = Reserva
     form_class = ReservaForm
@@ -375,6 +401,8 @@ class ReservasDetalleView(DetailView):
 #
 
 def edit_reserva(request, pk):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     reserva = Reserva.objects.get(pk=pk)
     cliente = Cliente.objects.get(pk=reserva.idCliente.pk)
     pagos = MovimientoCaja.objects.filter(idReserva=reserva)
@@ -411,6 +439,8 @@ def edit_reserva(request, pk):
 
 
 def alta_reserva(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     reserva = None
     cliente = None
     if request.method == 'POST':
@@ -443,6 +473,8 @@ def alta_reserva(request):
 
 
 def cancelar_reserva(request, pk):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     reserva = get_object_or_404(Reserva, pk=pk)
     if request.method == 'POST':
         reserva.fechaCancelacion = request.POST['fecha']
@@ -495,14 +527,14 @@ def listasPrecio(request):
     context = {'listas': listas, }
     return render(request, 'listPrecios.html', context)
 
-
+@method_decorator(login_required, name='dispatch')
 class ListaPrecioView(ListView):
     template_name = 'listPrecios.html'
     model = ListaPrecio
     paginate_by = 10
     context_object_name = 'listas'
 
-
+@method_decorator(login_required, name='dispatch')
 class ListaPrecioBajaView(SuccessMessageMixin, DeleteView):
     model = ListaPrecio
     template_name = 'listapreciobaja.html'
@@ -511,6 +543,8 @@ class ListaPrecioBajaView(SuccessMessageMixin, DeleteView):
 
 
 def listaPrecio_edit(request, pk=None):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     if pk is not None:
         lista = get_object_or_404(ListaPrecio, pk=pk)
         detalle = DetalleListaPrecio.objects.filter(idListaPrecio=lista)
@@ -604,7 +638,7 @@ def listaPrecio_edit(request, pk=None):
 #     context = {'cajaMov': cajaMov, }
 #     return render(request, 'listCaja.html', context)
 
-
+@method_decorator(login_required, name='dispatch')
 class MovimientosCajaView(ListView):
     template_name = 'listCaja.html'
     model = MovimientoCaja
@@ -638,6 +672,8 @@ class MovimientosCajaView(ListView):
 
 @csrf_exempt
 def caja_edit(request, pk=None):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     if pk is not None:
         mov = get_object_or_404(MovimientoCaja, pk=pk)
     else:
@@ -655,7 +691,7 @@ def caja_edit(request, pk=None):
         form = CajaForm(instance=mov)
     return render(request, "cajaform.html", {"method": request.method, "form": form, })
 
-
+@method_decorator(login_required, name='dispatch')
 class CajaBajaView(SuccessMessageMixin, DeleteView):
     model = MovimientoCaja
     template_name = 'cajabaja.html'
@@ -664,6 +700,8 @@ class CajaBajaView(SuccessMessageMixin, DeleteView):
 
 
 def agregar_pago_reserva(request, reserva_id):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     reserva = get_object_or_404(Reserva, pk=reserva_id)
 
     if request.method == "POST":
@@ -895,19 +933,13 @@ def BuscarReservaCliente(request):
         return render(request, 'listReservas.html', {})
 
 
-def get_holidays(year):
-    cache_key = f"holidays_{year}"
-    holidays = cache.get(cache_key)
+def helppage(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    return render(request, 'helppage.html')
 
-    if holidays is not None:
-        return holidays
-    else:
-        url = f"https://calendarific.com/api/v2/holidays?api_key=c19a938c72a4d126bb791e2f71fa75e329233903&country=AR&year={year}"
-        response = requests.get(url)
 
-        if response.status_code == 200:
-            holidays = response.json()["response"]["holidays"]
-            cache.set(cache_key, holidays)
-            return holidays
-        else:
-            return None
+#def profile(request):
+ #   if not request.user.is_authenticated:
+  #      return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+   # return render(request, 'profile.html')

@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 from Hotel.views import ReservasDetalleView, ReporteReservasPDF, HabitacionesDisponiblesView, HabitacionesView, \
     ClientesView, ReservasView, ListaPrecioView, MovimientosCajaView, ReporteReservasCalendarioPDF, ListaPrecioBajaView, \
-    CajaBajaView
+    CajaBajaView, helppage
 
 urlpatterns = [
     #path('', views.inicio, name='vInicio'),
@@ -26,7 +26,7 @@ urlpatterns = [
     path('clientes/editreserva/<int:pk>/', views.cliente_edit_reserva, name='modResCliente'),
     path('clientes/viewdetail/<int:pk>/', views.cliente_edit, name='detailCliente'),
     path('clientes/delete/<int:pk>/', views.ClienteBajaView.as_view(), name='deleteCliente'),
-
+    path('clientemensaje/', views.clientemensaje, name='clientemensaje'),
 
     #RESERVAS
     #path('reservas/', views.reservas, name='reservas'),
@@ -67,4 +67,10 @@ urlpatterns = [
     path('reporte_reservas_pdf/', ReporteReservasPDF.as_view(), name="reporte_reservas_pdf"),
     path('reporte_caja_pdf/', views.ReporteCajaPDF, name="reporte_caja_pdf"),
     path('calendario_reservas_pdf/<int:mes>/<int:anio>/', ReporteReservasCalendarioPDF, name="calendario_reservas_pdf"),
+
+    #PAGINA DE AYUDA
+    path('helppage/', views.helppage, name='helppage'),
+
+    #PAGINA DE PERFIl
+    #path('profile/', views.profile, name='profile')
 ]

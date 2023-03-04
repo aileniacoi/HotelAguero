@@ -136,6 +136,8 @@ MESSAGE_TAGS = {
     messages.ERROR: 'alert-danger',
 }
 
+LOGIN_URL = '/accounts/login'
+
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',

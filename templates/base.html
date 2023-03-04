@@ -134,7 +134,7 @@
   <header id="header" class="header fixed-top d-flex align-items-center">
 
     <div class="d-flex align-items-center justify-content-between">
-      <a href="/index" class="logo d-flex align-items-center">
+      <a href="/" class="logo d-flex align-items-center">
         <img src="{% static 'Hotel/logo1.png' %}"  alt="">
         <span class="d-none d-lg-block">Hotel Aguero</span>
       </a>
@@ -157,14 +157,14 @@
             <i class="bi bi-search"></i>
           </a>
         </li><!-- End Search Icon-->
-
+        <!--
         <li class="nav-item dropdown">
 
           <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
             <i class="bi bi-bell"></i>
             <span class="badge bg-primary badge-number">4</span>
-          </a><!-- End Notification Icon -->
-
+          </a>--><!-- End Notification Icon -->
+          <!--
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
             <li class="dropdown-header">
               You have 4 new notifications
@@ -229,18 +229,18 @@
               <a href="#">Show all notifications</a>
             </li>
 
-          </ul><!-- End Notification Dropdown Items -->
+          </ul>--><!-- End Notification Dropdown Items -->
 
-        </li><!-- End Notification Nav -->
+        <!--</li>--><!-- End Notification Nav -->
 
-        <li class="nav-item dropdown">
+        <!--<li class="nav-item dropdown">
 
           <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
             <i class="bi bi-chat-left-text"></i>
             <span class="badge bg-success badge-number">3</span>
-          </a><!-- End Messages Icon -->
+          </a>--><!-- End Messages Icon -->
 
-          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow messages">
+          <!--<ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow messages">
             <li class="dropdown-header">
               You have 3 new messages
               <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a>
@@ -295,28 +295,29 @@
               <a href="#">Show all messages</a>
             </li>
 
-          </ul><!-- End Messages Dropdown Items -->
+          </ul>--><!-- End Messages Dropdown Items -->
+        <!--
+        </li>--><!-- End Messages Nav -->
 
-        </li><!-- End Messages Nav -->
 
         <li class="nav-item dropdown pe-3">
 
           <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
             <img src="{% static 'Hotel/assets/img/profile-img.png' %}" alt="Profile" class="rounded-circle">
-            <span class="d-none d-md-block dropdown-toggle ps-2">Usuario</span>
+            <span class="d-none d-md-block dropdown-toggle ps-2">{{ request.user.username }}</span>
           </a><!-- End Profile Iamge Icon -->
 
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
             <li class="dropdown-header">
-              <h6>Usuario</h6>
-              <span>Django Developer</span>
+              <h6>{{ request.user.username }}</h6>
+              <span>{{ request.user.email }}</span>
             </li>
             <li>
               <hr class="dropdown-divider">
             </li>
 
             <li>
-              <a class="dropdown-item d-flex align-items-center" href="/accounts/profile">
+              <a class="dropdown-item d-flex align-items-center" href="/accounts/profile/">
                 <i class="bi bi-person"></i>
                 <span>Mi perfil</span>
               </a>
@@ -326,7 +327,7 @@
             </li>
 
             <li>
-              <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
+              <a class="dropdown-item d-flex align-items-center" href="/admin/">
                 <i class="bi bi-gear"></i>
                 <span>Configuracion</span>
               </a>
@@ -336,7 +337,7 @@
             </li>
 
             <li>
-              <a class="dropdown-item d-flex align-items-center" href="pages-faq.html">
+              <a class="dropdown-item d-flex align-items-center" href="/helppage/">
                 <i class="bi bi-question-circle"></i>
                 <span>Ayuda</span>
               </a>
@@ -346,7 +347,7 @@
             </li>
 
             <li>
-              <a class="dropdown-item d-flex align-items-center" href="#">
+              <a class="dropdown-item d-flex align-items-center" href="{% url 'logout' %}">
                 <i class="bi bi-box-arrow-right"></i>
                 <span>Cerrar sesion</span>
               </a>
@@ -435,9 +436,9 @@
       </li><!-- End Caja Page Nav -->
 
       <li class="nav-item">
-        <a class="nav-link collapsed" href="/accounts/login">
+        <a class="nav-link collapsed" href="{% url 'logout' %}  ">
           <i class="bi bi-box-arrow-in-right"></i>
-          <span>Login</span>
+          <span>Cerrar sesion</span>
         </a>
       </li><!-- End Login Page Nav -->
 
