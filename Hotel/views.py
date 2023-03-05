@@ -154,8 +154,14 @@ class HabitacionesView(ListView):
 class HabitacionBajaView(SuccessMessageMixin, DeleteView):
     model = Habitacion
     template_name = 'habitacionbaja.html'
-    success_url = '/habitaciones'
+    success_url = '/clientemensaje'
     success_message = 'La habitación fue eliminada.'
+
+def habitacionesmensaje(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    return render(request, 'habitacionesmensaje.html')
+
 
 
 def habitacion_edit(request, pk=None):
@@ -691,9 +697,13 @@ def caja_edit(request, pk=None):
 class CajaBajaView(SuccessMessageMixin, DeleteView):
     model = MovimientoCaja
     template_name = 'cajabaja.html'
-    success_url = '/movimientoscaja'
+    success_url = '/cajamensaje'
     success_message = 'El movimiento de caja fue eliminado.'
 
+def cajamensaje(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    return render(request, 'cajamensaje.html')
 
 def agregar_pago_reserva(request, reserva_id):
     if not request.user.is_authenticated:

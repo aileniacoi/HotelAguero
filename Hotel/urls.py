@@ -15,7 +15,7 @@ urlpatterns = [
     path('habitaciones/viewdetail/<int:pk>/', views.habitacion_edit, name='detailHabitacion'),
     path('habitaciones/edit/<int:pk>/', views.habitacion_edit, name='modHabitacion'),
     path('habitaciones/delete/<int:pk>/', views.HabitacionBajaView.as_view(), name='deleteHabitacion'),
-
+    path('habitacionesmensaje/', views.habitacionesmensaje, name='habitacionesmensaje'),
     path('api/habitaciones/disponibles/', HabitacionesDisponiblesView.as_view()),
 
     #CLIENTES
@@ -55,7 +55,7 @@ urlpatterns = [
     path('movimientoscaja/edit/<int:pk>/', views.caja_edit, name="modCaja"),
     path('movimientoscaja/viewdetail/<int:pk>/', views.caja_edit, name="detalleCaja"),
     path('movimientoscaja/delete/<int:pk>/', views.CajaBajaView.as_view(), name="cajaBaja"),
-
+    path('cajamensaje/', views.cajamensaje, name='cajamensajemensaje'),
     path('reservas/add/pagos/<int:reserva_id>/', views.agregar_pago_reserva, name='agregar_pago_reserva'),
 
 
