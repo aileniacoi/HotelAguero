@@ -35,6 +35,7 @@ from django.utils import timezone
 
 from datetime import datetime, date, time, timedelta
 import calendar
+import locale
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.conf import settings
@@ -44,6 +45,7 @@ from django.utils.decorators import method_decorator
 from django.contrib import messages
 
 from django.core.cache import cache
+import requests
 
 # Create your views here.
 
@@ -574,10 +576,14 @@ def listaPrecio_edit(request, pk=None):
                 else:
                     messages.success(request, "La lista de precio fue modificada.".format(updated_lista))
                 return redirect("/listasprecio/edit/" + str(updated_lista.pk), listaPrecio_edit)
+        else:
+            i_formset = ListaPrecioDetalleInlineFormset(request.POST, instance=lista)
+
     else:
         t_form = ListaPrecioForm(instance=lista)
         i_formset = ListaPrecioDetalleInlineFormset(instance=lista)
         i_formset.extra = 4 if i_formset.queryset.count() < 1 else 1
+
 
     return render(request, "preciosform.html", {"method": request.method, "t_form": t_form, 'i_formset': i_formset})
 
@@ -777,12 +783,16 @@ def ReporteReservasCalendarioPDF(request, mes, anio):
     buffer = BytesIO()
     pdf = canvas.Canvas(buffer, landscape(A4))
 
+    locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
+    fecha = date(anio, mes, 1)
+
     archivo_imagen = os.path.join(settings.BASE_DIR, '/HotelAguero/Hotel/static/Hotel/logo-ha-rep.jpg')
     pdf.drawImage(archivo_imagen, 100, 490, 120, 90, preserveAspectRatio=True)
     pdf.setFont("Helvetica", 16)
     pdf.drawString(350, 540, u"HOTEL AGÜERO")
     pdf.setFont("Helvetica", 14)
     pdf.drawString(330, 510, u"REPORTE DE RESERVAS")
+    pdf.drawString(360, 460, fecha.strftime('%B').upper() + " " + str(anio))
 
     y = 200
 
@@ -790,19 +800,58 @@ def ReporteReservasCalendarioPDF(request, mes, anio):
     cantidadDias = rangoFecha[1]
 
     habitaciones = Habitacion.objects.all().order_by('numero')
-    reservas = Reserva.objects.filter(Q(fechaIngreso__month=mes, fechaIngreso__year=anio) |
-                                      Q(fechaEgreso__month=mes, fechaEgreso__year=anio))
+    reservas = Reserva.objects.filter((Q(fechaIngreso__month=mes, fechaIngreso__year=anio) |
+                                      Q(fechaEgreso__month=mes, fechaEgreso__year=anio)) &
+                                      Q(idHabitacion__isnull=False))
 
     estado_reserva = {hab.numero: [False for i in range(cantidadDias)] for hab in habitaciones}
 
     for res in reservas:
         habitacion = res.idHabitacion.numero
-        ingreso = res.fechaIngreso.day
-        egreso = res.fechaEgreso.day
+
+        if res.fechaIngreso.month != mes:
+            ingreso = 1
+        else:
+            ingreso = res.fechaIngreso.day
+
+        if res.fechaEgreso.month != mes:
+            egreso = cantidadDias
+        else:
+            egreso = res.fechaEgreso.day
+
+
+        print(ingreso)
+        print(egreso)
+
         for i in range(ingreso - 1, egreso):
             estado_reserva[habitacion][i] = True
 
-    datosTabla = [[''] + [(dia + 1) for dia in range(cantidadDias)]]
+
+    dia_semana = fecha.weekday()
+
+    diasSemana = {
+        0: "Lun",
+        1: "Mar",
+        2: "Mie",
+        3: "Jue",
+        4: "Vie",
+        5: "Sab",
+        6: "Dom"
+    };
+
+    dias_mes = list()
+
+    for i in range(cantidadDias):
+
+        dias_mes.append(diasSemana[dia_semana])
+
+        if dia_semana < 6:
+            dia_semana += 1
+        else:
+            dia_semana = 0
+
+    datosTabla = [[''] + dias_mes]
+    datosTabla.append([''] + [(dia + 1) for dia in range(cantidadDias)])
 
     for hab in habitaciones:
         row = [hab.numero] + ['' if not estado_reserva[hab.numero][i] else 'X' for i in range(cantidadDias)]
@@ -937,6 +986,24 @@ def BuscarReservaCliente(request):
         return render(request, 'listReservas.html', {'cliente_buscado': cliente_buscado, 'reservas': reservas})
     else:
         return render(request, 'listReservas.html', {})
+
+
+def get_holidays(year):
+    cache_key = f"holidays_{year}"
+    holidays = cache.get(cache_key)
+
+    if holidays is not None:
+        return holidays
+    else:
+        url = f"https://calendarific.com/api/v2/holidays?api_key=c19a938c72a4d126bb791e2f71fa75e329233903&country=AR&year={year}"
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            holidays = response.json()["response"]["holidays"]
+            cache.set(cache_key, holidays)
+            return holidays
+        else:
+            return None
 
 
 def helppage(request):

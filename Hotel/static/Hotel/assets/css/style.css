@@ -857,3 +857,14 @@ h6 {
 .resVencidaFirst{
      background-color: #C00E0E !important;
 }
+
+.tabla-cal::-webkit-scrollbar {
+  width: 5px;
+  height: 8px;
+  background-color: #fff;
+}
+
+.tabla-cal::-webkit-scrollbar-thumb {
+  background-color: #fbd79d;
+}
+
