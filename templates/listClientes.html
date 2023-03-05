@@ -8,7 +8,7 @@
       <h1>Clientes</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/index">Home</a></li>
+          <li class="breadcrumb-item"><a href="/">Inicio</a></li>
           <li class="breadcrumb-item">Clientes</li>
           <li class="breadcrumb-item active">Lista</li>
         </ol>
@@ -26,16 +26,17 @@
        </div>
    </div>
 
-    {% for message in messages %}
-<div class="container-fluid p-0">
-  <div class="alert {{ message.tags }} alert-dismissible" role="alert" >
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-      <span aria-hidden="True">&times;</span>
-    </button>
-    {{ message }}
-  </div>
-</div>
-{% endfor %}
+    {% if messages %}
+        {% for message in messages %}
+    <div class="row">
+           <div class="alert {{ message.tags }} alert-dismissible col-md-6">
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                {{ message }}
+            </div>
+    </div>
+
+        {% endfor %}
+    {% endif %}
 
 <div class="row">
     <div class="col-md-12">
