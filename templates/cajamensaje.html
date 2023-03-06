@@ -1,0 +1,9 @@
+<form id="baja-cliente-form" >
+        {% csrf_token %}
+
+        <p>El cliente {{ object.nombreYApellido }} fue eliminado con exito</p>
+
+      <div class="modal-footer flex-column border-top-0">
+        <a  class="btn btn-lg btn-light w-100 mx-0" data-bs-dismiss="modal" href="/clientes">Aceptar</a>
+      </div>
+    </form>
