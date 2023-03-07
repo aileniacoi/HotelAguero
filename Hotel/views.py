@@ -194,14 +194,9 @@ class HabitacionesDisponiblesView(APIView):
         fecha_egreso = request.GET.get('fecha_egreso')
         # habitaciones_ocupadas = Reserva.objects.filter(fechaIngreso__lte=fecha_egreso, fechaIngreso__gte=fecha_egreso)\
         #     .values_list('idHabitacion', flat=True)
-        habitaciones_ocupadas = Reserva.objects.filter(Q(fechaIngreso__range=[fecha_ingreso, fecha_egreso]) |
-                                                       Q(fechaEgreso__range=[fecha_ingreso, fecha_egreso]))\
-            .values_list('idHabitacion', flat=True)
 
-        if habitaciones_ocupadas.exists():
-            habitaciones_disponibles = Habitacion.objects.exclude(pk__in=habitaciones_ocupadas)
-        else:
-            habitaciones_disponibles = Habitacion.objects.all()
+
+        habitaciones_disponibles = get_habitaciones_disponibles(fecha_ingreso, fecha_egreso)
 
         serializer = HabitacionSerializer(habitaciones_disponibles, many=True)
         return Response(serializer.data)
@@ -288,9 +283,9 @@ def cliente_edit_reserva(request, pk):
     else:
         form = ClienteForm(instance=cliente)
         form.fields['nombreYApellido'].widget.attrs['readonly'] = 'readonly'
-        form.fields['nombreYApellido'].widget.attrs['class'] = 'form-control-plaintext'
+        #form.fields['nombreYApellido'].widget.attrs['class'] = 'form-control-plaintext'
         form.fields['dni'].widget.attrs['readonly'] = 'readonly'
-        form.fields['dni'].widget.attrs['class'] = 'form-control-plaintext'
+        #form.fields['dni'].widget.attrs['class'] = 'form-control-plaintext'
     return render(request, "clienteresForm.html", {"method": request.method, "form_existente": form, "id_cliente": pk })
 
 
@@ -439,7 +434,7 @@ def edit_reserva(request, pk):
         form_cliente = ClienteForm(instance=cliente)
         #p_formset = PagosReservaInlineFormset(instance=reserva)
 
-        print(form_reserva)
+        form_reserva.fields['idHabitacion'].queryset = get_habitaciones_disponibles(reserva.fechaIngreso, reserva.fechaEgreso, pk)
 
         saldo = reserva.precioTotal - pagosRealizados
     return render(request, 'reservaDetail.html', {'form_reserva': form_reserva, 'form_cliente': form_cliente, 'pagos': pagos,
@@ -457,7 +452,6 @@ def alta_reserva(request):
 
         if form_reserva.is_valid():
             reserva = form_reserva.save(commit=False)
-            print(form_reserva)
             if bool(request.POST['idCliente']):
                 form_reserva.save()
 
@@ -477,6 +471,9 @@ def alta_reserva(request):
     else:
         form_reserva = ReservaForm(instance=reserva)
         form_cliente = ClienteForm(instance=cliente)
+
+        form_reserva.fields['idHabitacion'].widget.attrs['disabled'] = 'readonly'
+
     return render(request, 'nuevareserva.html', {'form_reserva': form_reserva, 'form_cliente': form_cliente})
 
 
@@ -819,10 +816,6 @@ def ReporteReservasCalendarioPDF(request, mes, anio):
         else:
             egreso = res.fechaEgreso.day
 
-
-        print(ingreso)
-        print(egreso)
-
         for i in range(ingreso - 1, egreso):
             estado_reserva[habitacion][i] = True
 
@@ -951,7 +944,6 @@ def get_price(request):
             detalle_precio = DetalleListaPrecio.objects.filter(idListaPrecio=lista_precio, cantidadPersonas=personas).first()
 
             if detalle_precio:
-                print(detalle_precio)
                 return JsonResponse({'precio':detalle_precio.precioPorDia})
         return JsonResponse({'precio': None})
 
@@ -1004,6 +996,19 @@ def get_holidays(year):
             return holidays
         else:
             return None
+
+
+def get_habitaciones_disponibles(fecha_ingreso, fecha_egreso, pk=None):
+    habitaciones_ocupadas = Reserva.objects.exclude(pk=pk)\
+                                           .filter((Q(fechaIngreso__range=[fecha_ingreso, fecha_egreso]) |
+                                                   Q(fechaEgreso__range=[fecha_ingreso, fecha_egreso])) &
+                                                   Q(idHabitacion__isnull=False)) \
+        .values_list('idHabitacion', flat=True)
+
+    if habitaciones_ocupadas.exists():
+        return Habitacion.objects.exclude(pk__in=habitaciones_ocupadas).order_by('numero')
+    else:
+        return Habitacion.objects.all().order_by('numero')
 
 
 def helppage(request):
