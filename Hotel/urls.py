@@ -4,6 +4,7 @@ from Hotel.views import ReservasDetalleView, ReporteReservasPDF, HabitacionesDis
     ClientesView, ReservasView, ListaPrecioView, MovimientosCajaView, ReporteReservasCalendarioPDF, ListaPrecioBajaView, \
     CajaBajaView, helppage
 
+app_name = "Hotel"
 urlpatterns = [
     #path('', views.inicio, name='vInicio'),
     path('', views.index, name='index'),
