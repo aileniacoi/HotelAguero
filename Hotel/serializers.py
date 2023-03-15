@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Cliente, Habitacion, Reserva, MovimientoCaja
+from .models import Cliente, Habitacion, Reserva, MovimientoCaja, ListaPrecio, DetalleListaPrecio
 
 class ClienteSerializer(serializers.ModelSerializer):
     class Meta:
@@ -15,6 +15,25 @@ class CajaSerializer(serializers.ModelSerializer):
     class Meta:
         model = MovimientoCaja
         fields = ('pk', 'monto')
+
+
+class PreciosSerializer(serializers.ModelSerializer):
+    detalles = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ListaPrecio
+        fields = ('pk', 'idTipoLista', 'vigenciaDesde', 'vigenciaHasta', 'detalles')
+
+    def get_detalles(self, obj):
+        detalles = DetalleListaPrecio.objects.filter(idListaPrecio=obj)
+        serializer = PreciosDetalleSerializer(detalles, many=True)
+        return serializer.data
+
+class PreciosDetalleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DetalleListaPrecio
+        fields = ('cantidadPersonas', 'precioPorDia')
+
 
 class ReservaSerializer(serializers.ModelSerializer):
     total_pagos = serializers.SerializerMethodField()

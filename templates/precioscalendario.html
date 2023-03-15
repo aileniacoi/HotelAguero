@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+{% block title %}Precios{% endblock %}
+
+{% block content %}
+
+
+<main id="main" class="main">
+
+      <div class="pagetitle">
+      <h1>Precios</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+          <li class="breadcrumb-item">Precios</li>
+          <li class="breadcrumb-item active">Calendario</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+  <div class="card row justify-content-center" >
+    <div class="card-body">
+        <div class="row justify-content-center">
+            <div class="col-md-4">
+                <h4 class="card-header" >
+                  {% if mes == 1 %}
+                    <a href="/listasprecio/calendar/12/{{ anio|add:-1 }}"><i class="fa-solid fa-chevron-left" style="color: #223868;"></i></a>
+                        {% else %}
+                    <a href="/listasprecio/calendar/{{ mes|add:-1}}/{{ anio }}"><i class="fa-solid fa-chevron-left" style="color: #F79B03;"></i></a>
+                        {% endif %}
+                    <span id="nombreMes" style="font-family: 'PT Sans', sans-serif; Color: #2B4A84;"></span>
+                        {% if mes == 12 %}
+                    <a href="/listasprecio/calendar/1/{{ anio|add:1 }}"><i class="fa-solid fa-chevron-right" style="color: #223868;"></i></a>
+                        {% else %}
+                    <a href="/listasprecio/calendar/{{ mes|add:1}}/{{ anio }}"><i class="fa-solid fa-chevron-right" style="color: #F79B03;"></i></a>
+                        {% endif %}
+                </h4>
+            </div>
+        </div>
+
+        <div class="table-responsive tabla-cal">
+            <table class="table table-bordered" style="width:70%; margin: auto;">
+                <thead>
+
+                  <tr>
+                      <th class="columnasCal">Dom</th>
+                      <th class="columnasCal">Lun</th>
+                      <th class="columnasCal">Mar</th>
+                      <th class="columnasCal">Mie</th>
+                      <th class="columnasCal">Jue</th>
+                      <th class="columnasCal">Vie</th>
+                      <th class="columnasCal">Sab</th>
+                  </tr>
+
+                </thead>
+
+            <tbody id="calendar-body">
+            </tbody>
+          </table>
+        </div>
+    </div>
+  </div>
+</main>
+
+<script type="text/javascript">
+
+var preciosJs = JSON.parse('{{ precios|safe }}');
+
+function ConvertirFecha(fechaString){
+    fecha = fechaString.split("-");
+    return new Date(fecha[0], fecha[1] - 1, fecha[2]);
+}
+
+function ObtenerNombreMes() {
+  let fecha = new Date();
+  let mesInt = {{ mes }};
+  let mes = '';
+  if (0 < mesInt && mesInt <= 12) {
+    fecha.setMonth(mesInt - 1);
+    mes = new Intl.DateTimeFormat('es-ES', { month: 'long'}).format(fecha);
+  }
+  document.getElementById('nombreMes').innerHTML = mes.toUpperCase() + ' ' + {{ anio }};
+}
+
+function CargarCalendario(){
+    var calendarBody = document.getElementById("calendar-body");
+    var daysInMonth = new Date({{ anio }}, {{ mes }}, 0).getDate();
+
+    var firstDayOfMonth = new Date({{ anio }}, {{ mes }} - 1, 1).getDay();
+
+    var calendarDays = new Array(6);
+
+    var dayCount = 1;
+    for (var row = 0; row < 6; row++) {
+
+        if (dayCount > daysInMonth) break;
+
+        calendarDays[row] = new Array(7);
+
+        for (var col = 0; col < 7; col++) {
+            if (row == 0 && col < firstDayOfMonth) {
+            calendarDays[row][col] = "";
+            } else if (dayCount > daysInMonth) {
+                calendarDays[row][col] = "";
+            } else {
+                calendarDays[row][col] = dayCount;
+                dayCount++;
+            }
+        }
+    }
+
+     for (var row = 0; row < 6 ; row++) {
+
+     if (!calendarDays[row]) break;
+
+      var calendarRow = document.createElement("tr");
+      for (var col = 0; col < 7; col++) {
+        var calendarCell = document.createElement("td");
+
+        var claseTipoLista = GetColorSegunListaPrecio(calendarDays[row][col])
+
+        calendarCell.textContent = calendarDays[row][col];
+        calendarCell.classList.add(claseTipoLista)
+
+        calendarRow.appendChild(calendarCell);
+      }
+      calendarBody.appendChild(calendarRow);
+    }
+}
+
+function GetColorSegunListaPrecio(dia){
+
+    if (!dia) return;
+
+    var fecha = new Date({{ anio }}, {{ mes }} - 1, dia);
+    var precio = preciosJs.find(f => ConvertirFecha(f.vigenciaDesde) <= fecha && ConvertirFecha(f.vigenciaHasta) >= fecha)
+
+    if (!precio) return;
+
+
+    switch (precio.idTipoLista){
+        case 'TA':
+            return 'listaTA';
+            break;
+
+        case 'TM':
+            return 'listaTM';
+            break;
+
+        case 'TB':
+            return 'listaTB';
+            break;
+
+        default:
+            return '';
+    }
+}
+
+function CargarDatosDeInicio(){
+    ObtenerNombreMes();
+    CargarCalendario();
+}
+
+window.addEventListener('load', CargarDatosDeInicio());
+
+function ObtenerInfoLista(precio){
+
+     var ret = '<ul>';
+
+     for (var i = 0; i < precio.detalles.length; i++){
+        detalle = precio.detalles[i];
+
+        ret += '<li>' + detalle.cantidadPersonas + '  pax: $' + detalle.precioPorDia + '</li>'
+     }
+
+      ret += '</ul>';
+
+     return ret;
+}
+
+function SetPopover(celda){
+    var dia = celda.textContent;
+    var fecha = new Date({{ anio }}, {{ mes }} - 1, dia);
+
+    var precio = preciosJs.find(f => ConvertirFecha(f.vigenciaDesde) <= fecha && ConvertirFecha(f.vigenciaHasta) >= fecha);
+
+        if (!precio)
+            return;
+
+    var content = ObtenerInfoLista(precio);
+    var contentTitle = '';
+
+    switch (precio.idTipoLista){
+        case 'TA':
+            contentTitle = 'Temporada Alta';
+            break;
+
+        case 'TM':
+            contentTitle = 'Temporada Media';
+            break;
+
+        case 'TB':
+            contentTitle = 'Temporada Baja';
+            break;
+
+        default:
+            return '';
+    }
+
+    return new bootstrap.Popover(celda, {
+            toggle: 'popover',
+            trigger: 'click',
+            title: contentTitle,
+            html: true,
+            sanitize: false,
+            content: content});
+}
+
+
+const popoverTriggerList = document.getElementsByTagName('td')
+const popoverList = [...popoverTriggerList].map(popoverTriggerEl => SetPopover(popoverTriggerEl))
+
+</script>
+<style>
+    th, td {
+      padding: 10px;
+      text-align: center;
+      font-size: 20px;
+    }
+</style>
+
+{% endblock %}
