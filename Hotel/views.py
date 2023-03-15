@@ -9,7 +9,7 @@ from django.http import HttpResponse
 from django.forms import inlineformset_factory
 from .forms import ClienteForm, HabitacionForm, ReservaForm, CajaForm, ListaPrecioForm, DetalleListaPrecioForm, \
     ListaPrecioDetalleInlineFormset, FiltrosCajaForm, FiltrosReservaForm, CancelacionReservaForm
-from .serializers import ReservaSerializer, HabitacionSerializer, ClienteSerializer
+from .serializers import ReservaSerializer, HabitacionSerializer, ClienteSerializer, PreciosSerializer, PreciosDetalleSerializer
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -45,7 +45,7 @@ from django.utils.decorators import method_decorator
 from django.contrib import messages
 
 from django.core.cache import cache
-
+import requests
 
 # Create your views here.
 
@@ -380,6 +380,7 @@ def reservasCalendario(request, mes=None, anio=None):
                'cantidadDias': range(1, cantidadDias + 1), 'mes': mes, 'anio': anio, 'feriados': json.dumps(feriados)}
     return render(request, 'reservasCalendario.html', context)
 
+
 @method_decorator(login_required, name='dispatch')
 class ReservasDetalleView(DetailView):
     model = Reserva
@@ -532,12 +533,38 @@ def listasPrecio(request):
     context = {'listas': listas, }
     return render(request, 'listPrecios.html', context)
 
+
 @method_decorator(login_required, name='dispatch')
 class ListaPrecioView(ListView):
     template_name = 'listPrecios.html'
     model = ListaPrecio
     paginate_by = 10
     context_object_name = 'listas'
+
+
+def preciosCalendario(request, mes=None, anio=None):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+
+    feriados = get_holidays(anio)
+    rangoFecha = calendar.monthrange(anio,mes)
+
+    primerDiaMes = date(anio, mes, 1)
+    ultimoDiaMes = date(anio, mes, rangoFecha[1])
+
+    preciosQuery = ListaPrecio.objects.filter(Q(vigenciaDesde__lte=ultimoDiaMes) & 
+                                              Q(vigenciaHasta__gte=primerDiaMes) |
+                                              Q(vigenciaDesde__gte=primerDiaMes, vigenciaDesde__lte=ultimoDiaMes) &
+                                              Q(vigenciaHasta__gte=primerDiaMes) |
+                                              Q(vigenciaHasta__lte=ultimoDiaMes, vigenciaHasta__gte=primerDiaMes) &
+                                              Q(vigenciaDesde__lte=ultimoDiaMes) |
+                                              Q(vigenciaDesde__lte=primerDiaMes, vigenciaHasta__gte=ultimoDiaMes))
+
+    precios = PreciosSerializer(preciosQuery, many=True)
+
+    context = {'precios': json.dumps(precios.data), 'mes': mes, 'anio': anio, 'feriados': json.dumps(feriados)}
+    return render(request, 'preciosCalendario.html', context)
+
 
 @method_decorator(login_required, name='dispatch')
 class ListaPrecioBajaView(SuccessMessageMixin, DeleteView):

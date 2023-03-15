@@ -43,6 +43,7 @@ urlpatterns = [
 
     #LISTAS DE PRECIO
     path('listasprecio/', views.ListaPrecioView.as_view(), name='listasPrecio'),
+    path('listasprecio/calendar/<int:mes>/<int:anio>/', views.preciosCalendario, name='preciosCalendario'),
     path('listasprecio/add/', views.listaPrecio_edit, name='newPrecio'),
     path('listasprecio/edit/<int:pk>/', views.listaPrecio_edit, name='modlistasPrecio'),
     path('listasprecio/viewdetail/<int:pk>/', views.listaPrecio_edit, name='deleteListasPrecio'),

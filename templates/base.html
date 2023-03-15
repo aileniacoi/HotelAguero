@@ -59,6 +59,12 @@
       a.setAttribute('href', url);
     })
 
+    window.addEventListener('load', function(){
+      var a = document.getElementById("precioCalendario");
+      var url = '/listasprecio/calendar/' + mes + '/' + anio;
+      a.setAttribute('href', url);
+    })
+
   </script>
 
 </head>
@@ -404,7 +410,7 @@
             </a>
           </li>
           <li>
-            <a href="#">
+            <a href="" id="precioCalendario">
               <i class="bi bi-circle"></i><span>Calendario</span>
             </a>
           </li>
