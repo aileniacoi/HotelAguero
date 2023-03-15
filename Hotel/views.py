@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from .models import Habitacion, Cliente, Reserva, ListaPrecio, MovimientoCaja, DetalleListaPrecio
 from django.views.decorators.csrf import csrf_exempt
-
+from django.urls import reverse
 from django.contrib import messages
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
@@ -45,7 +45,6 @@ from django.utils.decorators import method_decorator
 from django.contrib import messages
 
 from django.core.cache import cache
-import requests
 
 # Create your views here.
 
