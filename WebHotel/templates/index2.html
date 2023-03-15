@@ -1,0 +1,128 @@
+{% extends 'base2.html' %}
+{% block title %}Inicio{% endblock %}
+{% block content %}
+  <!-- Header-->
+{% load static %}
+
+<!-- Carousel -->
+<div id="demo" class="carousel slide" data-bs-ride="carousel">
+
+  <!-- Indicators/dots -->
+  <div class="carousel-indicators">
+    <button type="button" data-bs-target="#demo" data-bs-slide-to="0" class="active"></button>
+    <button type="button" data-bs-target="#demo" data-bs-slide-to="1"></button>
+    <button type="button" data-bs-target="#demo" data-bs-slide-to="2"></button>
+  </div>
+
+  <!-- The slideshow/carousel -->
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <img src="{% static 'WebHotel/a4.jpg' %}" style="background-position: center center; height: 90vh;" alt="Los Angeles" class="d-block w-100">
+    </div>
+    <div class="carousel-item">
+      <img src="{% static 'WebHotel/a2.jpg' %}" style="background-position: center center; height: 90vh;" alt="Chicago" class="d-block w-100">
+    </div>
+    <div class="carousel-item">
+      <img src="{% static 'WebHotel/a5.jpg' %}" style="background-position: center center; height: 90vh;" alt="New York" class="d-block w-100">
+    </div>
+  </div>
+    <!-- texto dentro del carousel -->
+    <div class="carousel-indicators row gx-5 align-items-center justify-content-center">
+              <div class="carousel-control col-lg-8 col-xl-7 col-xxl-6">
+                  <div class="carousel-control my-5 text-center text-xl-start">
+                      <h1 class="carousel-control display-5 fw-bolder text-white mb-2">Disfrutá de Traslasierra junto a Hotel Aguero</h1>
+                      <p class="carousel-control lead fw-normal text-white mb-4 ">Vivi increibles experiencias en el Valle de Traslasierra</p>
+                      <div class="carousel-control d-grid gap-3 d-sm-flex justify-content-sm-center justify-content-xl-start">
+                          <a class="carousel-control btn btn-primary btn-lg px-4 me-sm-3" href="#features">Contacto</a>
+                          <a class="carousel-control btn btn-outline-light btn-lg px-4" href="#!">Nosotros</a>
+                      </div>
+                  </div>
+              </div>
+              {% load static %}
+              <div class="col-xl-5 col-xxl-6 d-none d-xl-block text-center"><img class="img-fluid rounded-3 my-5" /></div>
+          </div>
+
+  <!-- Left and right controls/icons -->
+  <button class="carousel-control-prev" type="button" data-bs-target="#demo" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon"></span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#demo" data-bs-slide="next">
+    <span class="carousel-control-next-icon"></span>
+  </button>
+</div>
+
+    <!-- Seccion 2-->
+    <section class="py-2">
+        <div class="container px-5 mt-5">
+            <div class="row gx-5 align-items-center">
+                    <div class="col-lg-6 order-first order-lg-last h-25"><img class="img-fluid rounded mb-5 mb-lg-0;" src="{% static 'WebHotel/hoteaguero.jpg' %}" alt="..." /></div>
+                    <div class="col-lg-6">
+                    <h2 class="fw-bolder">Hotel Aguero el lugar para hospedarte en Mina Clavero</h2>
+                    <p class="lead fw-normal text-muted mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit. Iusto est, ut esse a labore aliquam beatae expedita. Blanditiis impedit numquam libero molestiae et fugit cupiditate, quibusdam expedita, maiores eaque quisquam.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<!-- Features section-->
+    <section class="pb-1 pt-1" id="features" style=" background-color: #E8F0FB;">
+        <div class="container px-5 my-5">
+            <div class="row gx-5">
+                <div class="col-lg-4 mb-5 mb-lg-0"><h2 class="fw-bolder mb-0">Servicios de Hotel</h2></div>
+                <div class="col-lg-8">
+                    <div class="row gx-5 row-cols-1 row-cols-md-2">
+                        <div class="col mb-5 h-100">
+                            <div class="feature text-black mb-3"><span class="material-symbols-outlined" style="font-size: 4rem;">room_service</span></div>
+                            <h2 class="h5">Recepción las 24hs</h2>
+                        </div>
+                        <div class="col mb-5 h-100">
+                            <div class="feature text-black rounded-3 mb-3"><span class="material-symbols-outlined" style="font-size: 4rem;">restaurant</span></div>
+                            <h2 class="h5">Cocina Equipada</h2>
+                        </div>
+                        <div class="col mb-5 mb-md-0 h-100">
+                            <div class="feature text-black rounded-3 mb-3"><span class="material-symbols-outlined" style="font-size: 4rem;">luggage</span></div>
+                            <h2 class="h5">Guarda Equipaje Gratis</h2>
+                        </div>
+                        <div class="col h-100">
+                            <div class="feature text-black rounded-3 mb-3"><span class="material-symbols-outlined"  style="font-size: 4rem;">local_cafe</span></div>
+                            <h2 class="h5">Desayuno Incluido</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact cards-->
+    <section class="py-5">
+        <div class="container px-5">
+            <div class="text-center">
+                <h2 class="fw-bolder">Tipos de habitaciones</h2>
+            </div>
+            <div class="row gx-5 row-cols-2 row-cols-lg-4 py-5">
+                <div class="col text-center">
+                    <div class="text-black mb-3"><span class="material-symbols-outlined" style="font-size: 4rem;">king_bed</span></div>
+                    <div class="h5 mb-2">Habitaciones Dobles</div>
+
+                </div>
+                <div class="col text-center">
+                    <div class="text-black mb-3"><span class="material-symbols-outlined" style="font-size: 4rem;">king_bed</span></div>
+                    <div class="h5">Habitaciones Triples</div>
+
+                </div>
+                <div class="col  text-center">
+                    <div class="text-black mb-3"><span class="material-symbols-outlined" style="font-size: 4rem;">king_bed</span></div>
+                    <div class="h5">Habitaciones Cuadruples</div>
+
+                </div>
+                <div class="col text-center">
+                    <div class="text-black mb-3"><span class="material-symbols-outlined" style="font-size: 4rem;">king_bed</span></div>
+                    <div class="h5">Habitaciones familiares</div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+{% endblock %}
