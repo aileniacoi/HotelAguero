@@ -7,7 +7,6 @@ def inicio2(request):
     return render(request, 'base2.html')
 
 def index2(request):
-
     return render(request, 'index2.html')
 
 def Conocenos(request):

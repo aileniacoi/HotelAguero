@@ -18,6 +18,7 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from HotelAguero.views import profile
 
+
 urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/profile/', profile, name='profile'),
