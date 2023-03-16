@@ -785,11 +785,12 @@ class ReporteReservasPDF(View):
 
     def tabla(self, pdf, y):
 
-        encabezados = ('Cliente', 'Habitacion', 'Fecha de ingreso', 'Precio total')
-        detalles = [(reserva.idCliente, reserva.idHabitacion, reserva.fechaIngreso, reserva.precioTotal) for reserva in
+        encabezados = ('Id', 'Cliente', 'Hab.', 'Check-in', 'Check-out', 'Precio total')
+        detalles = [(reserva.pk, reserva.idCliente.nombreYApellido, reserva.idHabitacion, reserva.fechaIngreso.strftime("%d/%m/%Y"),
+                     reserva.fechaEgreso.strftime("%d/%m/%Y"), reserva.precioTotal) for reserva in
                     Reserva.objects.all()]
 
-        detalle_orden = Table([encabezados] + detalles, colWidths=[2 * cm, 5 * cm, 5 * cm, 5 * cm])
+        detalle_orden = Table([encabezados] + detalles, colWidths=[1.5 * cm, 4 * cm, 1.5 * cm, 3 * cm, 3 * cm])
         detalle_orden.setStyle(TableStyle(
             [
                 ('ALIGN', (0, 0), (3, 0), 'CENTER'),
@@ -798,6 +799,10 @@ class ReporteReservasPDF(View):
             ]
         ))
         detalle_orden.wrapOn(pdf, 800, 600)
+        alto_tabla = detalle_orden._height
+
+        y = y - alto_tabla
+
         detalle_orden.drawOn(pdf, 60, y)
 
 
@@ -818,7 +823,6 @@ def ReporteReservasCalendarioPDF(request, mes, anio):
     pdf.drawString(330, 510, u"REPORTE DE RESERVAS")
     pdf.drawString(360, 460, fecha.strftime('%B').upper() + " " + str(anio))
 
-    y = 200
 
     rangoFecha = calendar.monthrange(anio, mes)
     cantidadDias = rangoFecha[1]
@@ -886,6 +890,9 @@ def ReporteReservasCalendarioPDF(request, mes, anio):
         ]
     ))
     detalle_orden.wrapOn(pdf, 800, 400)
+    alto_tabla = detalle_orden._height
+
+    y = 400 - alto_tabla
     detalle_orden.drawOn(pdf, 20, y)
 
     pdf.showPage()
@@ -921,14 +928,17 @@ def ReporteCajaPDF(request):
     pdf = canvas.Canvas(buffer)
 
     #Cabecera
-    archivo_imagen = os.path.join(settings.BASE_DIR, '/HotelAguero/Hotel/static/Hotel/logo-ha-rep.jpg')
-    pdf.drawImage(archivo_imagen, 40, 740, 120, 90, preserveAspectRatio=True)
-    pdf.setFont("Helvetica", 16)
-    pdf.drawString(230, 790, u"HOTEL AGÜERO")
-    pdf.setFont("Helvetica", 14)
-    pdf.drawString(228, 770, u"REPORTE DE CAJA")
+    pdf.drawString(0, 800, '')
 
-    y = 650
+    alto_encabezado = 50
+
+    archivo_imagen = os.path.join(settings.BASE_DIR, '/HotelAguero/Hotel/static/Hotel/logo-ha-rep.jpg')
+    # pdf.drawImage(archivo_imagen, 40, 740, 120, 90, preserveAspectRatio=True)
+    # pdf.setFont("Helvetica", 16)
+    # pdf.drawString(230, 790, u"HOTEL AGÜERO")
+    # pdf.setFont("Helvetica", 14)
+    # pdf.drawString(228, 770, u"REPORTE DE CAJA")
+    encabezado_y = 740
 
     #tabla
     encabezados = ('Fecha', 'Tipo', 'Concepto', 'Monto', 'N° Reserva')
@@ -944,8 +954,17 @@ def ReporteCajaPDF(request):
         ]
     ))
     detalle_orden.wrapOn(pdf, 800, 600)
+    alto_tabla = detalle_orden._height
+
+    y = 650 - alto_tabla
+
     detalle_orden.drawOn(pdf, 60, y)
 
+    pdf.drawImage(archivo_imagen, 40, encabezado_y, 120, 90, preserveAspectRatio=True)
+    pdf.setFont("Helvetica", 16)
+    pdf.drawString(230, encabezado_y + 50, u"HOTEL AGÜERO")
+    pdf.setFont("Helvetica", 14)
+    pdf.drawString(228, encabezado_y + 30, u"REPORTE DE CAJA")
 
     pdf.showPage()
     pdf.save()

@@ -50,7 +50,7 @@ class Reserva(models.Model):
 
 
     def __str__(self):
-        return f'{self.pk} - {self.idCliente}'
+        return f'{self.pk} - {self.idCliente.nombreYApellido}'
 
 
 class ListaPrecio(models.Model):

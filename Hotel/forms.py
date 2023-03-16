@@ -106,7 +106,6 @@ class FiltrosCajaForm(forms.Form):
 #     extra=0
 # )
 
-
 class ListaPrecioForm(forms.ModelForm):
     class Meta:
         model = ListaPrecio
