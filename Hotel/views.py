@@ -8,7 +8,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.forms import inlineformset_factory
 from .forms import ClienteForm, HabitacionForm, ReservaForm, CajaForm, ListaPrecioForm, DetalleListaPrecioForm, \
-    ListaPrecioDetalleInlineFormset, FiltrosCajaForm, FiltrosReservaForm, CancelacionReservaForm
+    ListaPrecioDetalleInlineFormset, FiltrosCajaForm, FiltrosReservaForm, CancelacionReservaForm, FiltrosListaPrecio
 from .serializers import ReservaSerializer, HabitacionSerializer, ClienteSerializer, PreciosSerializer, PreciosDetalleSerializer
 
 from rest_framework.views import APIView
@@ -45,6 +45,7 @@ from django.utils.decorators import method_decorator
 from django.contrib import messages
 
 from django.core.cache import cache
+import requests
 
 # Create your views here.
 
@@ -539,6 +540,35 @@ class ListaPrecioView(ListView):
     model = ListaPrecio
     paginate_by = 10
     context_object_name = 'listas'
+
+    def get_queryset(self):
+        form = FiltrosListaPrecio(self.request.GET or None)
+        queryset = super().get_queryset()
+        now = timezone.now().date()
+        if form.is_valid():
+            fecha_desde = form.cleaned_data['fechaDesde']
+            fecha_hasta = form.cleaned_data['fechaHasta']
+            tipo_lista = form.cleaned_data['tipoLista']
+            mostrar_historicas = form.cleaned_data['mostrarHistoricas']
+            # if fecha_desde and fecha_hasta:
+            #     queryset = queryset.filter(Q(vigenciaDesde__range=(fecha_desde, fecha_hasta)) |
+            #                                Q(vigenciaHasta__range=(fecha_desde, fecha_hasta)))
+            if fecha_desde:
+                queryset = queryset.filter(vigenciaHasta__gte=fecha_desde)
+            if fecha_hasta:
+                queryset = queryset.filter(vigenciaDesde__lte=fecha_hasta)
+            if not mostrar_historicas:
+                queryset = queryset.exclude(vigenciaHasta__lte=now)
+            if tipo_lista:
+                queryset = queryset.filter(idTipoLista=tipo_lista)
+        else:
+            queryset = queryset.exclude(vigenciaHasta__lte=now)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = FiltrosListaPrecio(self.request.GET or None)
+        return context
 
 
 def preciosCalendario(request, mes=None, anio=None):

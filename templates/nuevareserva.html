@@ -268,7 +268,7 @@ function GetPrice(fechaIngreso, fechaEgreso, cantidadPersonas) {
                 document.getElementById("warning_precios").removeAttribute("hidden");
             }
 
-            //CalcularPrecioTotal(fechaIngreso, fechaEgreso, data.precio);
+            CalcularPrecioTotal(fechaIngreso, fechaEgreso, data.precio);
         });
 }
 
@@ -345,7 +345,7 @@ $(document).on('submit', '#agregar-cliente-form', function(e) {
 document.getElementById("id_fechaIngreso").addEventListener("change", GetPrecioYComboHabitaciones);
 document.getElementById("id_fechaEgreso").addEventListener("change", GetPrecioYComboHabitaciones);
 document.getElementById("id_cantidadPersonas").addEventListener("change", GetPrecioYComboHabitaciones);
-document.getElementById("id_precioPorDia").addEventListener("change", CalcularPrecioTotal)
+//document.getElementById("id_precioPorDia").addEventListener("change", CalcularPrecioTotal)
 
 </script>
 {% endblock %}

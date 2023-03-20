@@ -42,13 +42,58 @@
 
     <div class="row">
     <div class="col-md-12">
-        <div class="table-responsive">
+        <div>
 
             <div class="card">
             <div class="card-body">
-              <h5 class="card-title">Tabla de clientes</h5>
+                <div class="row">
+                    <div class="col-md-3 align-self-start">
+                        <h5 class="card-title">Tabla de Precios</h5>
+                    </div>
 
-    <table class="table table-hover">
+                     <div class="col-md-2 offset-md-7" style="margin-top:20px;">
+                        <div class="dropdown" style="width:250px;">
+                          <button class="btn btn-outline-secondary dropdown-toggle"  type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-filter"></i> Filtrar
+                          </button>
+                          <form method="GET" id="filtro-form">
+                              {% csrf_token %}
+                              <ul class="dropdown-menu">
+                                <li>
+                                    <div class="form-group container">
+                                        <label>Desde:</label>
+                                        {{ form.fechaDesde }}
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="form-group container" style="margin-top:10px;">
+                                        <label>Hasta:</label>
+                                        {{ form.fechaHasta }}
+                                    </div>
+                                </li>
+                                  <li>
+                                      <div class="form-group container" style="margin-top:10px;">
+                                        <label>Tipo lista:</label>
+                                        {{ form.tipoLista }}
+                                    </div>
+                                  </li>
+                                <li>
+                                    <div class="form-check form-switch container" style="margin-left:10px; margin-top:10px;">
+                                        <label>Mostrar históricas</label>
+                                        {{ form.mostrarHistoricas }}
+                                    </div>
+                                </li>
+                                   <li><hr class="dropdown-divider" style="margin-top:10px;"></li>
+                                  <li style="display: flex; justify-content: center;">
+                                      <button class="btn btn-sm btn-outline-danger" style="margin-top:10px;" onclick="LimpiarFiltros()">Limpiar filtros</button>
+                                  </li>
+                              </ul>
+                          </form>
+                        </div>
+                    </div>
+                </div>
+
+    <table class="table table-hover table-responsive">
         <thead>
         <tr>
             <th>Fecha inicio</th>
@@ -99,6 +144,23 @@
 </main>
 
 <script type="text/javascript">
+
+document.querySelectorAll('[name="fechaDesde"], [name="fechaHasta"], [name="mostrarHistoricas"], [name="tipoLista"]').forEach(function(element) {
+  element.onchange = function() {
+    document.getElementById('filtro-form').submit();
+  };
+});
+
+function LimpiarFiltros(){
+    document.querySelectorAll('[name="fechaDesde"], [name="fechaHasta"], [name="tipoLista"]').forEach(function(element) {
+        element.value = '';
+    });
+
+    document.querySelectorAll('[name="mostrarHistoricas"]').forEach(function(element) {
+        element.value = false;
+    });
+}
+
     $(document).ready(function() {
   $('.eliminar-precio').click(function() {
     var idPrecio = $(this).data('id');

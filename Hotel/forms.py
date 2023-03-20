@@ -106,6 +106,13 @@ class FiltrosCajaForm(forms.Form):
 #     extra=0
 # )
 
+class FiltrosListaPrecio(forms.Form):
+    fechaDesde = forms.DateField(required=False, widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}))
+    fechaHasta = forms.DateField(required=False, widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}))
+    tipoLista = forms.CharField(widget=forms.Select(choices=[('', '-------')] + ListaPrecio.TIPOLISTA, attrs={'class': 'form-control'}), required=False)
+    mostrarHistoricas = forms.BooleanField(required=False, initial=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
+
+
 class ListaPrecioForm(forms.ModelForm):
     class Meta:
         model = ListaPrecio
