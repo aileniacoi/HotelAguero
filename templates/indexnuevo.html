@@ -31,17 +31,11 @@
                                         <!-- numero de ocupacion y porcentaje -->
 
                                         <div class="row justify-content-center border-bottom">
-                                            <div class="col-4 text-center">
-                                                <br>
-                                                <span style="font-size:40;"
-                                                      data-bs-toggle="tooltip"
-                                                      data-bs-placement="left"
-                                                      data-bs-html="true"
-                                                      data-bs-title="<ul>{% for hab in habitacionesDisponibles %}<li><b>N° {{ hab.numero}}:</b> {{ hab.plazas }} pax</li>{% endfor %}</ul>">
-                                                    {{ habitacionesDisponibles|length }}
-                                                    <h5>Hab. libres</h5>
-                                                </span>
-                                            </div>
+                                           <div class="col-6">
+                                                    <div class="mb-4" style="width: 120%;">
+                                                        <canvas id="bar-chart" ></canvas>
+                                                    </div>
+                                                </div>
 
                                             <div class="col-5">
                                                     <div class="mb-4" style="width: 130%;">
@@ -365,6 +359,77 @@
   }]
   });
 
+
+		var ctxBar = document.getElementById('bar-chart').getContext('2d');
+		var myChart = new Chart(ctxBar, {
+			type: 'horizontalBar',
+			data: {
+				labels: ['Lista', 'Limpieza', 'Ocupada', 'Deshabilitada'],
+				datasets: [{
+					label: 'Cantidad de habitaciones por estado',
+					data: [{{ habitacionesPorEstado.LIS|length }}, {{ habitacionesPorEstado.LIM|length }}, {{ habitacionesPorEstado.OCU|length }}, {{ habitacionesPorEstado.DES|length }}],
+					backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+					borderColor: '#FFFFFF',
+					borderWidth: 1
+				}]
+			},
+			options: {
+				tooltips: {
+					callbacks: {
+						title: function(tooltipItem, data) {
+							var label = data.labels[tooltipItem[0].index];
+							return 'Habitaciones ' + label;
+						},
+						label: function(tooltipItem, data) {
+							var value = data.datasets[0].data[tooltipItem.index];
+							ret = 'Cantidad: ' + value;
+
+                            var habitaciones = [];
+							var estado = data.labels[tooltipItem.index];
+
+                            switch(estado){
+                                case "Limpieza":
+                                    {% for hab in habitacionesPorEstado.LIM %}
+								        habitaciones.push('N° {{ hab.numero }}');
+							        {% endfor %}
+                                    break;
+                                case "Lista":
+                                    {% for hab in habitacionesPorEstado.LIS %}
+								        habitaciones.push('N° {{ hab.numero }}');
+							        {% endfor %}
+                                    break;
+                                case "Ocupada":
+                                    {% for hab in habitacionesPorEstado.OCU %}
+								        habitaciones.push('N° {{ hab.numero }}');
+							        {% endfor %}
+                                    break;
+                                case "Deshabilitada":
+                                    {% for hab in habitacionesPorEstado.DES %}
+								        habitaciones.push('N° {{ hab.numero }}');
+							        {% endfor %}
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            ret = habitaciones.join(' - ');
+
+							return ret;
+						}
+					}
+				},
+				legend: {
+					display: false
+				},
+				scales: {
+					xAxes: [{
+						ticks: {
+							beginAtZero:true
+						}
+					}]
+				}
+			}
+		});
 
 </script>
 

@@ -169,18 +169,25 @@ def index(request):
 
         reserva.saldo= reserva.precioTotal - suma_pagos
 
+    habitaciones = Habitacion.objects.all().order_by('numero')
+
     habitaciones_ocupadas = reservasActuales.values_list('idHabitacion', flat=True)
     if habitaciones_ocupadas.exists():
-        habitaciones_disponibles = Habitacion.objects.exclude(pk__in=habitaciones_ocupadas).order_by('numero')
+        habitaciones_disponibles = habitaciones.exclude(pk__in=habitaciones_ocupadas).order_by('numero')
     else:
-        habitaciones_disponibles = Habitacion.objects.all().order_by('numero')
+        habitaciones_disponibles = habitaciones
+
+    habitacionesPorEstado = {'DES': [], 'OCU': [], 'LIM': [], 'LIS': []}
+
+    for habitacion in habitaciones:
+        habitacionesPorEstado[habitacion.idEstado].append(habitacion)
 
 
     lista_precio = ListaPrecio.objects.filter(Q(vigenciaDesde__lte=hoy) & Q(vigenciaHasta__gte=hoy))[0]
     detalle_precios = DetalleListaPrecio.objects.filter(idListaPrecio=lista_precio)
 
     context = {'ingresos': ingresos, 'egresos': egresos, 'cantidadHabitaciones':cantidadHabitaciones,
-               'ingresosManiana': ingresosManiana, 'egresosManiana': egresosManiana,
+               'ingresosManiana': ingresosManiana, 'egresosManiana': egresosManiana, 'habitacionesPorEstado': habitacionesPorEstado,
                'habitacionesDisponibles': habitaciones_disponibles, 'reservasActuales': reservasActuales,
                'cantidadDesayunosHoy': cantidadDesayunos, 'cantidadDesayunosManiana': cantidadDesayunosManiana,
                'detallePrecios': detalle_precios, 'dolarMayorista': compra_mayorista}
