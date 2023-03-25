@@ -78,10 +78,16 @@ class MyView(LoginRequiredMixin, View):
 def index(request):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
-    hoy = datetime.now().date()
+
+    now = datetime.now()
+    hoy = now.date()
+    maniana = now + timedelta(days=1)
 
     ingresos = Reserva.objects.filter(fechaIngreso=hoy)
     egresos = Reserva.objects.filter(fechaEgreso=hoy)
+
+    ingresosManiana = Reserva.objects.filter(fechaIngreso=maniana)
+    egresosManiana = Reserva.objects.filter(fechaEgreso=maniana)
 
     pagos = MovimientoCaja.objects.filter(idReserva__isnull=False)
 
@@ -106,10 +112,52 @@ def index(request):
 
         egreso.saldo= egreso.precioTotal - suma_pagos
 
+    for ingreso in ingresosManiana:
+        pagosReserva = pagos.filter(idReserva=ingreso)
+        suma_pagos = pagosReserva.aggregate(valor_total=Sum('monto'))
+        if suma_pagos['valor_total']:
+            suma_pagos = suma_pagos['valor_total']
+        else:
+            suma_pagos = 0
+
+        ingreso.saldo= ingreso.precioTotal - suma_pagos
+        ingreso.reserva_sin_senia = suma_pagos == 0
+
+    for egreso in egresosManiana:
+        pagosReserva = pagos.filter(idReserva=egreso)
+        suma_pagos = pagosReserva.aggregate(valor_total=Sum('monto'))
+        if suma_pagos['valor_total']:
+            suma_pagos = suma_pagos['valor_total']
+        else:
+            suma_pagos = 0
+
+        egreso.saldo= egreso.precioTotal - suma_pagos
+
 
     cantidadHabitaciones = Habitacion.objects.count()
 
     reservasActuales = Reserva.objects.filter(Q(fechaIngreso__lt=hoy) & Q(fechaEgreso__gt=hoy)).exclude(idHabitacion__isnull=True)
+
+    cantidadDesayunosQuery = Reserva.objects.filter(Q(fechaIngreso__lt=hoy) & Q(fechaEgreso__gte=hoy)).exclude(idHabitacion__isnull=True)\
+        .aggregate(Sum('cantidadPersonas'))
+
+    precioDolar = get_dolar_price()
+    mayorista = next((casa["casa"] for casa in precioDolar if "Mayorista" in casa["casa"]["nombre"]), None)
+    compra_mayorista = mayorista["compra"] if mayorista else None
+
+    if cantidadDesayunosQuery['cantidadPersonas__sum']:
+        cantidadDesayunos = cantidadDesayunosQuery['cantidadPersonas__sum']
+    else:
+        cantidadDesayunos = 0
+
+    cantidadDesayunosManianaQuery = Reserva.objects.filter(Q(fechaIngreso__lt=maniana) & Q(fechaEgreso__gte=maniana)).exclude(
+        idHabitacion__isnull=True) \
+        .aggregate(Sum('cantidadPersonas'))
+
+    if cantidadDesayunosManianaQuery['cantidadPersonas__sum']:
+        cantidadDesayunosManiana = cantidadDesayunosManianaQuery['cantidadPersonas__sum']
+    else:
+        cantidadDesayunosManiana = 0
 
     for reserva in reservasActuales:
         pagosReserva = pagos.filter(idReserva=reserva)
@@ -132,10 +180,12 @@ def index(request):
     detalle_precios = DetalleListaPrecio.objects.filter(idListaPrecio=lista_precio)
 
     context = {'ingresos': ingresos, 'egresos': egresos, 'cantidadHabitaciones':cantidadHabitaciones,
+               'ingresosManiana': ingresosManiana, 'egresosManiana': egresosManiana,
                'habitacionesDisponibles': habitaciones_disponibles, 'reservasActuales': reservasActuales,
-               'detallePrecios': detalle_precios}
+               'cantidadDesayunosHoy': cantidadDesayunos, 'cantidadDesayunosManiana': cantidadDesayunosManiana,
+               'detallePrecios': detalle_precios, 'dolarMayorista': compra_mayorista}
 
-    return render(request, 'index.html', context)
+    return render(request, 'indexnuevo.html', context)
 
 
 # ------ HABITACIONES ------
@@ -1069,6 +1119,24 @@ def get_holidays(year):
             holidays = response.json()["response"]["holidays"]
             cache.set(cache_key, holidays)
             return holidays
+        else:
+            return None
+
+
+def get_dolar_price():
+    cache_key = "dolar"
+    prices = cache.get(cache_key)
+
+    if prices is not None:
+        return prices
+    else:
+        url = "https://www.dolarsi.com/api/api.php?type=dolar"
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            prices = response.json()
+            cache.set(cache_key, prices)
+            return prices
         else:
             return None
 

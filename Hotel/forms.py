@@ -25,8 +25,8 @@ class HabitacionForm(forms.ModelForm):
         widgets = {
             'numero': forms.TextInput(attrs={'class': 'form-control'}),
             'plazas': forms.TextInput(attrs={'class': 'form-control'}),
+            'idEstado': forms.Select(attrs={'class': 'form-control'}),
             'esPlantaBaja': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'habilitada': forms.CheckboxInput(attrs={'class': 'form-check-input'})
         }
 
 

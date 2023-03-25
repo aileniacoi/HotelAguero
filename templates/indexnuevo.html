@@ -1,0 +1,371 @@
+{% extends 'base.html' %}
+{% block title %}Inicio{% endblock %}
+{% block content %}
+
+<main id="main" class="main">
+    <div>
+        <div class="pagetitle">
+          <h1>Inicio</h1>
+          <nav>
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+              <li class="breadcrumb-item active">Panel de inicio</li>
+            </ol>
+          </nav>
+        </div><!-- End Page Title -->
+        <div>
+            <div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-8">
+                                                        <div class="card">
+                                <div class="card-body">
+                                    <div class="col-12ADF">
+                                        <div class="row border-bottom  mb-4">
+                                            <div class="col-12 text-center">
+                                                <h5 class="card-title fs-5">Ocupación <span class="fs-4" style="color: #FCB643;">| Hoy</span></h5>
+                                            </div>
+                                        </div>
+
+                                        <!-- numero de ocupacion y porcentaje -->
+
+                                        <div class="row justify-content-center border-bottom">
+                                            <div class="col-4 text-center">
+                                                <br>
+                                                <span style="font-size:40;"
+                                                      data-bs-toggle="tooltip"
+                                                      data-bs-placement="left"
+                                                      data-bs-html="true"
+                                                      data-bs-title="<ul>{% for hab in habitacionesDisponibles %}<li><b>N° {{ hab.numero}}:</b> {{ hab.plazas }} pax</li>{% endfor %}</ul>">
+                                                    {{ habitacionesDisponibles|length }}
+                                                    <h5>Hab. libres</h5>
+                                                </span>
+                                            </div>
+
+                                            <div class="col-5">
+                                                    <div class="mb-4" style="width: 130%;">
+                                                        <canvas id="pie-chart" ></canvas>
+                                                    </div>
+                                                </div>
+
+                                        </div>
+
+                                        <div class="row justify-content-center mt-4 border-bottom">
+                                            <div class="col-11">
+                                                <table class="table table-striped table-hover mb-5">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>Hab</th>
+                                                        <th>Pax</th>
+                                                        <th>Cliente</th>
+                                                        <th>Saldo</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {% for res in reservasActuales %}
+                                                    <tr>
+                                                        <td>{{ res.idHabitacion }}</td>
+                                                        <td>{{ res.cantidadPersonas }}</td>
+                                                        <td>{{ res.idCliente.nombreYApellido }}</td>
+                                                        <td {% if res.saldo > 0 %} class="text-danger" {% endif %}>
+                                                            $ {{ res.saldo }}
+                                                        </td>
+                                                    </tr>
+                                                    {% empty %}
+                                                    <tr>
+                                                        <td colspan="4"><i>*** Hoy no hay habitaciones ocupadas ***</i>
+                                                        </td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="row">
+                                    <div class="col-12">
+                                                                                                            <!-- Lista de precio -->
+            <div class=" text-center">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">Precios <span style="color: #FCB643;">| Vigentes</span></h5>
+                    <div class="ps-6">
+                        <table class="table table-hover text-center">
+                            {% for det in detallePrecios %}
+                            <tr>
+                                <td>{{ det.cantidadPersonas }} pax.</td>
+                                <td>$ {{ det.precioPorDia }}</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                        <br />
+                        <div style="font-size:20;">
+                            <b>Dólar Booking:</b> ${{ dolarMayorista }}
+                        </div>
+                    </div>
+                  </div>
+                </div>
+            </div><!-- Fin de lista de precio -->
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                                    <div class=" text-center">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">Desayunos</h5>
+                    <div class="ps-6">
+                        <div class="row">
+                            <div class="col-6">
+                                <h6 style="color: #FCB643;">Hoy</h6>
+                                <span style="font-size:25;">{{ cantidadDesayunosHoy }}</span>
+                            </div>
+                            <div class="col-6">
+                                <h6 style="color: #FCB643;">Mañana</h6>
+                                <span style="font-size:25;">{{ cantidadDesayunosManiana }}</span>
+                            </div>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+
+
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="row">
+                                            <div class="col-12 text-center fs-3">
+                                                <h5 class="card-title fs-5">Actividad <span class="fs-4" style="color: #FCB643;">| Hoy</span></h5>
+                                            </div>
+                                        </div>
+                                        <div class="row border-top">
+                                            <div class="col-md-6 text-center">
+                                                <h5 class="card-title fs-5">Check <span class="fs-4"  style="color: #05C392;">- In</span></h5>
+                                                <table class="table table-striped table-hover border-right">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>Hab</th>
+                                                        <th>Pax</th>
+                                                        <th>Cliente</th>
+                                                        <th>Saldo</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {% for ing in ingresos %}
+                                                    <tr>
+                                                        <td>{{ ing.idHabitacion }}</td>
+                                                        <td>{{ ing.cantidadPersonas }}</td>
+                                                        <td>{{ ing.idCliente.nombreYApellido }}</td>
+                                                        <td {% if ing.saldo > 0 %} class="text-danger" {% endif %}> ${{ ing.saldo }}
+                                                        </td>
+                                                    </tr>
+                                                    {% empty %}
+                                                    <tr>
+                                                        <td colspan="4"><i>*** No se registraron ingresos para hoy
+                                                            ***</i></td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="col-md-6 text-center border-left">
+                                                <h5 class="card-title fs-5" >Check <span class="fs-4"  style=" Color: #ef476f">- Out</span></h5>
+                                                <table class="table table-striped table-hover">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>Hab</th>
+                                                        <th>Pax</th>
+                                                        <th>Cliente</th>
+                                                        <th>Saldo</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {% for eg in egresos %}
+                                                    <tr>
+                                                        <td>{{ eg.idHabitacion }}</td>
+                                                        <td>{{ eg.cantidadPersonas }}</td>
+                                                        <td>{{ eg.idCliente.nombreYApellido }}</td>
+                                                        <td {% if eg.saldo > 0 %} class="text-danger" {% endif %}>
+                                                           $ {{ eg.saldo }}
+                                                        </td>
+                                                    </tr>
+                                                    {% empty %}
+                                                    <tr>
+                                                        <td colspan="4"><i>*** Hoy no hay egresos ***</i></td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="row">
+                                            <div class="col-12 text-center fs-3">
+                                                <h5 class="card-title fs-5">Actividad <span class="fs-4" style="color: #FCB643;">| Mañana</span></h5>
+                                            </div>
+                                        </div>
+                                        <div class="row border-top">
+                                            <div class="col-md-6 text-center">
+                                                <h5 class="card-title fs-5">Check <span class="fs-4"  style="color: #05C392;">- In</span></h5>
+                                                <table class="table table-striped table-hover border-right">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>Hab</th>
+                                                        <th>Pax</th>
+                                                        <th>Cliente</th>
+                                                        <th>Saldo</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {% for ing in ingresosManiana %}
+                                                    <tr>
+                                                        <td>{{ ing.idHabitacion }}</td>
+                                                        <td>{{ ing.cantidadPersonas }}</td>
+                                                        <td>{{ ing.idCliente.nombreYApellido }}</td>
+                                                        <td {% if ing.saldo > 0 %} class="text-danger" {% endif %}> ${{ ing.saldo }}
+                                                        </td>
+                                                    </tr>
+                                                    {% empty %}
+                                                    <tr>
+                                                        <td colspan="4"><i>*** No se registraron ingresos para mañana
+                                                            ***</i></td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="col-md-6 text-center border-left">
+                                                <h5 class="card-title fs-5" >Check <span class="fs-4"  style=" Color: #ef476f">- Out</span></h5>
+                                                <table class="table table-striped table-hover">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>Hab</th>
+                                                        <th>Pax</th>
+                                                        <th>Cliente</th>
+                                                        <th>Saldo</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {% for eg in egresosManiana %}
+                                                    <tr>
+                                                        <td>{{ eg.idHabitacion }}</td>
+                                                        <td>{{ eg.cantidadPersonas }}</td>
+                                                        <td>{{ eg.idCliente.nombreYApellido }}</td>
+                                                        <td {% if eg.saldo > 0 %} class="text-danger" {% endif %}>
+                                                           $ {{ eg.saldo }}
+                                                        </td>
+                                                    </tr>
+                                                    {% empty %}
+                                                    <tr>
+                                                        <td colspan="4"><i>*** Mañana no hay egresos ***</i></td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.7.0"></script>
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.7.0/dist/chartjs-plugin-datalabels.css">
+
+<script type="text/javascript">
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+  var ctx = document.getElementById('pie-chart').getContext('2d');
+  var ocupacion = Math.floor(({{ cantidadHabitaciones }} - {{ habitacionesDisponibles|length }}) * 100 / {{ cantidadHabitaciones }})
+  var pieChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Ocupado', 'Disponible'],
+      datasets: [{
+        data: [ocupacion, 100 - ocupacion],
+        backgroundColor: ['#F3CB38', '#F1F1F1'],
+        borderWidth: 0,
+      }],
+    },
+    options: {
+      cutoutPercentage: 70,
+      legend: {
+        display: false
+      },
+      tooltips: {
+        callbacks: {
+          label: function(tooltipItem, data) {
+            var allData = data.datasets[tooltipItem.datasetIndex].data;
+            var tooltipLabel = data.labels[tooltipItem.index];
+            var tooltipData = allData[tooltipItem.index];
+            var total = 0;
+            for (var i in allData) {
+              total += allData[i];
+            }
+            var tooltipPercentage = Math.round((tooltipData / total) * 100);
+            return tooltipLabel + ': ' + tooltipPercentage + '%';
+          }
+        }
+      }
+    },
+    plugins: [{
+    id: 'text',
+    beforeDraw: function(chart, a, b) {
+      var width = chart.width,
+        height = chart.height,
+        ctx = chart.ctx;
+
+      ctx.restore();
+      var fontSize = (height / 114).toFixed(2);
+      ctx.font = fontSize + "em sans-serif";
+      ctx.textBaseline = "middle";
+
+      var text = ocupacion + "%",
+        textX = Math.round((width - ctx.measureText(text).width) / 2),
+        textY = height / 2;
+
+      ctx.fillText(text, textX, textY);
+      ctx.save();
+    }
+  }]
+  });
+
+
+</script>
+
+{% endblock %}

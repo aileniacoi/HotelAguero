@@ -6,10 +6,20 @@ from django.urls import reverse
 
 class Habitacion(models.Model):
     """Habitaciones en alquiler"""
+    DESHABILITADA = 'DES'
+    OCUPADA = 'OCU'
+    LIBRELIMP = 'LIM'
+    LIBRELISTA = 'LIS'
+    ESTADO = [
+        (DESHABILITADA, 'Deshabilitada'),
+        (OCUPADA, 'Ocupada'),
+        (LIBRELIMP, 'Libre (limpieza)'),
+        (LIBRELISTA, 'Libre (lista)'),
+    ]
     numero = models.IntegerField()
     plazas = models.IntegerField()
     esPlantaBaja = models.BooleanField(verbose_name='Planta baja')
-    habilitada = models.BooleanField()
+    idEstado = models.CharField(choices=ESTADO, verbose_name='Estado', max_length=3)
 
     def __str__(self):
         return str(self.numero)
