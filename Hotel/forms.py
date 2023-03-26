@@ -29,6 +29,10 @@ class HabitacionForm(forms.ModelForm):
             'esPlantaBaja': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.fields['idEstado'].initial = "LIS"
+
 
 class FiltrosReservaForm(forms.Form):
     fechaDesde = forms.DateField(required=False, widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}))
@@ -61,7 +65,7 @@ class ReservaForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['fechaRegistro'].initial = datetime.now().date()
         self.fields['incluyeDesayuno'].initial = True
-        self.fields['idCliente'].required = False
+        #self.fields['idCliente'].required = False
 
 
 class CancelacionReservaForm(forms.Form):

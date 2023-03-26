@@ -483,8 +483,12 @@ def edit_reserva(request, pk):
         saldo = reserva.precioTotal - pagosRealizados
 
         if form_reserva.is_valid() and form_cliente.is_valid():
+
             form_reserva.save()
             form_cliente.save()
+
+            messages.success(request, "La reserva \"{}\" fue modificada.".format(reserva))
+
             return redirect("reservaEdit", pk=reserva.pk)
 
     else:
@@ -530,6 +534,7 @@ def alta_reserva(request):
         form_reserva = ReservaForm(instance=reserva)
         form_cliente = ClienteForm(instance=cliente)
 
+        #form_reserva.fields['idCliente']
         form_reserva.fields['idHabitacion'].widget.attrs['disabled'] = 'readonly'
 
     return render(request, 'nuevareserva.html', {'form_reserva': form_reserva, 'form_cliente': form_cliente})

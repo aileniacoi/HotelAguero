@@ -9,7 +9,7 @@
       <h1>Reservas</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+          <li class="breadcrumb-item"><a href="/index">Inicio</a></li>
           <li class="breadcrumb-item"><a href="/reservas">Reservas</a></li>
           <li class="breadcrumb-item active">Agregar</li>
         </ol>
@@ -111,6 +111,10 @@
 
             </div>
             <h5 class="card-title">Datos de la Reserva</h5>
+
+            <div style="display: none;">
+                {{ form_reserva.idCliente }}
+            </div>
 
             <div class="row"  style="margin-top: 15px">
                 <div class="col-md-5">
