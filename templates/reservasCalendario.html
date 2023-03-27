@@ -111,10 +111,12 @@ function GetEstadoReserva(reserva){
         return 'Confirmada';
     }
 
-    var fechaVenc = new Date();
-    fechaVenc.setDate(fechaVenc.getDate() + 2);
+    var fechaVenc = ConvertirFecha(reserva.fechaRegistro);
+    fechaVenc.setDate(fechaVenc.getDate() + 3);
 
-    if(ConvertirFecha(reserva.fechaRegistro).getTime() < fechaVenc.getTime()){
+    console.log(fechaVenc)
+
+    if(fechaVenc < new Date().getTime()){
         return 'Vencida';
     } else {
         return 'Pendiente';
