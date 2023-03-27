@@ -210,8 +210,9 @@
 
 
     </fieldset>
-    <button type="submit" class="btn btn-success" style="margin-top:15px;" {% if form_reserva.fechaCancelacion.value %} disabled {% endif %}>Enviar</button>
-    <a type="submit" class="btn btn-primary" href="/reservas/" style="margin-top:15px;">Volver</a>
+            <a type="button" class="btn btn-primary" href="/reservas/" style="margin-top:15px;">Volver</a>
+        <button type="submit" class="btn btn-success" style="margin-top:15px;" {% if form_reserva.fechaCancelacion.value %} disabled {% endif %}>Enviar</button>
+
         </form>
             </div>
         </div>
