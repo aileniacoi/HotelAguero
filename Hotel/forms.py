@@ -74,7 +74,7 @@ class ReservaForm(forms.ModelForm):
 
         if fechaDesde and fechaHasta:
             if fechaDesde > fechaHasta:
-                raise forms.ValidationError('La fecha de ingreso debe ser menor a la de egreso')
+                raise forms.ValidationError('La fecha de ingreso no puede ser mayor a la de egreso')
 
 
 class CancelacionReservaForm(forms.Form):

@@ -30,6 +30,28 @@
         {% endfor %}
     {% endif %}
 
+    {% if form_reserva.non_field_errors %}
+    <div class="row">
+        {% for error in form_reserva.non_field_errors %}
+        <div class="alert alert-danger alert-dismissible col-md-6" role="alert">
+            {{ error|safe }}
+        </div>
+        {% endfor %}
+
+    </div>
+{% endif %}
+
+        {% if form_cliente.non_field_errors %}
+    <div class="row">
+        {% for error in form_cliente.non_field_errors %}
+        <div class="alert alert-danger alert-dismissible col-md-6" role="alert">
+            {{ error|safe }}
+        </div>
+        {% endfor %}
+
+    </div>
+{% endif %}
+
         <div class="col-md-12 offset-md-0 m-0">
         <div class="card">
             <div class="card-body">
@@ -148,6 +170,13 @@
                 </div>
             </div>
 
+            <div class="row" id="error_fechas" hidden>
+                <div class="col-md-7 alert alert-danger m-3" role="alert">
+                    <p><strong>Error:</strong></p>
+                    <p>La fecha de ingreso no puede ser mayor a la de egreso.</p>
+                </div>
+            </div>
+
             <div class="row" style="margin-top:15px">
                  <div class="col-md-5">
                      <label>{{ form_reserva.incluyeDesayuno.label }}</label>
@@ -245,7 +274,14 @@ function CalcularPrecioTotal(){
 
 function GetPrice(fechaIngreso, fechaEgreso, cantidadPersonas) {
 
+    document.getElementById("warning_precios").setAttribute("hidden", true);
+    document.getElementById("error_fechas").setAttribute("hidden", true);
+
     if (!fechaIngreso || !fechaEgreso || !cantidadPersonas) return;
+
+    if (fechaIngreso > fechaEgreso)
+        document.getElementById("error_fechas").removeAttribute("hidden");
+        return;
 
     var jsonObject = {
         fechaIngreso: fechaIngreso,
