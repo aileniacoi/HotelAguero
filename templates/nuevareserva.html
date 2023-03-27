@@ -23,7 +23,7 @@
     <div class="row">
            <div class="alert {{ message.tags }} alert-dismissible col-md-6">
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                {{ message }}
+                {{ message|safe }}
             </div>
     </div>
 
@@ -227,6 +227,12 @@ jQuery(document).ready(function($){
     });
 });
 
+function ConvertirFecha(fechaString){
+    fecha = fechaString.split("-");
+    return new Date(fecha[0], fecha[1] - 1, fecha[2]);
+}
+
+
 function ActivarBuscarCliente(){
 
     var buscarCliente = document.getElementById("buscar_cliente").checked;
@@ -279,9 +285,10 @@ function GetPrice(fechaIngreso, fechaEgreso, cantidadPersonas) {
 
     if (!fechaIngreso || !fechaEgreso || !cantidadPersonas) return;
 
-    if (fechaIngreso > fechaEgreso)
+    if (ConvertirFecha(fechaIngreso).getTime() > ConvertirFecha(fechaEgreso).getTime()){
         document.getElementById("error_fechas").removeAttribute("hidden");
         return;
+    }
 
     var jsonObject = {
         fechaIngreso: fechaIngreso,
@@ -322,11 +329,13 @@ function GetComboHabitaciones(fechaIngreso, fechaEgreso){
             //var select = document.getElementById("id_idHabitacion");
             var options = "";
             for(var i = 0; i < data.length; i++) {
-                options += "<option value='"+data[i].id+"'>"+data[i].numero+"</option>";
+                options += "<option value='" + data[i].pk + "'>" + data[i].numero + "</option>";
             }
             select.innerHTML = options;
             select.value = '';
             select.disabled = false;
+
+            console.log(select)
         });
 }
 
@@ -381,7 +390,7 @@ $(document).on('submit', '#agregar-cliente-form', function(e) {
 document.getElementById("id_fechaIngreso").addEventListener("change", GetPrecioYComboHabitaciones);
 document.getElementById("id_fechaEgreso").addEventListener("change", GetPrecioYComboHabitaciones);
 document.getElementById("id_cantidadPersonas").addEventListener("change", GetPrecioYComboHabitaciones);
-//document.getElementById("id_precioPorDia").addEventListener("change", CalcularPrecioTotal)
+document.getElementById("id_precioPorDia").addEventListener("change", CalcularPrecioTotal)
 
 </script>
 {% endblock %}

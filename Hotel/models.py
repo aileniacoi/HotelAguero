@@ -57,6 +57,8 @@ class Reserva(models.Model):
     descuentoPorPorcentaje = models.BooleanField(null=True, verbose_name='Descuento por porcentaje')
     observaciones = models.TextField(max_length=500, blank=True)
     fechaCancelacion = models.DateField(verbose_name='Fecha de Cancelacion', null=True, blank=True)
+    realizoCheckIn = models.BooleanField()
+    realizoCheckOut = models.BooleanField()
 
 
     def __str__(self):

@@ -53,7 +53,7 @@
             <th>Dni</th>
             <th>Teléfono</th>
             <th style="width:1%"></th>
-            <th style="width:1%"></th>
+<!--            <th style="width:1%"></th>-->
         </tr>
         </thead>
         <tbody>
@@ -63,7 +63,7 @@
             <td class="pointer" onclick="ViewItem({{ cliente.pk }})">{{ cliente.dni }}</td>
             <td class="pointer" onclick="ViewItem({{ cliente.pk }})">{{ cliente.telefono }}</td>
             <td style="width:1%"><a class="btn btn-outline-primary btn-sm" href="edit/{{ cliente.pk }}">Editar</a></td>
-            <td style="width:1%"><button  class="btn btn-outline-danger btn-sm eliminar-cliente" data-id="{{ cliente.pk }}">Borrar</button></td>
+<!--            <td style="width:1%"><button  class="btn btn-outline-danger btn-sm eliminar-cliente" data-id="{{ cliente.pk }}">Borrar</button></td>-->
         </tr>
         {% endfor %}
         </tbody>

@@ -358,6 +358,7 @@ class ReservasView(ListView):
     model = Reserva
     paginate_by = 15
     context_object_name = 'reservas'
+    ordering = ['fechaIngreso']
 
     def get_queryset(self):
         form = FiltrosReservaForm(self.request.GET or None)
@@ -512,6 +513,7 @@ def alta_reserva(request):
         form_reserva = ReservaForm(request.POST, instance=reserva)
         form_cliente = ClienteForm(request.POST, instance=cliente)
 
+        print(form_reserva)
         if form_reserva.is_valid():
             reserva = form_reserva.save(commit=False)
             if bool(request.POST['idCliente']):
@@ -527,7 +529,7 @@ def alta_reserva(request):
 
             return redirect("reservaEdit", pk=reserva.pk)
         else:
-            print(form_reserva.errors)
+            messages.error(request, f"Error en alta de la reserva: {form_reserva.errors} {form_cliente.errors}")
 
 
     else:
@@ -535,7 +537,7 @@ def alta_reserva(request):
         form_cliente = ClienteForm(instance=cliente)
 
         #form_reserva.fields['idCliente']
-        form_reserva.fields['idHabitacion'].widget.attrs['disabled'] = 'readonly'
+        form_reserva.fields['idHabitacion'].widget.attrs['disabled'] = 'disabled'
 
     return render(request, 'nuevareserva.html', {'form_reserva': form_reserva, 'form_cliente': form_cliente})
 
