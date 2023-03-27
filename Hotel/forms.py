@@ -67,6 +67,15 @@ class ReservaForm(forms.ModelForm):
         self.fields['incluyeDesayuno'].initial = True
         #self.fields['idCliente'].required = False
 
+    def clean(self):
+        cleaned_data = super().clean()
+        fechaDesde = cleaned_data.get('fechaIngreso')
+        fechaHasta = cleaned_data.get('fechaEgreso')
+
+        if fechaDesde and fechaHasta:
+            if fechaDesde > fechaHasta:
+                raise forms.ValidationError('La fecha de ingreso debe ser menor a la de egreso')
+
 
 class CancelacionReservaForm(forms.Form):
     idReserva = forms.IntegerField(widget=forms.HiddenInput)
@@ -134,6 +143,9 @@ class ListaPrecioForm(forms.ModelForm):
 
         if vigenciaDesde and vigenciaHasta:
             # Verificamos si ya existe una lista de precios para las fechas seleccionadas
+
+            if vigenciaDesde > vigenciaHasta:
+                raise forms.ValidationError('La fecha de inicio de vigencia debe ser menor a la de finalización')
 
             listasExistentes = ListaPrecio.objects.filter(
                 Q(vigenciaDesde__range=(vigenciaDesde, vigenciaHasta)) |
