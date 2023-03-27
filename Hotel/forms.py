@@ -29,9 +29,9 @@ class HabitacionForm(forms.ModelForm):
             'esPlantaBaja': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-            self.fields['idEstado'].initial = "LIS"
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['idEstado'].initial = "LIS"
 
 
 class FiltrosReservaForm(forms.Form):

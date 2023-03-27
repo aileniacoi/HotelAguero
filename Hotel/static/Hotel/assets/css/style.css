@@ -884,3 +884,7 @@ h6 {
   --bs-tooltip-bg: #FFF2B8;
   --bs-tooltip-color: #000000;
 }
+
+.pointer {
+    cursor: pointer;
+}

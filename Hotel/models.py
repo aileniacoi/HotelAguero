@@ -18,8 +18,8 @@ class Habitacion(models.Model):
     ]
     numero = models.IntegerField()
     plazas = models.IntegerField()
-    esPlantaBaja = models.BooleanField(verbose_name='Planta baja')
     idEstado = models.CharField(choices=ESTADO, verbose_name='Estado', max_length=3)
+    esPlantaBaja = models.BooleanField(verbose_name='Planta baja')
 
     def __str__(self):
         return str(self.numero)

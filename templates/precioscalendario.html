@@ -121,6 +121,10 @@ function CargarCalendario(){
         calendarCell.textContent = calendarDays[row][col];
         calendarCell.classList.add(claseTipoLista)
 
+        if (claseTipoLista){
+            calendarCell.classList.add("pointer")
+        }
+
         calendarRow.appendChild(calendarCell);
       }
       calendarBody.appendChild(calendarRow);
