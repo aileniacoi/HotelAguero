@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 from Hotel.views import ReservasDetalleView, ReporteReservasPDF, HabitacionesDisponiblesView, HabitacionesView, \
     ClientesView, ReservasView, ListaPrecioView, MovimientosCajaView, ReporteReservasCalendarioPDF, ListaPrecioBajaView, \
-    CajaBajaView, helppage
+    CajaBajaView, helppage, ListaPrecioPDF
 
 
 
@@ -69,6 +69,7 @@ urlpatterns = [
     #REPORTES
     path('reporte_reservas_pdf/', ReporteReservasPDF.as_view(), name="reporte_reservas_pdf"),
     path('reporte_caja_pdf/', views.ReporteCajaPDF, name="reporte_caja_pdf"),
+    path('lista_precio_pdf/', ListaPrecioPDF.as_view(), name="lista_precio_pdf"),
     path('calendario_reservas_pdf/<int:mes>/<int:anio>/', ReporteReservasCalendarioPDF, name="calendario_reservas_pdf"),
 
     #PAGINA DE AYUDA

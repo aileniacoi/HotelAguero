@@ -897,6 +897,80 @@ class ReporteReservasPDF(View):
         detalle_orden.drawOn(pdf, 60, y)
 
 
+class ListaPrecioPDF(View):
+
+    def cabecera(self, pdf):
+        archivo_imagen = os.path.join(settings.BASE_DIR, '/HotelAguero/Hotel/static/Hotel/logo-ha-rep.jpg')
+        pdf.drawImage(archivo_imagen, 40, 740, 120, 90, preserveAspectRatio=True)
+        pdf.setFont("Helvetica", 16)
+        pdf.drawString(230, 790, u"HOTEL AGÜERO")
+        pdf.setFont("Helvetica", 14)
+        pdf.drawString(200, 770, u"REPORTE DE RESERVAS")
+
+    def get(self, request, *args, **kwargs):
+        response = HttpResponse(content_type='application/pdf')
+        buffer = BytesIO()
+        pdf = canvas.Canvas(buffer)
+
+        self.cabecera(pdf)
+        y = 680
+        self.tabla(pdf, y)
+
+        pdf.showPage()
+        pdf.save()
+        pdf = buffer.getvalue()
+        buffer.close()
+        response.write(pdf)
+        return response
+
+    def tabla(self, pdf, y):
+
+        #encabezados = ('', 'Temporada baja', 'Temporada media', 'Temporada alta')
+
+        ultimas_listas = []
+        for tipo, _ in ListaPrecio.TIPOLISTA:
+            ultima_lista = ListaPrecio.objects.filter(idTipoLista=tipo).order_by('-vigenciaDesde').first()
+            if ultima_lista:
+                ultimas_listas.append(ultima_lista)
+
+        encabezados = [''] + [opciones[1] for opciones in ListaPrecio.TIPOLISTA]
+
+        # Crear el contenido de la tabla
+        detalles = []
+
+        detallesLista = DetalleListaPrecio.objects.filter(idListaPrecio__in=ultimas_listas)
+        print(detallesLista)
+        cantidadPersonas = detallesLista.distinct().values_list('cantidadPersonas', flat=True)
+        for cant in cantidadPersonas:
+            fila = [str(cant) + " pax"]
+
+            for tipo, _ in ListaPrecio.TIPOLISTA:
+                lista = [l for l in ultimas_listas if l.idTipoLista == tipo][-1]
+                precio = lista.detallelistaprecio_set.filter(cantidadPersonas=cant).first()
+                fila.append('$ {}'.format(precio.precioPorDia) if precio else '-')
+            detalles.append(fila)
+
+            # for lista in ultimas_listas:
+            #     precio = lista.detallelistaprecio_set.filter(cantidadPersonas=cant).first()
+            #     fila.append('$ {}'.format(precio.precioPorDia) if precio else '-')
+            # detalles.append(fila)
+
+        detalle_orden = Table([encabezados] + detalles, colWidths=[1.5 * cm, 4 * cm, 4 * cm, 4 * cm])
+        detalle_orden.setStyle(TableStyle(
+            [
+                ('ALIGN', (0, 0), (3, 0), 'CENTER'),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                ('FONTSIZE', (0, 0), (-1, -1), 10),
+            ]
+        ))
+        detalle_orden.wrapOn(pdf, 800, 600)
+        alto_tabla = detalle_orden._height
+
+        y = y - alto_tabla
+
+        detalle_orden.drawOn(pdf, 60, y)
+
+
 def ReporteReservasCalendarioPDF(request, mes, anio):
 
     response = HttpResponse(content_type='application/pdf')
