@@ -65,7 +65,7 @@ class ReservaForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['fechaRegistro'].initial = datetime.now().date()
         self.fields['incluyeDesayuno'].initial = True
-        #self.fields['idCliente'].required = False
+        self.fields['idCliente'].required = False
 
     def clean(self):
         cleaned_data = super().clean()

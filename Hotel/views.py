@@ -47,6 +47,7 @@ from django.contrib import messages
 
 from django.core.cache import cache
 import requests
+from django.contrib.sessions.backends.cache import SessionStore
 
 # Create your views here.
 
@@ -622,7 +623,7 @@ def registrar_checkout(request, pk):
         pago = 0
 
         if valor_pago:
-            pago = int(request.POST['pagoSaldo'])
+            pago = int(valor_pago)
 
         fecha = datetime.now()
 
@@ -842,31 +843,37 @@ class MovimientosCajaView(ListView):
     model = MovimientoCaja
     paginate_by = 15
     context_object_name = 'cajaMov'
+    ordering = ['-fecha']
 
     def get_queryset(self):
         form = FiltrosCajaForm(self.request.GET or None)
+
         queryset = super().get_queryset()
         if form.is_valid():
             fecha_desde = form.cleaned_data['fechaDesde']
             fecha_hasta = form.cleaned_data['fechaHasta']
             ingresos = form.cleaned_data['ingresos']
             egresos = form.cleaned_data['egresos']
-            if fecha_desde and fecha_hasta:
-                queryset = queryset.filter(fecha__range=(fecha_desde, fecha_hasta))
-            elif fecha_desde:
+            # if fecha_desde and fecha_hasta:
+            #     queryset = queryset.filter(fecha__range=(fecha_desde, fecha_hasta))
+            if fecha_desde:
                 queryset = queryset.filter(fecha__gte=fecha_desde)
-            elif fecha_hasta:
+            if fecha_hasta:
                 queryset = queryset.filter(fecha__lte=fecha_hasta)
             if not ingresos:
                 queryset = queryset.exclude(idTipoMovimiento="IN")
             if not egresos:
                 queryset = queryset.exclude(idTipoMovimiento="EG")
+
         return queryset
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = FiltrosCajaForm(self.request.GET or None)
+
         return context
+
 
 @csrf_exempt
 def caja_edit(request, pk=None):
