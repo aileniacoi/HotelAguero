@@ -41,6 +41,8 @@ urlpatterns = [
     path('reservas/viewdetail/<int:pk>/', ReservasDetalleView.as_view(), name='detalleReserva'),
     path('reservas/delete/<int:pk>/', ReservasDetalleView.as_view(), name='deleteReserva'),
     path('reservas/cancel/<int:pk>/', views.cancelar_reserva, name='deleteReserva'),
+    path('reservas/checkin/<int:pk>/', views.registrar_checkin, name='checkinReserva'),
+    path('reservas/checkout/<int:pk>/', views.registrar_checkout, name='checkoutReserva'),
 
 
     #LISTAS DE PRECIO

@@ -162,8 +162,12 @@
                                                     <tbody>
                                                     {% for ing in ingresos %}
                                                     <tr>
-                                                        <td><img src="{% static 'Hotel/check-in.png' %}" style="width:23px;" class="pointer"
-                                                            data-bs-toggle="tooltip" data-bs-placement="bottom" title="Registrar check-in"></td>
+                                                        <td>
+                                                            <a href="#" class="check-in" data-id="{{ ing.pk }}">
+                                                                <img src="{% static 'Hotel/check-in.png' %}" style="width:23px;" class="pointer"
+                                                                data-bs-toggle="tooltip" data-bs-placement="bottom" title="Registrar check-in">
+                                                            </a>
+                                                        </td>
                                                         <td>{{ ing.idHabitacion }}</td>
                                                         <td>{{ ing.cantidadPersonas }}</td>
                                                         <td>{{ ing.idCliente.nombreYApellido }}</td>
@@ -193,8 +197,13 @@
                                                     <tbody>
                                                     {% for eg in egresos %}
                                                     <tr>
-                                                        <td><img src="{% static 'Hotel/check-out.png' %}" style="width:23px;" class="pointer"
-                                                            data-bs-toggle="tooltip" data-bs-placement="bottom" title="Registrar check-out"></td>
+                                                        <td>
+                                                            <a href="#" class="check-out" data-id="{{ eg.pk }}">
+                                                                <img src="{% static 'Hotel/check-out.png' %}" style="width:23px;" class="pointer"
+                                                            data-bs-toggle="tooltip" data-bs-placement="bottom" title="Registrar check-out">
+                                                            </a>
+                                                        </td>
+
                                                         <td>{{ eg.idHabitacion }}</td>
                                                         <td>{{ eg.cantidadPersonas }}</td>
                                                         <td>{{ eg.idCliente.nombreYApellido }}</td>
@@ -299,6 +308,39 @@
 
         </div>
     </div>
+
+    <div class="modal fade" id="checkin-modal" tabindex="-1" role="dialog" aria-labelledby="checkin-modal-label">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="checkin-modal-label" >Confirmar Check-In</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true"></span></button>
+      </div>
+      <div class="modal-body py-0">
+
+
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+    <div class="modal fade" id="checkout-modal" tabindex="-1" role="dialog" aria-labelledby="checkout-modal-label">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="checkout-modal-label" >Confirmar Check-Out</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true"></span></button>
+      </div>
+      <div class="modal-body py-0">
+
+
+
+      </div>
+    </div>
+  </div>
+</div>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
@@ -436,6 +478,69 @@
 				}
 			}
 		});
+
+
+$(document).ready(function() {
+  $('.check-in').click(function() {
+    var idRes = $(this).data('id');
+    var url = "/reservas/checkin/" + idRes + "/";
+    $.get(url, function(data) {
+      $('#checkin-modal .modal-body').html(data);
+      $('#checkin-modal').modal('show');
+    });
+  });
+});
+
+$(document).on('submit', '#checkin-form', function(e) {
+    e.preventDefault();
+    var form = $(this);
+    var url = form.attr('action');
+    console.log(url)
+    $.ajax({
+        type: 'POST',
+        url: url,
+        data: form.serialize(),
+        success: function(data) {
+                $('#checkin-modal').modal('hide');
+                location.reload();
+
+        },
+        error: function(xhr, status, error) {
+            alert('Error: ' + error);
+        }
+    });
+});
+
+$(document).ready(function() {
+  $('.check-out').click(function() {
+    var idRes = $(this).data('id');
+    var url = "/reservas/checkout/" + idRes + "/";
+    $.get(url, function(data) {
+      $('#checkout-modal .modal-body').html(data);
+      $('#checkout-modal').modal('show');
+    });
+  });
+});
+
+$(document).on('submit', '#checkout-form', function(e) {
+    e.preventDefault();
+    var form = $(this);
+    var url = form.attr('action');
+    console.log(url)
+    $.ajax({
+        type: 'POST',
+        url: url,
+        data: form.serialize(),
+        success: function(data) {
+                $('#checkout-modal').modal('hide');
+                location.reload();
+
+        },
+        error: function(xhr, status, error) {
+            alert('Error: ' + error);
+        }
+    });
+});
 
 </script>
 

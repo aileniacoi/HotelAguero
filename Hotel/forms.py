@@ -1,7 +1,7 @@
 from django import forms
 from datetime import datetime
 from .models import Cliente, Reserva, Habitacion, MovimientoCaja, ListaPrecio, DetalleListaPrecio
-from django.db.models import Q
+from django.db.models import Q, Sum
 
 
 class ClienteForm(forms.ModelForm):
@@ -81,11 +81,78 @@ class CancelacionReservaForm(forms.Form):
     idReserva = forms.IntegerField(widget=forms.HiddenInput)
     fecha = forms.DateField(required=True, label='Fecha', initial=datetime.now().date(), widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}))
     montoDevuelto = forms.IntegerField(required=False, label='Monto devuelto', widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    formaPago = forms.CharField(label='Forma de pago', widget=forms.Select(choices=[('', '-------')] + MovimientoCaja.FORMAPAGO, attrs={'class': 'form-control'}), required=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         idReserva = self.initial.get('idReserva')
         self.fields['montoDevuelto'].initial = 0
+
+
+class RegistroCheckInForm(forms.Form):
+    idReserva = forms.IntegerField(widget=forms.HiddenInput)
+    nombreCliente = forms.CharField(label='Cliente', widget=forms.TextInput(attrs={'class': 'form-control form-control-plaintext', 'readonly': 'readonly'}))
+    dniCliente = forms.CharField(label='DNI', widget=forms.TextInput(attrs={'class': 'form-control form-control-plaintext', 'readonly': 'readonly'}))
+    habitacion = forms.IntegerField(label='Habitación', widget=forms.TextInput(attrs={'class': 'form-control form-control-plaintext', 'readonly': 'readonly'}))
+    cantidadPesonas = forms.IntegerField(label='Pax', widget=forms.TextInput(attrs={'class': 'form-control form-control-plaintext', 'readonly': 'readonly'}))
+    saldo = forms.IntegerField(label='Saldo', widget=forms.TextInput(attrs={'class': 'form-control form-control-plaintext', 'readonly': 'readonly'}))
+    pagoSaldo = forms.IntegerField(required=False, label='Pago', widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    formaPago = forms.CharField(label='Forma de pago', widget=forms.Select(choices=[('', '-------')] + MovimientoCaja.FORMAPAGO, attrs={'class': 'form-control'}))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        idReserva = self.initial.get('idReserva')
+        reserva = Reserva.objects.get(pk=idReserva)
+        cliente = reserva.idCliente
+
+        pagosReserva = MovimientoCaja.objects.filter(idReserva=reserva.pk)
+
+        suma_pagos = pagosReserva.aggregate(valor_total=Sum('monto'))
+        if suma_pagos['valor_total']:
+            suma_pagos = suma_pagos['valor_total']
+        else:
+            suma_pagos = 0
+
+        self.fields['nombreCliente'].initial = cliente.nombreYApellido
+        self.fields['dniCliente'].initial = cliente.dni
+        self.fields['habitacion'].initial = reserva.idHabitacion.numero
+        self.fields['cantidadPesonas'].initial = reserva.cantidadPersonas
+        self.fields['saldo'].initial = reserva.precioTotal - suma_pagos
+        self.fields['pagoSaldo'].initial = 0
+
+
+class RegistroCheckOutForm(forms.Form):
+    idReserva = forms.IntegerField(widget=forms.HiddenInput)
+    nombreCliente = forms.CharField(label='Cliente', widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}))
+    habitacion = forms.IntegerField(label='Habitación', widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}))
+    saldo = forms.IntegerField(label='Saldo', widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}))
+    pagoSaldo = forms.IntegerField(required=False, label='Pago', widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    formaPago = forms.CharField(label='Forma de pago', widget=forms.Select(choices=[('', '-------')] + MovimientoCaja.FORMAPAGO, attrs={'class': 'form-control'}))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        idReserva = self.initial.get('idReserva')
+        reserva = Reserva.objects.get(pk=idReserva)
+        cliente = reserva.idCliente
+
+        pagosReserva = MovimientoCaja.objects.filter(idReserva=reserva.pk)
+
+        suma_pagos = pagosReserva.aggregate(valor_total=Sum('monto'))
+        if suma_pagos['valor_total']:
+            suma_pagos = suma_pagos['valor_total']
+        else:
+            suma_pagos = 0
+
+        saldo = reserva.precioTotal - suma_pagos
+
+        if saldo > 0:
+            self.fields['saldo'].initial = saldo
+            self.fields['pagoSaldo'].initial = 0
+
+        self.fields['nombreCliente'].initial = cliente.nombreYApellido
+        self.fields['habitacion'].initial = reserva.idHabitacion.numero
+
+
 
 class CajaForm(forms.ModelForm):
     class Meta:

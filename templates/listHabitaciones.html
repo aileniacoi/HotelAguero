@@ -56,9 +56,9 @@
         </tr>
         {% for hab in habitaciones %}
         <tr>
-            <td class="pointer" onclick="ViewItem({{ hab.pk }})">{{ hab.numero }}</td>
-            <td class="pointer" onclick="ViewItem({{ hab.pk }})">{{ hab.plazas }}</td>
-            <td class="pointer" onclick="ViewItem({{ hab.pk }})">
+            <td onclick="ViewItem({{ hab.pk }})">{{ hab.numero }}</td>
+            <td onclick="ViewItem({{ hab.pk }})">{{ hab.plazas }}</td>
+            <td onclick="ViewItem({{ hab.pk }})">
                 {{ hab.get_idEstado_display }}
             </td>
 

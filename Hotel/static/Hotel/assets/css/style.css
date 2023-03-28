@@ -888,3 +888,9 @@ h6 {
 .pointer {
     cursor: pointer;
 }
+
+.form-inline .form-control {
+  display: inline-block;
+  width: auto;
+  vertical-align: middle;
+}

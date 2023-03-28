@@ -1,0 +1,20 @@
+    <form method="post" id="checkout-form" class="form-inline" action="/reservas/checkout/{{ reserva.pk }}/">
+        {% csrf_token %}
+
+        <p>Confirmar check-out del cliente {{ form_checkout.nombreCliente.value }} de la habitación {{ form_checkout.habitacion.value }}</p>
+
+        {% if form_checkout.saldo.value and form_checkout.saldo.value > 0 %}
+
+        <p>La reserva registra una deuda de {{ form_checkout.saldo.value }}</p>
+
+        <div>Pago: {{ form_checkout.pagoSaldo }}</div>
+        <br>
+        <div>Forma de pago: {{ form_checkout.formaPago }}</div>
+
+        {% endif %}
+
+      <div class="modal-footer flex-column border-top-0">
+        <button type="submit" class="btn btn-lg btn-success w-100 mx-0 mb-2">Confirmar</button>
+        <button type="button" class="btn btn-lg btn-light w-100 mx-0" data-bs-dismiss="modal" >Volver</button>
+      </div>
+    </form>

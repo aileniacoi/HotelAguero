@@ -8,7 +8,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.forms import inlineformset_factory
 from .forms import ClienteForm, HabitacionForm, ReservaForm, CajaForm, ListaPrecioForm, DetalleListaPrecioForm, \
-    ListaPrecioDetalleInlineFormset, FiltrosCajaForm, FiltrosReservaForm, CancelacionReservaForm, FiltrosListaPrecio
+    ListaPrecioDetalleInlineFormset, FiltrosCajaForm, FiltrosReservaForm, CancelacionReservaForm, FiltrosListaPrecio, \
+    RegistroCheckInForm, RegistroCheckOutForm
 from .serializers import ReservaSerializer, HabitacionSerializer, ClienteSerializer, PreciosSerializer, PreciosDetalleSerializer
 
 from rest_framework.views import APIView
@@ -86,12 +87,15 @@ def index(request):
     ingresos = Reserva.objects.filter(fechaIngreso=hoy)
     egresos = Reserva.objects.filter(fechaEgreso=hoy)
 
+    ingresosHoy = ingresos.filter(realizoCheckIn=False)
+    egresosHoy = egresos.filter(realizoCheckOut=False)
+
     ingresosManiana = Reserva.objects.filter(fechaIngreso=maniana)
     egresosManiana = Reserva.objects.filter(fechaEgreso=maniana)
 
     pagos = MovimientoCaja.objects.filter(idReserva__isnull=False)
 
-    for ingreso in ingresos:
+    for ingreso in ingresosHoy:
         pagosReserva = pagos.filter(idReserva=ingreso)
         suma_pagos = pagosReserva.aggregate(valor_total=Sum('monto'))
         if suma_pagos['valor_total']:
@@ -102,7 +106,7 @@ def index(request):
         ingreso.saldo= ingreso.precioTotal - suma_pagos
         ingreso.reserva_sin_senia = suma_pagos == 0
 
-    for egreso in egresos:
+    for egreso in egresosHoy:
         pagosReserva = pagos.filter(idReserva=egreso)
         suma_pagos = pagosReserva.aggregate(valor_total=Sum('monto'))
         if suma_pagos['valor_total']:
@@ -159,7 +163,9 @@ def index(request):
     else:
         cantidadDesayunosManiana = 0
 
-    for reserva in reservasActuales:
+    ocupacionHoy = reservasActuales.union(ingresos.filter(realizoCheckIn=True))
+
+    for reserva in ocupacionHoy:
         pagosReserva = pagos.filter(idReserva=reserva)
         suma_pagos = pagosReserva.aggregate(valor_total=Sum('monto'))
         if suma_pagos['valor_total']:
@@ -186,9 +192,9 @@ def index(request):
     lista_precio = ListaPrecio.objects.filter(Q(vigenciaDesde__lte=hoy) & Q(vigenciaHasta__gte=hoy))[0]
     detalle_precios = DetalleListaPrecio.objects.filter(idListaPrecio=lista_precio)
 
-    context = {'ingresos': ingresos, 'egresos': egresos, 'cantidadHabitaciones':cantidadHabitaciones,
+    context = {'ingresos': ingresosHoy, 'egresos': egresosHoy, 'cantidadHabitaciones':cantidadHabitaciones,
                'ingresosManiana': ingresosManiana, 'egresosManiana': egresosManiana, 'habitacionesPorEstado': habitacionesPorEstado,
-               'habitacionesDisponibles': habitaciones_disponibles, 'reservasActuales': reservasActuales,
+               'habitacionesDisponibles': habitaciones_disponibles, 'reservasActuales': ocupacionHoy,
                'cantidadDesayunosHoy': cantidadDesayunos, 'cantidadDesayunosManiana': cantidadDesayunosManiana,
                'detallePrecios': detalle_precios, 'dolarMayorista': compra_mayorista}
 
@@ -559,7 +565,7 @@ def cancelar_reserva(request, pk):
                                         idTipoMovimiento='EG',
                                         idConcepto='DEV',
                                         monto=montoDevuelto,
-                                        idFormaPago='TRA')
+                                        idFormaPago=request.POST['formaPago'])
             devolucion.save()
 
         return JsonResponse({'success': True})
@@ -567,6 +573,73 @@ def cancelar_reserva(request, pk):
     else:
         form_cancel = CancelacionReservaForm(initial={'idReserva': reserva.pk})
         return render(request, 'cancelreserva.html', {'form_cancel': form_cancel, 'reserva': reserva})
+
+
+def registrar_checkin(request, pk):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    reserva = get_object_or_404(Reserva, pk=pk)
+    if request.method == 'POST':
+        reserva.realizoCheckIn = True
+        reserva.save()
+
+        habitacion = reserva.idHabitacion
+        habitacion.idEstado = 'OCU'
+        habitacion.save()
+
+        pago = int(request.POST['pagoSaldo'])
+        fecha = datetime.now()
+
+        if pago > 0:
+            saldo = MovimientoCaja(idReserva=reserva,
+                                    fecha=fecha,
+                                    idTipoMovimiento='IN',
+                                    idConcepto='SAL',
+                                    monto=pago,
+                                    idFormaPago=request.POST['formaPago'])
+            saldo.save()
+
+        return JsonResponse({'success': True})
+
+    else:
+        form_checkin = RegistroCheckInForm(initial={'idReserva': reserva.pk})
+        return render(request, 'checkin.html', {'form_checkin': form_checkin, 'reserva': reserva})
+
+
+def registrar_checkout(request, pk):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    reserva = get_object_or_404(Reserva, pk=pk)
+    if request.method == 'POST':
+        reserva.realizoCheckOut = True
+        reserva.save()
+
+        habitacion = reserva.idHabitacion
+        habitacion.idEstado = 'LIM'
+        habitacion.save()
+
+        valor_pago = request.POST.get('pagoSaldo')
+        pago = 0
+
+        if valor_pago:
+            pago = int(request.POST['pagoSaldo'])
+
+        fecha = datetime.now()
+
+        if pago > 0:
+            saldo = MovimientoCaja(idReserva=reserva,
+                                    fecha=fecha,
+                                    idTipoMovimiento='IN',
+                                    idConcepto='SAL',
+                                    monto=pago,
+                                    idFormaPago=request.POST['formaPago'])
+            saldo.save()
+
+        return JsonResponse({'success': True})
+
+    else:
+        form_checkin = RegistroCheckOutForm(initial={'idReserva': reserva.pk})
+        return render(request, 'checkout.html', {'form_checkout': form_checkin, 'reserva': reserva})
 
 
 
