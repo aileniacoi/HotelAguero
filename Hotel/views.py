@@ -46,7 +46,7 @@ from django.utils.decorators import method_decorator
 from django.contrib import messages
 
 from django.core.cache import cache
-import requests
+
 from django.contrib.sessions.backends.cache import SessionStore
 
 # Create your views here.

@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'Hotel',
     'WebHotel',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
