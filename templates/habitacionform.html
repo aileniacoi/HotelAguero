@@ -15,7 +15,6 @@
       </nav>
     </div><!-- End Page Title -->
 
- <div class="">
 
     {% if messages %}
         {% for message in messages %}
@@ -29,7 +28,16 @@
         {% endfor %}
     {% endif %}
 
+{% if form.non_field_errors %}
+    <div class="row">
+        {% for error in form.non_field_errors %}
+        <div class="alert alert-danger alert-dismissible col-md-6" role="alert">
+            {{ error|safe }}
+        </div>
+        {% endfor %}
 
+    </div>
+{% endif %}
 
         <div class="col-md-3 offset-md-0 m-0">
         <div class="card">
@@ -37,19 +45,46 @@
               <h5 class="card-title">Agregar habitacion</h5>
         <form method="post">
             {% csrf_token %}
-            <div class="row">
-                <div class="col-md-12">
-                    {{ form.as_p }}
+
+             <div class="row" style="margin-top: 15px">
+                    <div class="col-md-12">
+                    <label>Numero:</label>
+                    {{ form.numero}}
+                    </div>
                 </div>
 
-            </div>
-            <div class="text-center">
+                <div class="row" style="margin-top: 15px">
+                    <div class="col-md-12">
+                    <label>Plazas:</label>
+                    {{ form.plazas }}
+                </div>
+                </div>
+                <div class="row" style="margin-top: 15px">
+                    <div class="col-md-12">
+                    <label>Estado:</label>
+                    {{ form.idEstado}}
+                    </div>
+                </div>
+                    <div class="row" style="margin-top: 15px">
+                    <div class="col-md-12">
+                    <label>Planta baja:</label>
+                    {{ form.esPlantaBaja}}
+                </div>
+                    </div>
+            <br>
+            <div class="row">
+                <div class="col-12">
+                    <div class="text-center">
                 <a type="button" class="btn btn-primary" href="/habitaciones/" >Volver</a>
             <input type="submit" class="btn btn-success">
             </div>
+                </div>
+            </div>
+
         </form>
             </div>
     </div>
+        </div>
 
 </main>
 {% endblock %}

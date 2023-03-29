@@ -33,6 +33,19 @@ class HabitacionForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['idEstado'].initial = "LIS"
 
+    def clean(self):
+        cleaned_data = super().clean()
+        numero = cleaned_data.get('numero')
+
+        if numero:
+
+            habExistente = Habitacion.objects.filter(numero=numero).exclude(pk=self.instance.pk)
+
+            if habExistente.exists():
+
+                raise forms.ValidationError('Ya existe una habitación con el mismo número')
+
+
 
 class FiltrosReservaForm(forms.Form):
     fechaDesde = forms.DateField(required=False, widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}))

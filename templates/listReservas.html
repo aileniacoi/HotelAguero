@@ -16,19 +16,17 @@
     </div><!-- End Page Title -->
 
 <div class="container-fluid my-3">
-   <div class="row">
+   <div class="row justify-content-between">
        <div class="col-md-9">
             <h3 class="m-3" style ="float:left;">Reservas</h3>
 
        </div>
-       <div class="col-md-2">
-
-            <a class="btn btn-success" href="/reservas/add" style="float: right;"><i class="fa-solid fa-plus"></i> Agregar</a>
-       </div>
-       <div class="col-md-1">
-            <a href="{% url 'reporte_reservas_pdf' %}" class="btn btn-secondary btn-block" style="float: right;">
+       <div class="col-md-3">
+            <a href="{% url 'reporte_reservas_pdf' %}" class="btn btn-secondary btn-block" style="float: right; margin-left:15px;">
                 <i class="fa-regular fa-file-pdf"></i> PDF
             </a>
+            <a class="btn btn-success" href="/reservas/add" style="float: right;"><i class="fa-solid fa-plus"></i> Agregar</a>
+
         </div>
    </div>
 

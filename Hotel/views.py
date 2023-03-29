@@ -47,7 +47,9 @@ from django.contrib import messages
 
 from django.core.cache import cache
 
+import requests
 from django.contrib.sessions.backends.cache import SessionStore
+from django.templatetags.static import static
 
 # Create your views here.
 
@@ -933,7 +935,7 @@ def agregar_pago_reserva(request, reserva_id):
 class ReporteReservasPDF(View):
 
     def cabecera(self, pdf):
-        archivo_imagen = os.path.join(settings.BASE_DIR, '/HotelAguero/Hotel/static/Hotel/logo-ha-rep.jpg')
+        archivo_imagen = os.path.join(settings.BASE_DIR,'Hotel', 'static', 'Hotel', 'logo-ha-rep.jpg')
         pdf.drawImage(archivo_imagen, 40, 740, 120, 90, preserveAspectRatio=True)
         pdf.setFont("Helvetica", 16)
         pdf.drawString(230, 790, u"HOTEL AGÜERO")
@@ -982,7 +984,7 @@ class ReporteReservasPDF(View):
 class ListaPrecioPDF(View):
 
     def cabecera(self, pdf):
-        archivo_imagen = os.path.join(settings.BASE_DIR, '/HotelAguero/Hotel/static/Hotel/logo-ha-rep.jpg')
+        archivo_imagen = os.path.join(settings.BASE_DIR,'Hotel', 'static', 'Hotel', 'logo-ha-rep.jpg')
         pdf.drawImage(archivo_imagen, 40, 740, 120, 90, preserveAspectRatio=True)
         pdf.setFont("Helvetica", 16)
         pdf.drawString(230, 790, u"HOTEL AGÜERO")
@@ -1062,7 +1064,7 @@ def ReporteReservasCalendarioPDF(request, mes, anio):
     locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
     fecha = date(anio, mes, 1)
 
-    archivo_imagen = os.path.join(settings.BASE_DIR, '/HotelAguero/Hotel/static/Hotel/logo-ha-rep.jpg')
+    archivo_imagen = os.path.join(settings.BASE_DIR,'Hotel', 'static', 'Hotel', 'logo-ha-rep.jpg')
     pdf.drawImage(archivo_imagen, 100, 490, 120, 90, preserveAspectRatio=True)
     pdf.setFont("Helvetica", 16)
     pdf.drawString(350, 540, u"HOTEL AGÜERO")
@@ -1179,7 +1181,7 @@ def ReporteCajaPDF(request):
 
     alto_encabezado = 50
 
-    archivo_imagen = os.path.join(settings.BASE_DIR, '/HotelAguero/Hotel/static/Hotel/logo-ha-rep.jpg')
+    archivo_imagen = os.path.join(settings.BASE_DIR,'Hotel', 'static', 'Hotel', 'logo-ha-rep.jpg')
     # pdf.drawImage(archivo_imagen, 40, 740, 120, 90, preserveAspectRatio=True)
     # pdf.setFont("Helvetica", 16)
     # pdf.drawString(230, 790, u"HOTEL AGÜERO")
