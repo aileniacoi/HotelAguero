@@ -94,7 +94,7 @@ class CancelacionReservaForm(forms.Form):
     idReserva = forms.IntegerField(widget=forms.HiddenInput)
     fecha = forms.DateField(required=True, label='Fecha', initial=datetime.now().date(), widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}))
     montoDevuelto = forms.IntegerField(required=False, label='Monto devuelto', widget=forms.NumberInput(attrs={'class': 'form-control'}))
-    formaPago = forms.CharField(label='Forma de pago', widget=forms.Select(choices=[('', '-------')] + MovimientoCaja.FORMAPAGO, attrs={'class': 'form-control'}), required=True)
+    formaPago = forms.CharField(label='Forma de pago', widget=forms.Select(choices=[('', '-------')] + MovimientoCaja.FORMAPAGO, attrs={'class': 'form-control'}), required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -168,7 +168,11 @@
                                                                 data-bs-toggle="tooltip" data-bs-placement="bottom" title="Registrar check-in">
                                                             </a>
                                                         </td>
-                                                        <td>{{ ing.idHabitacion }}</td>
+                                                        {% if ing.idHabitacion is None %}
+                                                            <td class="text-warning" style="font-size:23"><i class="fa-solid fa-triangle-exclamation"></i></td>
+                                                        {% else %}
+                                                            <td>{{ ing.idHabitacion }}</td>
+                                                        {% endif %}
                                                         <td>{{ ing.cantidadPersonas }}</td>
                                                         <td>{{ ing.idCliente.nombreYApellido }}</td>
                                                         <td {% if ing.saldo > 0 %} class="text-danger" {% endif %}> ${{ ing.saldo }}</td>
@@ -204,7 +208,11 @@
                                                             </a>
                                                         </td>
 
-                                                        <td>{{ eg.idHabitacion }}</td>
+                                                        {% if eg.idHabitacion is None %}
+                                                            <td class="text-warning" style="font-size:23"><i class="fa-solid fa-triangle-exclamation"></i></td>
+                                                        {% else %}
+                                                            <td>{{ eg.idHabitacion }}</td>
+                                                        {% endif %}
                                                         <td>{{ eg.cantidadPersonas }}</td>
                                                         <td>{{ eg.idCliente.nombreYApellido }}</td>
                                                         <td {% if eg.saldo > 0 %} class="text-danger" {% endif %}>
@@ -250,7 +258,11 @@
                                                     <tbody>
                                                     {% for ing in ingresosManiana %}
                                                     <tr>
-                                                        <td>{{ ing.idHabitacion }}</td>
+                                                        {% if ing.idHabitacion is None %}
+                                                            <td class="text-warning" style="font-size:23"><i class="fa-solid fa-triangle-exclamation"></i></td>
+                                                        {% else %}
+                                                            <td>{{ ing.idHabitacion }}</td>
+                                                        {% endif %}
                                                         <td>{{ ing.cantidadPersonas }}</td>
                                                         <td>{{ ing.idCliente.nombreYApellido }}</td>
                                                         <td {% if ing.saldo > 0 %} class="text-danger" {% endif %}> ${{ ing.saldo }}
@@ -279,7 +291,11 @@
                                                     <tbody>
                                                     {% for eg in egresosManiana %}
                                                     <tr>
-                                                        <td>{{ eg.idHabitacion }}</td>
+                                                        {% if eg.idHabitacion is None %}
+                                                            <td class="text-warning" style="font-size:23"><i class="fa-solid fa-triangle-exclamation"></i></td>
+                                                        {% else %}
+                                                            <td>{{ eg.idHabitacion }}</td>
+                                                        {% endif %}
                                                         <td>{{ eg.cantidadPersonas }}</td>
                                                         <td>{{ eg.idCliente.nombreYApellido }}</td>
                                                         <td {% if eg.saldo > 0 %} class="text-danger" {% endif %}>

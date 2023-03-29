@@ -87,14 +87,14 @@ def index(request):
     hoy = now.date()
     maniana = now + timedelta(days=1)
 
-    ingresos = Reserva.objects.filter(fechaIngreso=hoy)
-    egresos = Reserva.objects.filter(fechaEgreso=hoy)
+    ingresos = Reserva.objects.filter(Q(fechaIngreso=hoy) & Q(fechaCancelacion__isnull=True))
+    egresos = Reserva.objects.filter(Q(fechaEgreso=hoy) & Q(fechaCancelacion__isnull=True))
 
     ingresosHoy = ingresos.filter(realizoCheckIn=False)
     egresosHoy = egresos.filter(realizoCheckOut=False)
 
-    ingresosManiana = Reserva.objects.filter(fechaIngreso=maniana)
-    egresosManiana = Reserva.objects.filter(fechaEgreso=maniana)
+    ingresosManiana = Reserva.objects.filter(Q(fechaIngreso=maniana) & Q(fechaCancelacion__isnull=True))
+    egresosManiana = Reserva.objects.filter(Q(fechaEgreso=maniana) & Q(fechaCancelacion__isnull=True))
 
     pagos = MovimientoCaja.objects.filter(idReserva__isnull=False)
 
@@ -143,7 +143,7 @@ def index(request):
 
     cantidadHabitaciones = Habitacion.objects.count()
 
-    reservasActuales = Reserva.objects.filter(Q(fechaIngreso__lt=hoy) & Q(fechaEgreso__gt=hoy)).exclude(idHabitacion__isnull=True)
+    reservasActuales = Reserva.objects.filter(Q(fechaIngreso__lt=hoy) & Q(fechaEgreso__gt=hoy) & Q(fechaCancelacion__isnull=True)).exclude(idHabitacion__isnull=True)
 
     cantidadDesayunosQuery = Reserva.objects.filter(Q(fechaIngreso__lt=hoy) & Q(fechaEgreso__gte=hoy)).exclude(idHabitacion__isnull=True)\
         .aggregate(Sum('cantidadPersonas'))
@@ -1315,7 +1315,8 @@ def get_habitaciones_disponibles(fecha_ingreso, fecha_egreso, pk=None):
     habitaciones_ocupadas = Reserva.objects.exclude(pk=pk)\
                                            .filter((Q(fechaIngreso__range=[fecha_ingreso, fecha_egreso]) |
                                                    Q(fechaEgreso__range=[fecha_ingreso, fecha_egreso])) &
-                                                   Q(idHabitacion__isnull=False)) \
+                                                   Q(idHabitacion__isnull=False) &
+                                                   Q(fechaCancelacion__isnull=True)) \
         .values_list('idHabitacion', flat=True)
 
     if habitaciones_ocupadas.exists():
